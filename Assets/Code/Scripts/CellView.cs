@@ -1,11 +1,11 @@
 using UnityEngine;
 
 
-public class CellView : MonoBehaviour
+public class CellView : MonoBehaviour, IHighlightable
 {
     [SerializeField] private MeshRenderer meshRenderer;
     [SerializeField] private TMPro.TextMeshPro numberLabel;
-    [SerializeField] private Color highlightColor = Color.yellow; 
+    [SerializeField] private Color highlightColor = Color.green; 
 
     public CellCoord Coord {get; private set;}
 

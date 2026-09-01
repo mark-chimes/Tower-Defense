@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-
 public class CellController : MonoBehaviour
 {
     [SerializeField] private CellView cellPrefab;
@@ -12,18 +11,15 @@ public class CellController : MonoBehaviour
     [SerializeField] private Transform wallsParent;
     [SerializeField] private Wall wallPrefab;
 
-    // whether highlight stays on last hovered grid cell or gets cleared 
-    // when mouse cursor moves away
-    [SerializeField] private bool isHighlightSticky; 
-
     private GridCell[,] cells;
     private CellView[,] views;
     private Wall[,] wallObjects;
 
     private Camera cam;
-    private const float MAX_RAY_DISTANCE = 500f;
+    private const float MaxRayDistance = 500f;
 
-    private CellView hovered;
+    private CellView hoveredCell;
+    private IHighlightable highlighted;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -118,37 +114,42 @@ public class CellController : MonoBehaviour
     {
         if (Mouse.current == null) return;
 
-        HighlightHoveredCell();
+        HighlightAtHoveredCell();
         if (Mouse.current.leftButton.wasPressedThisFrame) PlaceWallAtHovered();
+        if (Mouse.current.rightButton.wasPressedThisFrame) DestroyWallAtHovered();
     }
 
-    private void HighlightHoveredCell()
+    private void HighlightAtHoveredCell()
     {
+        hoveredCell = RayCastForCell();
+        
+        IHighlightable target = null;
 
+        if (hoveredCell != null)
+        {
+            CellCoord c = hoveredCell.Coord;
+            Wall wall = wallObjects[c.X, c.Z];
+            target = (wall != null) ? wall : hoveredCell;
+        }
+
+        if (target == highlighted) return;
+        highlighted?.Unhighlight();
+        target?.Highlight();
+        highlighted = target;
+    }
+
+    private CellView RayCastForCell()
+    {
         Vector2 mousePos = Mouse.current.position.ReadValue();
         Ray ray = cam.ScreenPointToRay(mousePos);
-        CellView view = null;
-
-        if (Physics.Raycast(ray, out RaycastHit hit, MAX_RAY_DISTANCE))
-        {
-            view = hit.collider.GetComponentInParent<CellView>();
-        } else if (isHighlightSticky)
-        {
-            return;
-        }
-        
-        if (view == hovered) return;
-
-        if (hovered != null) hovered.Unhighlight();
-        if (view != null) view.Highlight();
-        hovered = view;
-    
+        if (!Physics.Raycast(ray, out RaycastHit hit, MaxRayDistance)) return null;
+        return hit.collider.GetComponentInParent<CellView>();
     }
 
     private void PlaceWallAtHovered()
     {
-        if (hovered == null) return;
-        CellCoord coord = hovered.Coord;
+        if (hoveredCell == null) return;
+        CellCoord coord = hoveredCell.Coord;
         if (wallObjects[coord.X, coord.Z] != null) return;
 
         GridCell cell = cells[coord.X, coord.Z];
@@ -159,5 +160,20 @@ public class CellController : MonoBehaviour
         wall.name = $"Wall_{coord.X}_{coord.Z}";
         wallObjects[coord.X,coord.Z] = wall;
 
+    }
+
+    private void DestroyWallAtHovered()
+    {
+        if (hoveredCell == null) return;
+        CellCoord coord = hoveredCell.Coord;
+
+        Wall wall = wallObjects[coord.X, coord.Z];
+        if (wall == null) return;
+
+        GridCell cell = cells[coord.X, coord.Z];
+        cell.HasWall = false;
+        wallObjects[coord.X, coord.Z] = null;
+        if (ReferenceEquals(highlighted, wall)) highlighted = null;
+        Destroy(wall.gameObject);
     }
 }
