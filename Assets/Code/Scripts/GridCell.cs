@@ -1,11 +1,9 @@
 public class GridCell
 {
-    public readonly int X;
-    public readonly int Z;
+    public readonly CellCoord Coord;
 
-    public GridCell(int x, int z) {
-        X = x;
-        Z = z;
+    public GridCell(CellCoord coord) {
+        this.Coord = coord;
     }
     
 }

@@ -8,6 +8,7 @@ public class CellController : MonoBehaviour
     [SerializeField] private float cellSizeMeters = 10f;
 
     private GridCell[,] cells;
+    private CellView[,] views;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -23,16 +24,16 @@ public class CellController : MonoBehaviour
         {
             for (int z = 0; z < height; z++)
             {
-                GridCell cell = new GridCell(x,z);
+                CellCoord coord = new CellCoord(x,z);
+                GridCell cell = new GridCell(coord);
                 cells[x,z] = cell;
 
-                Vector3 pos = CoordsCellToWorld(x,z);
-
                 CellView view = Instantiate(cellPrefab, transform); 
+                Vector3 pos = CoordsCellToWorld(coord);
                 view.transform.localPosition = pos;
-                view.name = $"Cell_{x}_{z}";
-                view.Initialize(x, z);
-
+                view.name = $"Cell_{coord.X}_{coord.Z}";
+                view.Initialize(coord);
+                views[x,z] = view;
             }
         }
     }
@@ -46,22 +47,16 @@ public class CellController : MonoBehaviour
         {
             for (int z = 0; z < height; z++)
             {
-                Gizmos.DrawWireCube(CoordsCellToWorld(x, z), size);
+                Gizmos.DrawWireCube(CoordsCellToWorld(new CellCoord(x,z)), size);
             }
         }
     }
 
     // Translate from cell coordinates to world coordinates
-    private Vector3 CoordsCellToWorld(int x, int z)
+    private Vector3 CoordsCellToWorld(CellCoord coord)
     {
-        float worldX = (x - (width-1) / 2f) * cellSizeMeters;
-        float worldZ = (z - (height-1) / 2f) * cellSizeMeters;
+        float worldX = (coord.X - (width-1) / 2f) * cellSizeMeters;
+        float worldZ = (coord.Z - (height-1) / 2f) * cellSizeMeters;
         return new Vector3(worldX, 0f, worldZ);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

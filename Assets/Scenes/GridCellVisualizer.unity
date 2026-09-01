@@ -291,9 +291,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CellController
   cellPrefab: {fileID: 428911081246246679, guid: cecf6f74b6087a1499f50fcadd62b46c, type: 3}
-  width: 7
+  width: 9
   height: 9
-  cellSize_meters: 10
+  cellSizeMeters: 10
 --- !u!1 &783511479
 GameObject:
   m_ObjectHideFlags: 0
@@ -586,7 +586,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 961469717666024025, guid: cecf6f74b6087a1499f50fcadd62b46c, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -59.7
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 961469717666024025, guid: cecf6f74b6087a1499f50fcadd62b46c, type: 3}
       propertyPath: m_LocalPosition.y
@@ -594,7 +594,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 961469717666024025, guid: cecf6f74b6087a1499f50fcadd62b46c, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -66.8
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 961469717666024025, guid: cecf6f74b6087a1499f50fcadd62b46c, type: 3}
       propertyPath: m_LocalRotation.w
