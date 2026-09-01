@@ -54,26 +54,6 @@ public class CellController : MonoBehaviour
                 view.name = $"Cell_{x}_{z}";
                 view.Initialize(coord);
                 views[x,z] = view;
-
-                /* Just to test, remove */
-                for (int i=0; i < 3; i++)
-                {
-                    CellCoord wall_coord = wallsCoords[i];
-                    if (wall_coord == coord)
-                    {
-                        cell.HasWall = true;
-                    }
-                } 
-                /* ^^^ */
-
-                if (cell.HasWall)
-                {
-                    Wall wall = Instantiate(wallPrefab, wallsParent); 
-                    wall.transform.localPosition = pos;
-                    wall.name = $"Wall_{x}_{z}";
-                    wallObjects[x,z] = wall;
-                }
-
             }
         }
     }
@@ -121,7 +101,7 @@ public class CellController : MonoBehaviour
 
     private void HighlightAtHoveredCell()
     {
-        hoveredCell = RayCastForCell();
+        hoveredCell = RaycastForCell();
         
         IHighlightable target = null;
 
@@ -138,7 +118,7 @@ public class CellController : MonoBehaviour
         highlighted = target;
     }
 
-    private CellView RayCastForCell()
+    private CellView RaycastForCell()
     {
         Vector2 mousePos = Mouse.current.position.ReadValue();
         Ray ray = cam.ScreenPointToRay(mousePos);
@@ -149,30 +129,35 @@ public class CellController : MonoBehaviour
     private void PlaceWallAtHovered()
     {
         if (hoveredCell == null) return;
-        CellCoord coord = hoveredCell.Coord;
-        if (wallObjects[coord.X, coord.Z] != null) return;
-
-        GridCell cell = cells[coord.X, coord.Z];
-        cell.HasWall = true;
-
-        Wall wall = Instantiate(wallPrefab, wallsParent); 
-        wall.transform.localPosition = CoordsCellToWorld(coord);
-        wall.name = $"Wall_{coord.X}_{coord.Z}";
-        wallObjects[coord.X,coord.Z] = wall;
-
+        SpawnWall(hoveredCell.Coord);
     }
 
     private void DestroyWallAtHovered()
     {
         if (hoveredCell == null) return;
-        CellCoord coord = hoveredCell.Coord;
+        DespawnWall(hoveredCell.Coord);
+    }
 
-        Wall wall = wallObjects[coord.X, coord.Z];
+    private void SpawnWall(CellCoord c)
+    {
+        if (wallObjects[c.X, c.Z] != null) return;
+
+        GridCell cell = cells[c.X, c.Z];
+        cell.HasWall = true;
+
+        Wall wall = Instantiate(wallPrefab, wallsParent); 
+        wall.transform.localPosition = CoordsCellToWorld(c);
+        wall.name = $"Wall_{c.X}_{c.Z}";
+        wallObjects[c.X,c.Z] = wall;
+    }
+
+    private void DespawnWall(CellCoord c)
+    {
+        Wall wall = wallObjects[c.X, c.Z];
         if (wall == null) return;
-
-        GridCell cell = cells[coord.X, coord.Z];
+        GridCell cell = cells[c.X, c.Z];
         cell.HasWall = false;
-        wallObjects[coord.X, coord.Z] = null;
+        wallObjects[c.X, c.Z] = null;
         if (ReferenceEquals(highlighted, wall)) highlighted = null;
         Destroy(wall.gameObject);
     }

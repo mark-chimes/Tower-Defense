@@ -6,7 +6,6 @@ public class GridCell
 
     public GridCell(CellCoord coord) {
         this.Coord = coord;
-        HasWall = false;
     }
     
 }
