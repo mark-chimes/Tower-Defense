@@ -7,7 +7,7 @@ public class CellView : MonoBehaviour
     [SerializeField] private TMPro.TextMeshPro numberLabel;
     [SerializeField] private Color highlightColor = Color.yellow; 
 
-    private CellCoord coord;
+    public CellCoord Coord {get; private set;}
 
     private MaterialPropertyBlock block;
     private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
@@ -19,7 +19,7 @@ public class CellView : MonoBehaviour
 
     public void Initialize(CellCoord coord)
     {
-        this.coord = coord;
+        this.Coord = coord;
         numberLabel.text = coord.ToStringNumbersOnly();
     }
 

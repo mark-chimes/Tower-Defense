@@ -12,6 +12,9 @@ public class CellController : MonoBehaviour
     [SerializeField] private Transform wallsParent;
     [SerializeField] private Wall wallPrefab;
 
+    // whether highlight stays on last hovered grid cell or gets cleared 
+    // when mouse cursor moves away
+    [SerializeField] private bool isHighlightSticky; 
 
     private GridCell[,] cells;
     private CellView[,] views;
@@ -101,8 +104,6 @@ public class CellController : MonoBehaviour
         return new Vector3(worldX, 0f, worldZ);
     }
 
-
-
     void Awake()
     {
         cam = Camera.main;
@@ -110,12 +111,20 @@ public class CellController : MonoBehaviour
 
     void Update()
     {
+        HandleMouse();
+    }
+
+    private void HandleMouse()
+    {
+        if (Mouse.current == null) return;
+
         HighlightHoveredCell();
+        if (Mouse.current.leftButton.wasPressedThisFrame) PlaceWallAtHovered();
     }
 
     private void HighlightHoveredCell()
     {
-        // fails if mouse is null
+
         Vector2 mousePos = Mouse.current.position.ReadValue();
         Ray ray = cam.ScreenPointToRay(mousePos);
         CellView view = null;
@@ -123,6 +132,9 @@ public class CellController : MonoBehaviour
         if (Physics.Raycast(ray, out RaycastHit hit, MAX_RAY_DISTANCE))
         {
             view = hit.collider.GetComponentInParent<CellView>();
+        } else if (isHighlightSticky)
+        {
+            return;
         }
         
         if (view == hovered) return;
@@ -131,5 +143,21 @@ public class CellController : MonoBehaviour
         if (view != null) view.Highlight();
         hovered = view;
     
+    }
+
+    private void PlaceWallAtHovered()
+    {
+        if (hovered == null) return;
+        CellCoord coord = hovered.Coord;
+        if (wallObjects[coord.X, coord.Z] != null) return;
+
+        GridCell cell = cells[coord.X, coord.Z];
+        cell.HasWall = true;
+
+        Wall wall = Instantiate(wallPrefab, wallsParent); 
+        wall.transform.localPosition = CoordsCellToWorld(coord);
+        wall.name = $"Wall_{coord.X}_{coord.Z}";
+        wallObjects[coord.X,coord.Z] = wall;
+
     }
 }
