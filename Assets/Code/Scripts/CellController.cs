@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -15,6 +14,11 @@ public class CellController : MonoBehaviour
     [SerializeField] private GameObject spawnPrefab;
 
     [SerializeField] private GameObject goalPrefab;
+
+
+    [SerializeField] private Color placeableColor = Color.green; 
+    [SerializeField] private Color blockedColor = Color.red; 
+    [SerializeField] private Color removeColor = Color.yellow; 
 
 
     [SerializeField] private Vector2Int spawnPosXZ = new (0,0);
@@ -34,6 +38,9 @@ public class CellController : MonoBehaviour
     private CellView hoveredCell;
     private IHighlightable highlighted;
 
+    private CellCoord spawnPos;
+    private CellCoord goalPos;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -46,14 +53,8 @@ public class CellController : MonoBehaviour
         views = new CellView[width, height];
         wallObjects = new Wall[width, height];
 
-        /* Just to test, remove */
-        CellCoord[] wallsCoords = new CellCoord[3];
-        wallsCoords[0] = new CellCoord(4,5);
-        wallsCoords[1] = new CellCoord(6,6);
-        wallsCoords[2] = new CellCoord(3,3);
-        /* ^^^ */
-        CellCoord spawnPos = new CellCoord(spawnPosXZ.x, spawnPosXZ.y);
-        CellCoord goalPos = new CellCoord(goalPosXZ.x, goalPosXZ.y);
+        spawnPos = new CellCoord(spawnPosXZ.x, spawnPosXZ.y);
+        goalPos = new CellCoord(goalPosXZ.x, goalPosXZ.y);
 
         for (int x=0; x < width; x++)
         {
@@ -124,8 +125,10 @@ public class CellController : MonoBehaviour
         if (Mouse.current.rightButton.wasPressedThisFrame) DestroyWallAtHovered();
     }
 
-    private void HighlightAtHoveredCell()
+    private void HighlightAtHoveredCellOld()
     {
+        // TODO: Red highlight
+
         hoveredCell = RaycastForCell();
         
         IHighlightable target = null;
@@ -139,9 +142,40 @@ public class CellController : MonoBehaviour
 
         if (target == highlighted) return;
         highlighted?.Unhighlight();
-        target?.Highlight();
+        target?.Highlight(placeableColor);
         highlighted = target;
     }
+
+        private void HighlightAtHoveredCell()
+    {
+        hoveredCell = RaycastForCell();
+        IHighlightable target = null;
+        Color highlightColor = Color.magenta; // something went wrong if this is the highlight color
+        if (hoveredCell != null)
+        {
+            CellCoord c = hoveredCell.Coord;
+            GridCell cell = cells[c.X, c.Z];
+            if (cell.Kind != CellKind.Floor)
+                highlightColor = blockedColor;  
+            else if (cell.HasWall)
+                highlightColor = removeColor;  
+            else
+                highlightColor = placeableColor; 
+            
+
+            Wall wall = wallObjects[c.X, c.Z];
+            target = (wall != null) ? wall : hoveredCell;
+        }
+
+        if (target == highlighted) return;
+        highlighted?.Unhighlight();
+
+        target?.Highlight(highlightColor);
+
+
+        highlighted = target;
+    }
+
 
     private CellView RaycastForCell()
     {
@@ -151,9 +185,13 @@ public class CellController : MonoBehaviour
         return hit.collider.GetComponentInParent<CellView>();
     }
 
+    private bool CanPlaceWall(CellCoord c) => cells[c.X, c.Z].Kind == CellKind.Floor
+        && wallObjects[c.X, c.Z] == null;
+
     private void PlaceWallAtHovered()
     {
         if (hoveredCell == null) return;
+        if (!CanPlaceWall(hoveredCell.Coord)) return; // TODO: red ghost
         SpawnWall(hoveredCell.Coord);
     }
 
@@ -168,6 +206,7 @@ public class CellController : MonoBehaviour
         if (wallObjects[c.X, c.Z] != null) return;
 
         GridCell cell = cells[c.X, c.Z];
+        
         if (cell.Kind != CellKind.Floor)
         {
             Debug.LogError($"SpawnWall: {c} Kind was {cell.Kind}");
@@ -175,7 +214,6 @@ public class CellController : MonoBehaviour
         }
 
         cell.HasWall = true;
-
         Wall wall = Instantiate(wallPrefab, wallsParent); 
         wall.transform.localPosition = CoordsCellToWorld(c);
         wall.name = $"Wall_{c.X}_{c.Z}";
@@ -186,13 +224,16 @@ public class CellController : MonoBehaviour
     {
         Wall wall = wallObjects[c.X, c.Z];
         if (wall == null) return;
+
         GridCell cell = cells[c.X, c.Z];
-        cell.HasWall = false;
+
         if (cell.Kind != CellKind.Floor)
         {
             Debug.LogError($"DespawnWall: {c} Kind was {cell.Kind}", wall);
             return;
         }
+
+        cell.HasWall = false;
         wallObjects[c.X, c.Z] = null;
         if (ReferenceEquals(highlighted, wall)) highlighted = null;
         Destroy(wall.gameObject);

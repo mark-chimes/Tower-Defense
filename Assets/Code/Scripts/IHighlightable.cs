@@ -1,5 +1,5 @@
 public interface IHighlightable
 {
-    void Highlight();
+    void Highlight(UnityEngine.Color highlightColor);
     void Unhighlight();
 } 

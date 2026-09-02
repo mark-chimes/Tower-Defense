@@ -5,8 +5,6 @@ public class CellView : MonoBehaviour, IHighlightable
 {
     [SerializeField] private MeshRenderer meshRenderer;
     [SerializeField] private TMPro.TextMeshPro numberLabel;
-    [SerializeField] private Color highlightColor = Color.green; 
-
     public CellCoord Coord {get; private set;}
 
     private MaterialPropertyBlock block;
@@ -23,9 +21,9 @@ public class CellView : MonoBehaviour, IHighlightable
         numberLabel.text = coord.ToStringNumbersOnly();
     }
 
-    public void Highlight()
+    public void Highlight(Color color)
     {
-        block.SetColor(BaseColorId, highlightColor);
+        block.SetColor(BaseColorId, color);
         meshRenderer.SetPropertyBlock(block);
     }
 

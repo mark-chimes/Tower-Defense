@@ -4,7 +4,6 @@ public class Wall : MonoBehaviour, IHighlightable
 {
 
     [SerializeField] private MeshRenderer meshRenderer;
-    [SerializeField] private Color highlightColor = Color.red; 
 
     private MaterialPropertyBlock block;
     private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
@@ -14,9 +13,9 @@ public class Wall : MonoBehaviour, IHighlightable
         block = new MaterialPropertyBlock();
     }
 
-    public void Highlight()
+    public void Highlight(Color color)
     {
-        block.SetColor(BaseColorId, highlightColor);
+        block.SetColor(BaseColorId, color);
         meshRenderer.SetPropertyBlock(block);
     }
 
