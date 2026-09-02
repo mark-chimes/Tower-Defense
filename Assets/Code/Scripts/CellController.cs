@@ -18,8 +18,7 @@ public class CellController : MonoBehaviour
 
     [SerializeField] private Color placeableColor = Color.green; 
     [SerializeField] private Color blockedColor = Color.red; 
-    [SerializeField] private Color removeColor = Color.yellow; 
-
+    [SerializeField] private Color existingWallColor = Color.yellow; 
 
     [SerializeField] private Vector2Int spawnPosXZ = new (0,0);
     [SerializeField] private Vector2Int goalPosXZ = new (1,1);
@@ -38,8 +37,7 @@ public class CellController : MonoBehaviour
     private CellView hoveredCell;
     private IHighlightable highlighted;
 
-    private CellCoord spawnPos;
-    private CellCoord goalPos;
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -53,8 +51,8 @@ public class CellController : MonoBehaviour
         views = new CellView[width, height];
         wallObjects = new Wall[width, height];
 
-        spawnPos = new CellCoord(spawnPosXZ.x, spawnPosXZ.y);
-        goalPos = new CellCoord(goalPosXZ.x, goalPosXZ.y);
+        CellCoord spawnPos = new CellCoord(spawnPosXZ.x, spawnPosXZ.y);
+        CellCoord goalPos = new CellCoord(goalPosXZ.x, goalPosXZ.y);
 
         for (int x=0; x < width; x++)
         {
@@ -86,14 +84,36 @@ public class CellController : MonoBehaviour
 
     void OnDrawGizmos()
     {
+        Matrix4x4 originalMatrix = Gizmos.matrix;
+        Color originalColor = Gizmos.color;
+
         Gizmos.matrix = transform.localToWorldMatrix;
-        Gizmos.color = Color.grey;
-        Vector3 size = new Vector3(cellSizeMeters, 0f, cellSizeMeters);
+        Vector3 size = new Vector3(cellSizeMeters, 1f, cellSizeMeters);
+        CellCoord spawnPos = new CellCoord(spawnPosXZ.x, spawnPosXZ.y);
+        CellCoord goalPos = new CellCoord(goalPosXZ.x, goalPosXZ.y);
+
         for (int x = 0; x < width; x++)
         {
             for (int z = 0; z < height; z++)
             {
-                Gizmos.DrawWireCube(CoordsCellToWorld(new CellCoord(x,z)), size);
+                Gizmos.color = Color.grey;
+                CellCoord c = new CellCoord(x,z);
+                if (c == spawnPos)
+                {
+                    Gizmos.color = Color.lightBlue;        
+                    Gizmos.DrawCube(CoordsCellToWorld(c), size);  
+                } 
+                else if (c == goalPos)  
+                {
+                    Gizmos.color = Color.yellow;        
+                    Gizmos.DrawCube(CoordsCellToWorld(c), size); 
+                }
+                else
+                {
+                    Gizmos.DrawWireCube(CoordsCellToWorld(c), size);
+                }
+                
+
             }
         }
     }
@@ -125,28 +145,7 @@ public class CellController : MonoBehaviour
         if (Mouse.current.rightButton.wasPressedThisFrame) DestroyWallAtHovered();
     }
 
-    private void HighlightAtHoveredCellOld()
-    {
-        // TODO: Red highlight
-
-        hoveredCell = RaycastForCell();
-        
-        IHighlightable target = null;
-
-        if (hoveredCell != null)
-        {
-            CellCoord c = hoveredCell.Coord;
-            Wall wall = wallObjects[c.X, c.Z];
-            target = (wall != null) ? wall : hoveredCell;
-        }
-
-        if (target == highlighted) return;
-        highlighted?.Unhighlight();
-        target?.Highlight(placeableColor);
-        highlighted = target;
-    }
-
-        private void HighlightAtHoveredCell()
+    private void HighlightAtHoveredCell()
     {
         hoveredCell = RaycastForCell();
         IHighlightable target = null;
@@ -158,7 +157,7 @@ public class CellController : MonoBehaviour
             if (cell.Kind != CellKind.Floor)
                 highlightColor = blockedColor;  
             else if (cell.HasWall)
-                highlightColor = removeColor;  
+                highlightColor = existingWallColor;  
             else
                 highlightColor = placeableColor; 
             
@@ -166,17 +165,13 @@ public class CellController : MonoBehaviour
             Wall wall = wallObjects[c.X, c.Z];
             target = (wall != null) ? wall : hoveredCell;
         }
-
-        if (target == highlighted) return;
         highlighted?.Unhighlight();
-
         target?.Highlight(highlightColor);
-
-
         highlighted = target;
     }
 
 
+    /// Currently assumes Walls have colliders off. Revisit if colliders turned on.
     private CellView RaycastForCell()
     {
         Vector2 mousePos = Mouse.current.position.ReadValue();

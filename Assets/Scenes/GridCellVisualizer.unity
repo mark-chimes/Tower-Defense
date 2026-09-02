@@ -327,6 +327,11 @@ MonoBehaviour:
   cellSizeMeters: 10
   wallsParent: {fileID: 652559275}
   wallPrefab: {fileID: 5586528569971646673, guid: 34992e6def475eb45b94617ae694c16b, type: 3}
+  spawnPrefab: {fileID: 7843005997107329825, guid: db2164dec387741419d8b3c4b1121cf3, type: 3}
+  goalPrefab: {fileID: 1768357886822621515, guid: f44c1ba509c38054783b63fdaf98d8e9, type: 3}
+  placeableColor: {r: 0, g: 1, b: 0, a: 1}
+  blockedColor: {r: 1, g: 0, b: 0, a: 1}
+  existingWallColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   spawnPosXZ: {x: 0, y: 0}
   goalPosXZ: {x: 8, y: 8}
 --- !u!1 &783511479
