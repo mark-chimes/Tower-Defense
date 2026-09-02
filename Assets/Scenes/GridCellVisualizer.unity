@@ -327,7 +327,8 @@ MonoBehaviour:
   cellSizeMeters: 10
   wallsParent: {fileID: 652559275}
   wallPrefab: {fileID: 5586528569971646673, guid: 34992e6def475eb45b94617ae694c16b, type: 3}
-  isHighlightSticky: 0
+  spawnPosXZ: {x: 0, y: 0}
+  goalPosXZ: {x: 8, y: 8}
 --- !u!1 &783511479
 GameObject:
   m_ObjectHideFlags: 0

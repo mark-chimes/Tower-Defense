@@ -1,5 +1,7 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+
 
 public class CellController : MonoBehaviour
 {
@@ -10,6 +12,17 @@ public class CellController : MonoBehaviour
 
     [SerializeField] private Transform wallsParent;
     [SerializeField] private Wall wallPrefab;
+    [SerializeField] private GameObject spawnPrefab;
+
+    [SerializeField] private GameObject goalPrefab;
+
+
+    [SerializeField] private Vector2Int spawnPosXZ = new (0,0);
+    [SerializeField] private Vector2Int goalPosXZ = new (1,1);
+    // Note it is possible to specify the above as out-of-bounds,
+    // or as the same square. 
+    // Improving it to add checks deferred to later
+
 
     private GridCell[,] cells;
     private CellView[,] views;
@@ -39,6 +52,8 @@ public class CellController : MonoBehaviour
         wallsCoords[1] = new CellCoord(6,6);
         wallsCoords[2] = new CellCoord(3,3);
         /* ^^^ */
+        CellCoord spawnPos = new CellCoord(spawnPosXZ.x, spawnPosXZ.y);
+        CellCoord goalPos = new CellCoord(goalPosXZ.x, goalPosXZ.y);
 
         for (int x=0; x < width; x++)
         {
@@ -46,6 +61,16 @@ public class CellController : MonoBehaviour
             {
                 CellCoord coord = new CellCoord(x,z);
                 GridCell cell = new GridCell(coord);
+                if (coord == spawnPos)
+                {
+                    cell.Kind = CellKind.Spawn;
+                    GameObject spawnObj = Instantiate(spawnPrefab, transform); 
+                    spawnObj.transform.localPosition = CoordsCellToWorld(coord);
+                } else if (coord == goalPos) {
+                    cell.Kind = CellKind.Goal;
+                    GameObject goalObj = Instantiate(goalPrefab, transform); 
+                    goalObj.transform.localPosition = CoordsCellToWorld(coord);
+                }
                 cells[x,z] = cell;
 
                 CellView view = Instantiate(cellPrefab, transform); 
@@ -143,6 +168,12 @@ public class CellController : MonoBehaviour
         if (wallObjects[c.X, c.Z] != null) return;
 
         GridCell cell = cells[c.X, c.Z];
+        if (cell.Kind != CellKind.Floor)
+        {
+            Debug.LogError($"SpawnWall: {c} Kind was {cell.Kind}");
+            return;
+        }
+
         cell.HasWall = true;
 
         Wall wall = Instantiate(wallPrefab, wallsParent); 
@@ -157,6 +188,11 @@ public class CellController : MonoBehaviour
         if (wall == null) return;
         GridCell cell = cells[c.X, c.Z];
         cell.HasWall = false;
+        if (cell.Kind != CellKind.Floor)
+        {
+            Debug.LogError($"DespawnWall: {c} Kind was {cell.Kind}", wall);
+            return;
+        }
         wallObjects[c.X, c.Z] = null;
         if (ReferenceEquals(highlighted, wall)) highlighted = null;
         Destroy(wall.gameObject);

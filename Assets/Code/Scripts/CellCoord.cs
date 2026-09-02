@@ -10,8 +10,6 @@ public readonly struct CellCoord : IEquatable<CellCoord>
         X = x;
         Z = z;
     }
-
-
     
     public override int GetHashCode() => HashCode.Combine(X,Z);
     public override string ToString() => $"({X}, {Z})";
