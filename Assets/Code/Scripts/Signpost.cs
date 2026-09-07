@@ -1,11 +1,11 @@
 using UnityEngine;
 
-
-public class CellView : MonoBehaviour, IHighlightable
+// It's kind of a signpost, right? It tells you how far you are. Or a marker
+public class Signpost : MonoBehaviour, IFeature
 {
     [SerializeField] private MeshRenderer meshRenderer;
     [SerializeField] private TMPro.TextMeshPro numberLabel;
-    public CellCoord Coord { get; private set; }
+    public Coord Coord { get; private set; }
 
     private MaterialPropertyBlock block;
     private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
@@ -15,7 +15,7 @@ public class CellView : MonoBehaviour, IHighlightable
         block = new MaterialPropertyBlock();
     }
 
-    public void Initialize(CellCoord coord)
+    public void Initialize(Coord coord)
     {
         this.Coord = coord;
         UpdateDistance(-1);

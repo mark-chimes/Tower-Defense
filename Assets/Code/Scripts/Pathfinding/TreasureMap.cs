@@ -1,57 +1,57 @@
 using System.Collections.Generic;
 
-public class GridData
+public class TreasureMap
 {
 
-    private CellData[,] cells;
+    private Erf[,] map;
     public readonly int Width;
     public readonly int Height;
 
-    public CellCoord SpawnPos { get; }
-    public CellCoord GoalPos { get; }
+    public Coord SpawnPos { get; }
+    public Coord GoalPos { get; }
 
     static readonly (int dx, int dz)[] Dirs = { (1, 0), (-1, 0), (0, 1), (0, -1) };
 
-    public GridData(int width, int height, CellCoord spawnPos, CellCoord goalPos) { 
+    public TreasureMap(int width, int height, Coord spawnPos, Coord goalPos) { 
         Width = width;
         Height = height;
         SpawnPos = spawnPos;
         GoalPos = goalPos;
 
-        cells = new CellData[width, height];
+        map = new Erf[width, height];
 
         for (int x = 0; x < width; x++)
         {
             for (int z = 0; z < height; z++)
             {
-                CellCoord coord = new CellCoord(x, z);
-                CellData cell = new CellData(coord);
+                Coord coord = new Coord(x, z);
+                Erf erf = new Erf(coord);
                 
                 if (coord == spawnPos)
                 {
-                    cell.Kind = CellKind.Spawn;
+                    erf.Kind = ErfKind.Spawn;
                 }
                 else if (coord == goalPos)
                 {
-                    cell.Kind = CellKind.Goal;
+                    erf.Kind = ErfKind.Goal;
                 }
-                cells[x, z] = cell;
+                map[x, z] = erf;
             }
         }
     }
 
-    public CellSnapshot At(CellCoord coord) => At(coord.X, coord.Z);
+    public ErfSnapshot At(Coord coord) => At(coord.X, coord.Z);
 
-    public CellSnapshot At(int x, int z)
+    public ErfSnapshot At(int x, int z)
     {
-        CellData data = cells[x, z];
-        return new CellSnapshot(data.Coord, data.Kind, data.DistanceToGoal, data.HasWall);
+        Erf data = map[x, z];
+        return new ErfSnapshot(data.Coord, data.Kind, data.DistanceToGoal, data.HasWall);
     }
 
-    public void SetWall(CellCoord c, bool hasWall) => cells[c.X, c.Z].HasWall = hasWall;
+    public void SetWall(Coord c, bool hasWall) => map[c.X, c.Z].HasWall = hasWall;
 
-    public bool CanPlaceWall(CellCoord c) => cells[c.X, c.Z].Kind == CellKind.Floor
-        && !cells[c.X, c.Z].HasWall;
+    public bool CanPlaceWall(Coord c) => map[c.X, c.Z].Kind == ErfKind.Floor
+        && !map[c.X, c.Z].HasWall;
 
 
     public void RecomputeDistances()
@@ -59,29 +59,29 @@ public class GridData
         ClearDistances();
 
         bool[,] visited = new bool[Width, Height];
-        Queue<CellCoord> cellQueue = new Queue<CellCoord>();
+        Queue<Coord> cellQueue = new Queue<Coord>();
 
-        CellCoord g = GoalPos;
+        Coord g = GoalPos;
         visited[g.X, g.Z] = true;
-        CellData goalCell = cells[g.X, g.Z];
+        Erf goalCell = map[g.X, g.Z];
         goalCell.DistanceToGoal = 0;
         cellQueue.Enqueue(g);
 
         while (cellQueue.TryDequeue(out var coord))
         {
-            CellData topCell = cells[coord.X, coord.Z];
+            Erf topCell = map[coord.X, coord.Z];
             int dist = topCell.DistanceToGoal;
 
             foreach (var (dx, dz) in Dirs)
             {
-                CellCoord c = coord.Shifted(dx, dz);
+                Coord c = coord.Shifted(dx, dz);
                 if (!c.InBounds(Width, Height) || visited[c.X, c.Z])
                 {
                     continue;
                 }
 
                 visited[c.X, c.Z] = true;
-                CellData cell = cells[c.X, c.Z];
+                Erf cell = map[c.X, c.Z];
                 if (cell.HasWall)
                 {
                     cell.DistanceToGoal = -1;
@@ -101,7 +101,7 @@ public class GridData
         {
             for (int z = 0; z < Height; z++)
             {
-                CellData cell = cells[x, z];
+                Erf cell = map[x, z];
                 cell.DistanceToGoal = -1;
             }
         }

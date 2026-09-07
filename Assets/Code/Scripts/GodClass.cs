@@ -3,9 +3,12 @@ using UnityEngine.InputSystem;
 using System.Collections.Generic;
 
 
-public class CellController : MonoBehaviour
+// May as well call it this until I figure out what it does 
+// In some way it is literally a God class; it lets you place 
+// walls and recomputes the map etc.
+public class GodClass : MonoBehaviour
 {
-    [SerializeField] private CellView cellPrefab;
+    [SerializeField] private Signpost cellPrefab;
     [SerializeField] private int width = 9;
     [SerializeField] private int height = 9;
     [SerializeField] private float cellSizeMeters = 10f;
@@ -26,18 +29,18 @@ public class CellController : MonoBehaviour
     // Note it is possible to specify the above as out-of-bounds,
     // or as the same square. 
     // Improving it to add checks deferred to later
-    CellCoord spawnPos;
-    CellCoord goalPos;
-    private GridData grid;
+    Coord spawnPos;
+    Coord goalPos;
+    private TreasureMap grid;
 
-    private CellView[,] views;
+    private Signpost[,] views;
     private Wall[,] wallObjects;
 
     private Camera cam;
     private const float MaxRayDistance = 500f;
 
-    private CellView hoveredCell;
-    private IHighlightable highlighted;
+    private Signpost hoveredCell;
+    private IFeature highlighted;
 
 
 
@@ -50,33 +53,33 @@ public class CellController : MonoBehaviour
     void GenerateGrid()
     {
         // TODO out-of-bounds check.
-        spawnPos = new CellCoord(spawnPosXZ.x, spawnPosXZ.y);
-        goalPos = new CellCoord(goalPosXZ.x, goalPosXZ.y);
+        spawnPos = new Coord(spawnPosXZ.x, spawnPosXZ.y);
+        goalPos = new Coord(goalPosXZ.x, goalPosXZ.y);
        
-        grid = new GridData(width, height, spawnPos, goalPos);
+        grid = new TreasureMap(width, height, spawnPos, goalPos);
 
-        views = new CellView[width, height];
+        views = new Signpost[width, height];
         wallObjects = new Wall[width, height];
 
         for (int x = 0; x < width; x++)
         {
             for (int z = 0; z < height; z++)
             {
-                CellCoord coord = new CellCoord(x,z);
+                Coord coord = new Coord(x,z);
 
-                CellView view = Instantiate(cellPrefab, transform);
+                Signpost view = Instantiate(cellPrefab, transform);
                 Vector3 pos = CoordsCellToWorld(coord);
                 view.transform.localPosition = pos;
                 view.name = $"Cell_{x}_{z}";
                 view.Initialize(coord);
                 views[x, z] = view;
 
-                CellSnapshot snap = grid.At(coord);
+                ErfSnapshot snap = grid.At(coord);
 
                 switch (snap.Kind) 
                 {
-                    case CellKind.Spawn: InstantiateObject(spawnPrefab, coord); break;
-                    case CellKind.Goal:  InstantiateObject(goalPrefab, coord);  break;
+                    case ErfKind.Spawn: InstantiateObject(spawnPrefab, coord); break;
+                    case ErfKind.Goal:  InstantiateObject(goalPrefab, coord);  break;
                 }
             }
         }
@@ -84,7 +87,7 @@ public class CellController : MonoBehaviour
         UpdateDistances();
     }
     
-    void InstantiateObject(GameObject prefab, CellCoord coord)
+    void InstantiateObject(GameObject prefab, Coord coord)
     {
         GameObject obj = Instantiate(prefab, transform);
         obj.transform.localPosition = CoordsCellToWorld(coord);
@@ -106,8 +109,8 @@ public class CellController : MonoBehaviour
         {
             for (int z = 0; z < grid.Height; z++)
             {
-                CellSnapshot cell = grid.At(x, z);
-                CellView view = views[x, z];
+                ErfSnapshot cell = grid.At(x, z);
+                Signpost view = views[x, z];
                 int distanceToGoal = cell.DistanceToGoal;
                 view.UpdateDistance(distanceToGoal);
             }
@@ -122,15 +125,15 @@ public class CellController : MonoBehaviour
 
         Gizmos.matrix = transform.localToWorldMatrix;
         Vector3 size = new Vector3(cellSizeMeters, 1f, cellSizeMeters);
-        CellCoord spawnPos = new CellCoord(spawnPosXZ.x, spawnPosXZ.y);
-        CellCoord goalPos = new CellCoord(goalPosXZ.x, goalPosXZ.y);
+        Coord spawnPos = new Coord(spawnPosXZ.x, spawnPosXZ.y);
+        Coord goalPos = new Coord(goalPosXZ.x, goalPosXZ.y);
 
         for (int x = 0; x < width; x++)
         {
             for (int z = 0; z < height; z++)
             {
                 Gizmos.color = Color.grey;
-                CellCoord c = new CellCoord(x, z);
+                Coord c = new Coord(x, z);
                 if (c == spawnPos)
                 {
                     Gizmos.color = Color.lightBlue;
@@ -152,7 +155,7 @@ public class CellController : MonoBehaviour
     }
 
     // Translate from cell coordinates to world coordinates
-    private Vector3 CoordsCellToWorld(CellCoord coord)
+    private Vector3 CoordsCellToWorld(Coord coord)
     {
         float worldX = (coord.X - (width - 1) / 2f) * cellSizeMeters;
         float worldZ = (coord.Z - (height - 1) / 2f) * cellSizeMeters;
@@ -181,13 +184,13 @@ public class CellController : MonoBehaviour
     private void HighlightAtHoveredCell()
     {
         hoveredCell = RaycastForCell();
-        IHighlightable target = null;
+        IFeature target = null;
         Color highlightColor = Color.magenta; // something went wrong if this is the highlight color
         if (hoveredCell != null)
         {
-            CellCoord c = hoveredCell.Coord;
-            CellSnapshot cell = grid.At(c);
-            if (cell.Kind != CellKind.Floor)
+            Coord c = hoveredCell.Coord;
+            ErfSnapshot cell = grid.At(c);
+            if (cell.Kind != ErfKind.Floor)
                 highlightColor = blockedColor;
             else if (cell.HasWall)
                 highlightColor = existingWallColor;
@@ -205,12 +208,12 @@ public class CellController : MonoBehaviour
 
 
     /// Currently assumes Walls have colliders off. Revisit if colliders turned on.
-    private CellView RaycastForCell()
+    private Signpost RaycastForCell()
     {
         Vector2 mousePos = Mouse.current.position.ReadValue();
         Ray ray = cam.ScreenPointToRay(mousePos);
         if (!Physics.Raycast(ray, out RaycastHit hit, MaxRayDistance)) return null;
-        return hit.collider.GetComponentInParent<CellView>();
+        return hit.collider.GetComponentInParent<Signpost>();
     }
 
     private void PlaceWallAtHovered()
@@ -228,13 +231,13 @@ public class CellController : MonoBehaviour
 
     }
 
-    private void SpawnWall(CellCoord c)
+    private void SpawnWall(Coord c)
     {
         if (wallObjects[c.X, c.Z] != null) return;
 
-        CellSnapshot cell = grid.At(c);
+        ErfSnapshot cell = grid.At(c);
 
-        if (cell.Kind != CellKind.Floor)
+        if (cell.Kind != ErfKind.Floor)
         {
             Debug.LogError($"SpawnWall: {c} Kind was {cell.Kind}");
             return;
@@ -248,14 +251,14 @@ public class CellController : MonoBehaviour
         UpdateDistances();
     }
 
-    private void DespawnWall(CellCoord c)
+    private void DespawnWall(Coord c)
     {
         Wall wall = wallObjects[c.X, c.Z];
         if (wall == null) return;
 
-        CellSnapshot cell = grid.At(c);
+        ErfSnapshot cell = grid.At(c);
 
-        if (cell.Kind != CellKind.Floor)
+        if (cell.Kind != ErfKind.Floor)
         {
             Debug.LogError($"DespawnWall: {c} Kind was {cell.Kind}", wall);
             return;
