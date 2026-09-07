@@ -53,6 +53,7 @@ public class CellController : MonoBehaviour
         views = new CellView[width, height];
         wallObjects = new Wall[width, height];
 
+        // TODO out-of-bounds check.
         spawnPos = new CellCoord(spawnPosXZ.x, spawnPosXZ.y);
         goalPos = new CellCoord(goalPosXZ.x, goalPosXZ.y);
 
@@ -86,97 +87,12 @@ public class CellController : MonoBehaviour
     }
 
 
-
+    // Breadth-first search
+    // Cannot use when multiple tile-costs are involved
     void UpdateDistances()
-    {   
-        bool[,] DirtyArray = new bool[width, height];
-        Queue<CellCoord> cellQueue = new Queue<CellCoord>();
-
-        CellCoord g = goalPos;
-        DirtyArray[g.X, g.Z] = true;
-        GridCell goalCell = cells[g.X, g.Z];
-        goalCell.distanceToGoal = 0;
-        cellQueue.Enqueue(g);
-
-        while (cellQueue.TryDequeue(out var coord))
-        {
-            GridCell top_cell = cells[coord.X, coord.Z];
-            int? dist = top_cell.distanceToGoal;
-            CellCoord[] adjacents = Adjacents(coord, 0, 0, width-1, height-1);
-
-            for(int i = 0; i < adjacents.Length; i++)
-            {
-                CellCoord c = adjacents[i];
-                if (DirtyArray[c.X, c.Z]) {
-                    continue;
-                }
-                DirtyArray[c.X, c.Z] = true;
-                if (wallObjects[c.X, c.Z]) {
-                    continue;
-                }
-                
-                GridCell cell = cells[c.X, c.Z];
-                CellView view = views[c.X, c.Z];
-                cell.distanceToGoal = dist+1;
-                view.UpdateDistance(dist+1);
-
-                cellQueue.Enqueue(c);
-            }
-        }
-
-        for (int x=0; x < width; x++)
-        {
-            for (int z = 0; z < height; z++)
-            {
-                if (!DirtyArray[x,z])
-                {
-                    GridCell cell = cells[x, z];
-                    CellView view = views[x, z];
-                    cell.distanceToGoal = null;
-                    view.UpdateDistance(null);
-                }
-            }
-
-        }
-    }   
-
-    private CellCoord[] Adjacents(CellCoord c, int MinX, int MinZ, int MaxX, int MaxZ)
-    { 
-        // out of bounds
-        if (c.X < MinX || c.Z < MinZ || c.X > MaxX || c.Z > MaxZ) {
-            return new CellCoord[0];
-        }
-
-        int n = 0;
-        CellCoord[] Adjacents = new CellCoord[4];
-
-        if (c.X != MinX) {
-            Adjacents[n] = new CellCoord(c.X-1, c.Z);
-            n++;
-        } 
-
-        if (c.Z != MinZ) {
-            Adjacents[n] = new CellCoord(c.X, c.Z-1);
-            n++;
-        }
-
-        if (c.X != MaxX) {
-            Adjacents[n] = new CellCoord(c.X+1, c.Z);
-            n++;
-        }
-
-        if (c.Z != MaxZ) {
-            Adjacents[n] = new CellCoord(c.X, c.Z+1);
-            n++;
-        }
-
-        CellCoord[] AdjacentsOnly = new CellCoord[n];
-        for (int i = 0; i < n; i++)
-        {
-            AdjacentsOnly[i] = Adjacents[i];
-        } 
-
-        return AdjacentsOnly;
+    {
+        DistanceCompute compute = new DistanceCompute();
+        compute.UpdateDistances(width, height, goalPos, cells, views);
     }
 
 

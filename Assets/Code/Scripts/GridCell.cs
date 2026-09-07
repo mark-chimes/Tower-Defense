@@ -2,7 +2,7 @@ public class GridCell
 {
     public readonly CellCoord Coord;
 
-    public int? distanceToGoal;
+    public int? DistanceToGoal;
 
     public CellKind Kind;
     public bool HasWall;
