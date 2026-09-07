@@ -35,8 +35,7 @@ public class GodClass : MonoBehaviour
     // Note it is possible to specify the above as out-of-bounds,
     // or as the same square. 
     // Improving it to add checks deferred to later
-    Coord spawnPos;
-    Coord goalPos;
+
     private TreasureMap treasureMap;
 
     private Signpost[,] signposts;
@@ -56,8 +55,8 @@ public class GodClass : MonoBehaviour
     void GenerateGrid()
     {
         // TODO out-of-bounds check.
-        spawnPos = new Coord(spawnPosXZ.x, spawnPosXZ.y);
-        goalPos = new Coord(goalPosXZ.x, goalPosXZ.y);
+        Coord spawnPos = new Coord(spawnPosXZ.x, spawnPosXZ.y);
+        Coord goalPos = new Coord(goalPosXZ.x, goalPosXZ.y);
        
         treasureMap = new TreasureMap(width, height, spawnPos, goalPos);
 
@@ -124,6 +123,7 @@ public class GodClass : MonoBehaviour
 
         Gizmos.matrix = transform.localToWorldMatrix;
         Vector3 size = new Vector3(cellSizeMeters, 1f, cellSizeMeters);
+
         Coord spawnPos = new Coord(spawnPosXZ.x, spawnPosXZ.y);
         Coord goalPos = new Coord(goalPosXZ.x, goalPosXZ.y);
 
@@ -151,6 +151,8 @@ public class GodClass : MonoBehaviour
 
             }
         }
+        Gizmos.matrix = originalMatrix;
+        Gizmos.color = originalColor;
     }
 
     // Translate from cell coordinates to world coordinates
