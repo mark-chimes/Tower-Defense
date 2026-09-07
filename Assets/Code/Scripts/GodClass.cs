@@ -6,9 +6,15 @@ using System.Collections.Generic;
 // May as well call it this until I figure out what it does 
 // In some way it is literally a God class; it lets you place 
 // walls and recomputes the map etc.
+// TODO separate concerns (some of these might still bundle / be split differently)
+// taking variables in editor
+// makes the view / physical unity objects
+// handles input from the player
+// manages walls
+// displays gizmos
 public class GodClass : MonoBehaviour
 {
-    [SerializeField] private Signpost cellPrefab;
+    [SerializeField] private Signpost signpostPrefab;
     [SerializeField] private int width = 9;
     [SerializeField] private int height = 9;
     [SerializeField] private float cellSizeMeters = 10f;
@@ -31,20 +37,17 @@ public class GodClass : MonoBehaviour
     // Improving it to add checks deferred to later
     Coord spawnPos;
     Coord goalPos;
-    private TreasureMap grid;
+    private TreasureMap treasureMap;
 
-    private Signpost[,] views;
-    private Wall[,] wallObjects;
+    private Signpost[,] signposts;
+    private Wall[,] walls;
 
     private Camera cam;
     private const float MaxRayDistance = 500f;
 
     private Signpost hoveredCell;
-    private IFeature highlighted;
+    private IHighlightable highlighted;
 
-
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         GenerateGrid();
@@ -56,10 +59,10 @@ public class GodClass : MonoBehaviour
         spawnPos = new Coord(spawnPosXZ.x, spawnPosXZ.y);
         goalPos = new Coord(goalPosXZ.x, goalPosXZ.y);
        
-        grid = new TreasureMap(width, height, spawnPos, goalPos);
+        treasureMap = new TreasureMap(width, height, spawnPos, goalPos);
 
-        views = new Signpost[width, height];
-        wallObjects = new Wall[width, height];
+        signposts = new Signpost[width, height];
+        walls = new Wall[width, height];
 
         for (int x = 0; x < width; x++)
         {
@@ -67,19 +70,19 @@ public class GodClass : MonoBehaviour
             {
                 Coord coord = new Coord(x,z);
 
-                Signpost view = Instantiate(cellPrefab, transform);
+                Signpost view = Instantiate(signpostPrefab, transform);
                 Vector3 pos = CoordsCellToWorld(coord);
                 view.transform.localPosition = pos;
                 view.name = $"Cell_{x}_{z}";
                 view.Initialize(coord);
-                views[x, z] = view;
+                signposts[x, z] = view;
 
-                ErfSnapshot snap = grid.At(coord);
+                ErfSnapshot snap = treasureMap.At(coord);
 
                 switch (snap.Kind) 
                 {
-                    case ErfKind.Spawn: InstantiateObject(spawnPrefab, coord); break;
-                    case ErfKind.Goal:  InstantiateObject(goalPrefab, coord);  break;
+                    case ErfKind.Spawn: InstantiateMarker(spawnPrefab, coord); break;
+                    case ErfKind.Goal:  InstantiateMarker(goalPrefab, coord);  break;
                 }
             }
         }
@@ -87,32 +90,28 @@ public class GodClass : MonoBehaviour
         UpdateDistances();
     }
     
-    void InstantiateObject(GameObject prefab, Coord coord)
+    void InstantiateMarker(GameObject prefab, Coord coord)
     {
         GameObject obj = Instantiate(prefab, transform);
         obj.transform.localPosition = CoordsCellToWorld(coord);
     }
     
-
-
     // Breadth-first search
     // Cannot use when multiple tile-costs are involved
     void UpdateDistances()
     {
-        grid.RecomputeDistances();
+        treasureMap.RecomputeDistances();
         RefreshDistanceLabels();
     }
 
     void RefreshDistanceLabels()
     {
-        for (int x = 0; x < grid.Width; x++)
+        for (int x = 0; x < treasureMap.Width; x++)
         {
-            for (int z = 0; z < grid.Height; z++)
+            for (int z = 0; z < treasureMap.Height; z++)
             {
-                ErfSnapshot cell = grid.At(x, z);
-                Signpost view = views[x, z];
-                int distanceToGoal = cell.DistanceToGoal;
-                view.UpdateDistance(distanceToGoal);
+                Signpost signpost = signposts[x, z];
+                signpost.UpdateDistance(treasureMap.DistanceToGoal(x,z));
             }
         }
     }
@@ -184,21 +183,21 @@ public class GodClass : MonoBehaviour
     private void HighlightAtHoveredCell()
     {
         hoveredCell = RaycastForCell();
-        IFeature target = null;
+        IHighlightable target = null;
         Color highlightColor = Color.magenta; // something went wrong if this is the highlight color
         if (hoveredCell != null)
         {
             Coord c = hoveredCell.Coord;
-            ErfSnapshot cell = grid.At(c);
-            if (cell.Kind != ErfKind.Floor)
+            ErfSnapshot erf = treasureMap.At(c);
+            if (erf.Kind != ErfKind.Floor)
                 highlightColor = blockedColor;
-            else if (cell.HasWall)
+            else if (erf.HasWall)
                 highlightColor = existingWallColor;
             else
                 highlightColor = placeableColor;
 
 
-            Wall wall = wallObjects[c.X, c.Z];
+            Wall wall = walls[c.X, c.Z];
             target = (wall != null) ? wall : hoveredCell;
         }
         highlighted?.Unhighlight();
@@ -219,7 +218,7 @@ public class GodClass : MonoBehaviour
     private void PlaceWallAtHovered()
     {
         if (hoveredCell == null) return;
-        if (!grid.CanPlaceWall(hoveredCell.Coord)) return; // TODO: red ghost
+        if (!treasureMap.CanPlaceWall(hoveredCell.Coord)) return; // TODO: red ghost
         SpawnWall(hoveredCell.Coord);
 
     }
@@ -233,40 +232,40 @@ public class GodClass : MonoBehaviour
 
     private void SpawnWall(Coord c)
     {
-        if (wallObjects[c.X, c.Z] != null) return;
+        if (walls[c.X, c.Z] != null) return;
 
-        ErfSnapshot cell = grid.At(c);
+        ErfSnapshot erf = treasureMap.At(c);
 
-        if (cell.Kind != ErfKind.Floor)
+        if (erf.Kind != ErfKind.Floor)
         {
-            Debug.LogError($"SpawnWall: {c} Kind was {cell.Kind}");
+            Debug.LogError($"SpawnWall: {c} Kind was {erf.Kind}");
             return;
         }
 
         Wall wall = Instantiate(wallPrefab, wallsParent);
         wall.transform.localPosition = CoordsCellToWorld(c);
         wall.name = $"Wall_{c.X}_{c.Z}";
-        wallObjects[c.X, c.Z] = wall;
-        grid.SetWall(c, true);
+        walls[c.X, c.Z] = wall;
+        treasureMap.SetWall(c, true);
         UpdateDistances();
     }
 
     private void DespawnWall(Coord c)
     {
-        Wall wall = wallObjects[c.X, c.Z];
+        Wall wall = walls[c.X, c.Z];
         if (wall == null) return;
 
-        ErfSnapshot cell = grid.At(c);
+        ErfSnapshot cell = treasureMap.At(c);
 
         if (cell.Kind != ErfKind.Floor)
         {
             Debug.LogError($"DespawnWall: {c} Kind was {cell.Kind}", wall);
             return;
         }
-        wallObjects[c.X, c.Z] = null;
+        walls[c.X, c.Z] = null;
         if (ReferenceEquals(highlighted, wall)) highlighted = null;
         Destroy(wall.gameObject);
-        grid.SetWall(c, false);
+        treasureMap.SetWall(c, false);
         UpdateDistances();
     }
 }

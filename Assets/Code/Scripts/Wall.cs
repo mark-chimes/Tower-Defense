@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Wall : MonoBehaviour, IFeature
+public class Wall : MonoBehaviour, IHighlightable
 {
 
     [SerializeField] private MeshRenderer meshRenderer;

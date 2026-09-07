@@ -4,6 +4,9 @@ public class TreasureMap
 {
 
     private Erf[,] map;
+    private int[,] distanceToGoal;
+
+
     public readonly int Width;
     public readonly int Height;
 
@@ -19,6 +22,7 @@ public class TreasureMap
         GoalPos = goalPos;
 
         map = new Erf[width, height];
+        distanceToGoal = new int[width, height];
 
         for (int x = 0; x < width; x++)
         {
@@ -45,7 +49,11 @@ public class TreasureMap
     public ErfSnapshot At(int x, int z)
     {
         Erf data = map[x, z];
-        return new ErfSnapshot(data.Coord, data.Kind, data.DistanceToGoal, data.HasWall);
+        return new ErfSnapshot(data.Coord, data.Kind, distanceToGoal[x,z], data.HasWall);
+    }
+    public int DistanceToGoal(int x, int z)
+    {
+        return distanceToGoal[x,z];
     }
 
     public void SetWall(Coord c, bool hasWall) => map[c.X, c.Z].HasWall = hasWall;
@@ -63,14 +71,12 @@ public class TreasureMap
 
         Coord g = GoalPos;
         visited[g.X, g.Z] = true;
-        Erf goalCell = map[g.X, g.Z];
-        goalCell.DistanceToGoal = 0;
+        distanceToGoal[g.X, g.Z] = 0;
         cellQueue.Enqueue(g);
 
         while (cellQueue.TryDequeue(out var coord))
         {
-            Erf topCell = map[coord.X, coord.Z];
-            int dist = topCell.DistanceToGoal;
+            int dist = distanceToGoal[coord.X, coord.Z];
 
             foreach (var (dx, dz) in Dirs)
             {
@@ -84,11 +90,11 @@ public class TreasureMap
                 Erf cell = map[c.X, c.Z];
                 if (cell.HasWall)
                 {
-                    cell.DistanceToGoal = -1;
+                    distanceToGoal[c.X, c.Z] = -1;
                     continue;
                 }
 
-                cell.DistanceToGoal = dist + 1;
+                distanceToGoal[c.X, c.Z] = dist + 1;
                 cellQueue.Enqueue(c);
             }
         }
@@ -101,8 +107,7 @@ public class TreasureMap
         {
             for (int z = 0; z < Height; z++)
             {
-                Erf cell = map[x, z];
-                cell.DistanceToGoal = -1;
+                distanceToGoal[x, z]= -1;
             }
         }
     }

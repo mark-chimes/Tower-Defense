@@ -23,8 +23,5 @@ public readonly struct Coord : IEquatable<Coord>
     public static bool operator ==(Coord a, Coord b) => a.Equals(b);
     public static bool operator !=(Coord a, Coord b) => !a.Equals(b);
 
-
-    public string ToStringNumbersOnly() => $"{X} {Z}";
-
 }
 

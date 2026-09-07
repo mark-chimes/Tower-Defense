@@ -1,7 +1,7 @@
 using UnityEngine;
 
-// It's kind of a signpost, right? It tells you how far you are. Or a marker
-public class Signpost : MonoBehaviour, IFeature
+// It tells you how far you are
+public class Signpost : MonoBehaviour, IHighlightable
 {
     [SerializeField] private MeshRenderer meshRenderer;
     [SerializeField] private TMPro.TextMeshPro numberLabel;
