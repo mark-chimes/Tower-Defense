@@ -24,3 +24,4 @@ public readonly struct CellCoord : IEquatable<CellCoord>
     public string ToStringNumbersOnly() => $"{X} {Z}";
 
 }
+
