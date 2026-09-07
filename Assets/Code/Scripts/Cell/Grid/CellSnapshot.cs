@@ -12,10 +12,5 @@ public readonly struct CellSnapshot
         DistanceToGoal = distanceToGoal;
         HasWall = hasWall;
     }
-
-    public static CellSnapshot FromData(CellData data)
-    {
-        return new CellSnapshot(data.Coord, data.Kind, data.DistanceToGoal, data.HasWall);
-    }
 }
 

@@ -4,19 +4,40 @@ public class GridData
 {
 
     private CellData[,] cells;
-    public readonly int width;
-    public readonly int height;
+    public readonly int Width;
+    public readonly int Height;
 
-    private CellCoord GoalPos;
+    public CellCoord SpawnPos { get; }
+    public CellCoord GoalPos { get; }
 
     static readonly (int dx, int dz)[] Dirs = { (1, 0), (-1, 0), (0, 1), (0, -1) };
 
-    public GridData(CellData[,] cells, CellCoord goalPos)
-    {
-        this.cells = cells;
+    public GridData(int width, int height, CellCoord spawnPos, CellCoord goalPos) { 
+        Width = width;
+        Height = height;
+        SpawnPos = spawnPos;
         GoalPos = goalPos;
-        width = this.cells.GetLength(0);
-        height = this.cells.GetLength(1);
+
+        cells = new CellData[width, height];
+
+        for (int x = 0; x < width; x++)
+        {
+            for (int z = 0; z < height; z++)
+            {
+                CellCoord coord = new CellCoord(x, z);
+                CellData cell = new CellData(coord);
+                
+                if (coord == spawnPos)
+                {
+                    cell.Kind = CellKind.Spawn;
+                }
+                else if (coord == goalPos)
+                {
+                    cell.Kind = CellKind.Goal;
+                }
+                cells[x, z] = cell;
+            }
+        }
     }
 
     public CellSnapshot At(CellCoord coord) => At(coord.X, coord.Z);
@@ -24,9 +45,8 @@ public class GridData
     public CellSnapshot At(int x, int z)
     {
         CellData data = cells[x, z];
-        return CellSnapshot.FromData(data);
+        return new CellSnapshot(data.Coord, data.Kind, data.DistanceToGoal, data.HasWall);
     }
-
 
     public void SetWall(CellCoord c, bool hasWall) => cells[c.X, c.Z].HasWall = hasWall;
 
@@ -38,7 +58,7 @@ public class GridData
     {
         ClearDistances();
 
-        bool[,] visited = new bool[width, height];
+        bool[,] visited = new bool[Width, Height];
         Queue<CellCoord> cellQueue = new Queue<CellCoord>();
 
         CellCoord g = GoalPos;
@@ -55,7 +75,7 @@ public class GridData
             foreach (var (dx, dz) in Dirs)
             {
                 CellCoord c = coord.Shifted(dx, dz);
-                if (!c.InBounds(width, height) || visited[c.X, c.Z])
+                if (!c.InBounds(Width, Height) || visited[c.X, c.Z])
                 {
                     continue;
                 }
@@ -77,9 +97,9 @@ public class GridData
 
     private void ClearDistances()
     {
-        for (int x = 0; x < width; x++)
+        for (int x = 0; x < Width; x++)
         {
-            for (int z = 0; z < height; z++)
+            for (int z = 0; z < Height; z++)
             {
                 CellData cell = cells[x, z];
                 cell.DistanceToGoal = -1;

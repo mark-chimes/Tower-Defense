@@ -28,7 +28,7 @@ public class CellController : MonoBehaviour
     // Improving it to add checks deferred to later
     CellCoord spawnPos;
     CellCoord goalPos;
-    private GridData Grid;
+    private GridData grid;
 
     private CellView[,] views;
     private Wall[,] wallObjects;
@@ -49,33 +49,20 @@ public class CellController : MonoBehaviour
 
     void GenerateGrid()
     {
-        CellData[,] cells = new CellData[width, height];
-        views = new CellView[width, height];
-        wallObjects = new Wall[width, height];
-
         // TODO out-of-bounds check.
         spawnPos = new CellCoord(spawnPosXZ.x, spawnPosXZ.y);
         goalPos = new CellCoord(goalPosXZ.x, goalPosXZ.y);
+       
+        grid = new GridData(width, height, spawnPos, goalPos);
+
+        views = new CellView[width, height];
+        wallObjects = new Wall[width, height];
 
         for (int x = 0; x < width; x++)
         {
             for (int z = 0; z < height; z++)
             {
-                CellCoord coord = new CellCoord(x, z);
-                CellData cell = new CellData(coord);
-                if (coord == spawnPos)
-                {
-                    cell.Kind = CellKind.Spawn;
-                    GameObject spawnObj = Instantiate(spawnPrefab, transform);
-                    spawnObj.transform.localPosition = CoordsCellToWorld(coord);
-                }
-                else if (coord == goalPos)
-                {
-                    cell.Kind = CellKind.Goal;
-                    GameObject goalObj = Instantiate(goalPrefab, transform);
-                    goalObj.transform.localPosition = CoordsCellToWorld(coord);
-                }
-                cells[x, z] = cell;
+                CellCoord coord = new CellCoord(x,z);
 
                 CellView view = Instantiate(cellPrefab, transform);
                 Vector3 pos = CoordsCellToWorld(coord);
@@ -83,28 +70,43 @@ public class CellController : MonoBehaviour
                 view.name = $"Cell_{x}_{z}";
                 view.Initialize(coord);
                 views[x, z] = view;
+
+                CellSnapshot snap = grid.At(coord);
+
+                switch (snap.Kind) 
+                {
+                    case CellKind.Spawn: InstantiateObject(spawnPrefab, coord); break;
+                    case CellKind.Goal:  InstantiateObject(goalPrefab, coord);  break;
+                }
             }
         }
-        Grid = new GridData(cells, goalPos);
+
         UpdateDistances();
     }
+    
+    void InstantiateObject(GameObject prefab, CellCoord coord)
+    {
+        GameObject obj = Instantiate(prefab, transform);
+        obj.transform.localPosition = CoordsCellToWorld(coord);
+    }
+    
 
 
     // Breadth-first search
     // Cannot use when multiple tile-costs are involved
     void UpdateDistances()
     {
-        Grid.RecomputeDistances();
+        grid.RecomputeDistances();
         RefreshDistanceLabels();
     }
 
     void RefreshDistanceLabels()
     {
-        for (int x = 0; x < width; x++)
+        for (int x = 0; x < grid.Width; x++)
         {
-            for (int z = 0; z < height; z++)
+            for (int z = 0; z < grid.Height; z++)
             {
-                CellSnapshot cell = Grid.At(x, z);
+                CellSnapshot cell = grid.At(x, z);
                 CellView view = views[x, z];
                 int distanceToGoal = cell.DistanceToGoal;
                 view.UpdateDistance(distanceToGoal);
@@ -184,7 +186,7 @@ public class CellController : MonoBehaviour
         if (hoveredCell != null)
         {
             CellCoord c = hoveredCell.Coord;
-            CellSnapshot cell = Grid.At(c);
+            CellSnapshot cell = grid.At(c);
             if (cell.Kind != CellKind.Floor)
                 highlightColor = blockedColor;
             else if (cell.HasWall)
@@ -214,7 +216,7 @@ public class CellController : MonoBehaviour
     private void PlaceWallAtHovered()
     {
         if (hoveredCell == null) return;
-        if (!Grid.CanPlaceWall(hoveredCell.Coord)) return; // TODO: red ghost
+        if (!grid.CanPlaceWall(hoveredCell.Coord)) return; // TODO: red ghost
         SpawnWall(hoveredCell.Coord);
 
     }
@@ -230,7 +232,7 @@ public class CellController : MonoBehaviour
     {
         if (wallObjects[c.X, c.Z] != null) return;
 
-        CellSnapshot cell = Grid.At(c);
+        CellSnapshot cell = grid.At(c);
 
         if (cell.Kind != CellKind.Floor)
         {
@@ -242,7 +244,7 @@ public class CellController : MonoBehaviour
         wall.transform.localPosition = CoordsCellToWorld(c);
         wall.name = $"Wall_{c.X}_{c.Z}";
         wallObjects[c.X, c.Z] = wall;
-        Grid.SetWall(c, true);
+        grid.SetWall(c, true);
         UpdateDistances();
     }
 
@@ -251,7 +253,7 @@ public class CellController : MonoBehaviour
         Wall wall = wallObjects[c.X, c.Z];
         if (wall == null) return;
 
-        CellSnapshot cell = Grid.At(c);
+        CellSnapshot cell = grid.At(c);
 
         if (cell.Kind != CellKind.Floor)
         {
@@ -261,7 +263,7 @@ public class CellController : MonoBehaviour
         wallObjects[c.X, c.Z] = null;
         if (ReferenceEquals(highlighted, wall)) highlighted = null;
         Destroy(wall.gameObject);
-        Grid.SetWall(c, false);
+        grid.SetWall(c, false);
         UpdateDistances();
     }
 }
