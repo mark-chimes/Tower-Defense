@@ -17,7 +17,7 @@ public class GodClass : MonoBehaviour
     [SerializeField] private Signpost signpostPrefab;
     [SerializeField] private int width = 9;
     [SerializeField] private int height = 9;
-    [SerializeField] private float cellSizeMeters = 10f;
+    [SerializeField] private float erfSizeMeters = 10f;
 
     [SerializeField] private Transform wallsParent;
     [SerializeField] private Wall wallPrefab;
@@ -44,7 +44,7 @@ public class GodClass : MonoBehaviour
     private Camera cam;
     private const float MaxRayDistance = 500f;
 
-    private Signpost hoveredCell;
+    private Signpost hoveredErf;
     private IHighlightable highlighted;
 
     void Start()
@@ -69,12 +69,12 @@ public class GodClass : MonoBehaviour
             {
                 Coord coord = new Coord(x,z);
 
-                Signpost view = Instantiate(signpostPrefab, transform);
-                Vector3 pos = CoordsCellToWorld(coord);
-                view.transform.localPosition = pos;
-                view.name = $"Cell_{x}_{z}";
-                view.Initialize(coord);
-                signposts[x, z] = view;
+                Signpost signpost = Instantiate(signpostPrefab, transform);
+                Vector3 pos = CoordsToWorld(coord);
+                signpost.transform.localPosition = pos;
+                signpost.name = $"Signpost_{x}_{z}";
+                signpost.Initialize(coord);
+                signposts[x, z] = signpost;
 
                 ErfSnapshot snap = treasureMap.At(coord);
 
@@ -92,7 +92,7 @@ public class GodClass : MonoBehaviour
     void InstantiateMarker(GameObject prefab, Coord coord)
     {
         GameObject obj = Instantiate(prefab, transform);
-        obj.transform.localPosition = CoordsCellToWorld(coord);
+        obj.transform.localPosition = CoordsToWorld(coord);
     }
     
     // Breadth-first search
@@ -122,7 +122,7 @@ public class GodClass : MonoBehaviour
         Color originalColor = Gizmos.color;
 
         Gizmos.matrix = transform.localToWorldMatrix;
-        Vector3 size = new Vector3(cellSizeMeters, 1f, cellSizeMeters);
+        Vector3 size = new Vector3(erfSizeMeters, 1f, erfSizeMeters);
 
         Coord spawnPos = new Coord(spawnPosXZ.x, spawnPosXZ.y);
         Coord goalPos = new Coord(goalPosXZ.x, goalPosXZ.y);
@@ -136,16 +136,16 @@ public class GodClass : MonoBehaviour
                 if (c == spawnPos)
                 {
                     Gizmos.color = Color.lightBlue;
-                    Gizmos.DrawCube(CoordsCellToWorld(c), size);
+                    Gizmos.DrawCube(CoordsToWorld(c), size);
                 }
                 else if (c == goalPos)
                 {
                     Gizmos.color = Color.yellow;
-                    Gizmos.DrawCube(CoordsCellToWorld(c), size);
+                    Gizmos.DrawCube(CoordsToWorld(c), size);
                 }
                 else
                 {
-                    Gizmos.DrawWireCube(CoordsCellToWorld(c), size);
+                    Gizmos.DrawWireCube(CoordsToWorld(c), size);
                 }
 
 
@@ -155,11 +155,10 @@ public class GodClass : MonoBehaviour
         Gizmos.color = originalColor;
     }
 
-    // Translate from cell coordinates to world coordinates
-    private Vector3 CoordsCellToWorld(Coord coord)
+    private Vector3 CoordsToWorld(Coord coord)
     {
-        float worldX = (coord.X - (width - 1) / 2f) * cellSizeMeters;
-        float worldZ = (coord.Z - (height - 1) / 2f) * cellSizeMeters;
+        float worldX = (coord.X - (width - 1) / 2f) * erfSizeMeters;
+        float worldZ = (coord.Z - (height - 1) / 2f) * erfSizeMeters;
         return new Vector3(worldX, 0f, worldZ);
     }
 
@@ -177,19 +176,19 @@ public class GodClass : MonoBehaviour
     {
         if (Mouse.current == null) return;
 
-        HighlightAtHoveredCell();
+        HighlightAtHoveredErf();
         if (Mouse.current.leftButton.wasPressedThisFrame) PlaceWallAtHovered();
         if (Mouse.current.rightButton.wasPressedThisFrame) DestroyWallAtHovered();
     }
 
-    private void HighlightAtHoveredCell()
+    private void HighlightAtHoveredErf()
     {
-        hoveredCell = RaycastForCell();
+        hoveredErf = RaycastForErf();
         IHighlightable target = null;
         Color highlightColor = Color.magenta; // something went wrong if this is the highlight color
-        if (hoveredCell != null)
+        if (hoveredErf != null)
         {
-            Coord c = hoveredCell.Coord;
+            Coord c = hoveredErf.Coord;
             ErfSnapshot erf = treasureMap.At(c);
             if (erf.Kind != ErfKind.Floor)
                 highlightColor = blockedColor;
@@ -200,7 +199,7 @@ public class GodClass : MonoBehaviour
 
 
             Wall wall = walls[c.X, c.Z];
-            target = (wall != null) ? wall : hoveredCell;
+            target = (wall != null) ? wall : hoveredErf;
         }
         highlighted?.Unhighlight();
         target?.Highlight(highlightColor);
@@ -209,7 +208,7 @@ public class GodClass : MonoBehaviour
 
 
     /// Currently assumes Walls have colliders off. Revisit if colliders turned on.
-    private Signpost RaycastForCell()
+    private Signpost RaycastForErf()
     {
         Vector2 mousePos = Mouse.current.position.ReadValue();
         Ray ray = cam.ScreenPointToRay(mousePos);
@@ -219,16 +218,16 @@ public class GodClass : MonoBehaviour
 
     private void PlaceWallAtHovered()
     {
-        if (hoveredCell == null) return;
-        if (!treasureMap.CanPlaceWall(hoveredCell.Coord)) return; // TODO: red ghost
-        SpawnWall(hoveredCell.Coord);
+        if (hoveredErf == null) return;
+        if (!treasureMap.CanPlaceWall(hoveredErf.Coord)) return; // TODO: red ghost
+        SpawnWall(hoveredErf.Coord);
 
     }
 
     private void DestroyWallAtHovered()
     {
-        if (hoveredCell == null) return;
-        DespawnWall(hoveredCell.Coord);
+        if (hoveredErf == null) return;
+        DespawnWall(hoveredErf.Coord);
 
     }
 
@@ -245,7 +244,7 @@ public class GodClass : MonoBehaviour
         }
 
         Wall wall = Instantiate(wallPrefab, wallsParent);
-        wall.transform.localPosition = CoordsCellToWorld(c);
+        wall.transform.localPosition = CoordsToWorld(c);
         wall.name = $"Wall_{c.X}_{c.Z}";
         walls[c.X, c.Z] = wall;
         treasureMap.SetWall(c, true);
@@ -257,11 +256,11 @@ public class GodClass : MonoBehaviour
         Wall wall = walls[c.X, c.Z];
         if (wall == null) return;
 
-        ErfSnapshot cell = treasureMap.At(c);
+        ErfSnapshot erf = treasureMap.At(c);
 
-        if (cell.Kind != ErfKind.Floor)
+        if (erf.Kind != ErfKind.Floor)
         {
-            Debug.LogError($"DespawnWall: {c} Kind was {cell.Kind}", wall);
+            Debug.LogError($"DespawnWall: {c} Kind was {erf.Kind}", wall);
             return;
         }
         walls[c.X, c.Z] = null;

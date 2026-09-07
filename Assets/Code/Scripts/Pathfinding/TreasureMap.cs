@@ -67,14 +67,14 @@ public class TreasureMap
         ClearDistances();
 
         bool[,] visited = new bool[Width, Height];
-        Queue<Coord> cellQueue = new Queue<Coord>();
+        Queue<Coord> erfQueue = new Queue<Coord>();
 
         Coord g = GoalPos;
         visited[g.X, g.Z] = true;
         distanceToGoal[g.X, g.Z] = 0;
-        cellQueue.Enqueue(g);
+        erfQueue.Enqueue(g);
 
-        while (cellQueue.TryDequeue(out var coord))
+        while (erfQueue.TryDequeue(out var coord))
         {
             int dist = distanceToGoal[coord.X, coord.Z];
 
@@ -87,15 +87,15 @@ public class TreasureMap
                 }
 
                 visited[c.X, c.Z] = true;
-                Erf cell = map[c.X, c.Z];
-                if (cell.HasWall)
+                Erf erf = map[c.X, c.Z];
+                if (erf.HasWall)
                 {
                     distanceToGoal[c.X, c.Z] = -1;
                     continue;
                 }
 
                 distanceToGoal[c.X, c.Z] = dist + 1;
-                cellQueue.Enqueue(c);
+                erfQueue.Enqueue(c);
             }
         }
 
