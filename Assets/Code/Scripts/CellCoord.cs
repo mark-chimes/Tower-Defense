@@ -2,16 +2,19 @@ using System;
 
 public readonly struct CellCoord : IEquatable<CellCoord>
 {
-    public int X {get;}
-    public int Z {get;}
+    public int X { get; }
+    public int Z { get; }
 
     public CellCoord(int x, int z)
     {
         X = x;
         Z = z;
     }
-    
-    public override int GetHashCode() => HashCode.Combine(X,Z);
+
+    public CellCoord Shifted(int x, int z) => new CellCoord(X + x, Z + z);
+    public bool InBounds(int width, int height) => X >= 0 && Z >= 0 && X < width && Z < height;
+
+    public override int GetHashCode() => HashCode.Combine(X, Z);
     public override string ToString() => $"({X}, {Z})";
 
     public bool Equals(CellCoord other) => X == other.X && Z == other.Z;

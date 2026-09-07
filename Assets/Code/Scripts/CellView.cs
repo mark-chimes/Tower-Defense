@@ -5,14 +5,11 @@ public class CellView : MonoBehaviour, IHighlightable
 {
     [SerializeField] private MeshRenderer meshRenderer;
     [SerializeField] private TMPro.TextMeshPro numberLabel;
-    public CellCoord Coord {get; private set;}
-    
-    public int? DistanceNum{get; private set;}
-     // For visualizing distance to target TODO rename
+    public CellCoord Coord { get; private set; }
 
     private MaterialPropertyBlock block;
     private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
-    
+
     public void Awake()
     {
         block = new MaterialPropertyBlock();
@@ -21,18 +18,17 @@ public class CellView : MonoBehaviour, IHighlightable
     public void Initialize(CellCoord coord)
     {
         this.Coord = coord;
-        UpdateDistance(null);
+        UpdateDistance(-1);
     }
 
-    public void UpdateDistance(int? distanceNum)
+    public void UpdateDistance(int distanceNum)
     {
-        this.DistanceNum = distanceNum;
-        if (distanceNum == null)
+        if (distanceNum < 0)
         {
-           numberLabel.text = "X"; 
-           return;
+            numberLabel.text = "X";
+            return;
         }
-        numberLabel.text = DistanceNum.ToString();
+        numberLabel.text = distanceNum.ToString();
     }
 
     public void Highlight(Color color)

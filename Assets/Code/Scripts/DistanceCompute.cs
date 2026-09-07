@@ -1,9 +1,26 @@
 using System.Collections.Generic;
 
-public class DistanceCompute {
+public static class DistanceCompute
+{
 
-    public static void RecomputeDistances(int width, int height, CellCoord goalPos, GridCell[,] cells)
-    {   
+    static readonly (int dx, int dz)[] Dirs = { (1, 0), (-1, 0), (0, 1), (0, -1) };
+
+    private static void ClearDistances(GridCell[,] cells,  int width, int height)
+    {
+        for (int x = 0; x < width; x++)
+        {
+            for (int z = 0; z < height; z++)
+            {
+                GridCell cell = cells[x, z];
+                cell.DistanceToGoal = -1;
+            }
+        }
+    }
+
+    public static void RecomputeDistances(GridCell[,] cells, int width, int height, CellCoord goalPos)
+    {
+        ClearDistances(cells, width, height);
+        
         bool[,] visited = new bool[width, height];
         Queue<CellCoord> cellQueue = new Queue<CellCoord>();
 
@@ -16,80 +33,28 @@ public class DistanceCompute {
         while (cellQueue.TryDequeue(out var coord))
         {
             GridCell topCell = cells[coord.X, coord.Z];
-            int? dist = topCell.DistanceToGoal;
-            CellCoord[] adjacents = Adjacents(coord, 0, 0, width-1, height-1);
+            int dist = topCell.DistanceToGoal;
 
-            for(int i = 0; i < adjacents.Length; i++)
+            foreach (var (dx, dz) in Dirs)
             {
-                CellCoord c = adjacents[i];
-                if (visited[c.X, c.Z]) {
+                CellCoord c = coord.Shifted(dx, dz);
+                if (!c.InBounds(width, height) || visited[c.X, c.Z])
+                {
                     continue;
                 }
+
                 visited[c.X, c.Z] = true;
                 GridCell cell = cells[c.X, c.Z];
-                if (cell.HasWall) {
-                    cell.DistanceToGoal = null;
+                if (cell.HasWall)
+                {
+                    cell.DistanceToGoal = -1;
                     continue;
                 }
-                
-                cell.DistanceToGoal = dist+1;
 
+                cell.DistanceToGoal = dist + 1;
                 cellQueue.Enqueue(c);
             }
         }
 
-        for (int x=0; x < width; x++)
-        {
-            for (int z = 0; z < height; z++)
-            {
-                if (!visited[x,z])
-                {
-                    GridCell cell = cells[x, z];
-                    cell.DistanceToGoal = null;
-                }
-            }
-        }
     }
-
-    
-    static private CellCoord[] Adjacents(CellCoord c, int minX, int minZ, int maxX, int maxZ)
-    { 
-        // out of bounds
-        if (c.X < minX || c.Z < minZ || c.X > maxX || c.Z > maxZ) {
-            return new CellCoord[0];
-        }
-
-        int n = 0;
-        CellCoord[] adjacents = new CellCoord[4];
-
-        if (c.X != minX) {
-            adjacents[n] = new CellCoord(c.X-1, c.Z);
-            n++;
-        } 
-
-        if (c.Z != minZ) {
-            adjacents[n] = new CellCoord(c.X, c.Z-1);
-            n++;
-        }
-
-        if (c.X != maxX) {
-            adjacents[n] = new CellCoord(c.X+1, c.Z);
-            n++;
-        }
-
-        if (c.Z != maxZ) {
-            adjacents[n] = new CellCoord(c.X, c.Z+1);
-            n++;
-        }
-
-        CellCoord[] adjacentsOnly = new CellCoord[n];
-        for (int i = 0; i < n; i++)
-        {
-            adjacentsOnly[i] = adjacents[i];
-        } 
-
-        return adjacentsOnly;
-    }
-
-
-}   
+}

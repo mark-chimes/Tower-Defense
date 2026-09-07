@@ -17,19 +17,19 @@ public class CellController : MonoBehaviour
     [SerializeField] private GameObject goalPrefab;
 
 
-    [SerializeField] private Color placeableColor = Color.green; 
-    [SerializeField] private Color blockedColor = Color.red; 
-    [SerializeField] private Color existingWallColor = Color.yellow; 
+    [SerializeField] private Color placeableColor = Color.green;
+    [SerializeField] private Color blockedColor = Color.red;
+    [SerializeField] private Color existingWallColor = Color.yellow;
 
-    [SerializeField] private Vector2Int spawnPosXZ = new (0,0);
-    [SerializeField] private Vector2Int goalPosXZ = new (1,1);
+    [SerializeField] private Vector2Int spawnPosXZ = new(0, 0);
+    [SerializeField] private Vector2Int goalPosXZ = new(1, 1);
     // Note it is possible to specify the above as out-of-bounds,
     // or as the same square. 
     // Improving it to add checks deferred to later
     CellCoord spawnPos;
     CellCoord goalPos;
+    private GridData Grid;
 
-    private GridCell[,] cells;
     private CellView[,] views;
     private Wall[,] wallObjects;
 
@@ -46,10 +46,10 @@ public class CellController : MonoBehaviour
     {
         GenerateGrid();
     }
-    
+
     void GenerateGrid()
     {
-        cells = new GridCell[width, height];
+        GridCell[,] cells = new GridCell[width, height];
         views = new CellView[width, height];
         wallObjects = new Wall[width, height];
 
@@ -57,32 +57,35 @@ public class CellController : MonoBehaviour
         spawnPos = new CellCoord(spawnPosXZ.x, spawnPosXZ.y);
         goalPos = new CellCoord(goalPosXZ.x, goalPosXZ.y);
 
-        for (int x=0; x < width; x++)
+        for (int x = 0; x < width; x++)
         {
             for (int z = 0; z < height; z++)
             {
-                CellCoord coord = new CellCoord(x,z);
+                CellCoord coord = new CellCoord(x, z);
                 GridCell cell = new GridCell(coord);
                 if (coord == spawnPos)
                 {
                     cell.Kind = CellKind.Spawn;
-                    GameObject spawnObj = Instantiate(spawnPrefab, transform); 
+                    GameObject spawnObj = Instantiate(spawnPrefab, transform);
                     spawnObj.transform.localPosition = CoordsCellToWorld(coord);
-                } else if (coord == goalPos) {
+                }
+                else if (coord == goalPos)
+                {
                     cell.Kind = CellKind.Goal;
-                    GameObject goalObj = Instantiate(goalPrefab, transform); 
+                    GameObject goalObj = Instantiate(goalPrefab, transform);
                     goalObj.transform.localPosition = CoordsCellToWorld(coord);
                 }
-                cells[x,z] = cell;
+                cells[x, z] = cell;
 
-                CellView view = Instantiate(cellPrefab, transform); 
+                CellView view = Instantiate(cellPrefab, transform);
                 Vector3 pos = CoordsCellToWorld(coord);
                 view.transform.localPosition = pos;
                 view.name = $"Cell_{x}_{z}";
                 view.Initialize(coord);
-                views[x,z] = view;
+                views[x, z] = view;
             }
         }
+        Grid = new GridData(cells, goalPos);
         UpdateDistances();
     }
 
@@ -91,22 +94,22 @@ public class CellController : MonoBehaviour
     // Cannot use when multiple tile-costs are involved
     void UpdateDistances()
     {
-        DistanceCompute.RecomputeDistances(width, height, goalPos, cells);
+        Grid.RecomputeDistances();
         RefreshDistanceLabels();
     }
 
     void RefreshDistanceLabels()
     {
-        for (int x=0; x < width; x++)
+        for (int x = 0; x < width; x++)
         {
             for (int z = 0; z < height; z++)
             {
-                GridCell cell = cells[x, z];
+                GridCell cell = Grid.At(x, z);
                 CellView view = views[x, z];
-                int? distanceToGoal = cell.DistanceToGoal;
+                int distanceToGoal = cell.DistanceToGoal;
                 view.UpdateDistance(distanceToGoal);
             }
-        } 
+        }
     }
 
 
@@ -125,22 +128,22 @@ public class CellController : MonoBehaviour
             for (int z = 0; z < height; z++)
             {
                 Gizmos.color = Color.grey;
-                CellCoord c = new CellCoord(x,z);
+                CellCoord c = new CellCoord(x, z);
                 if (c == spawnPos)
                 {
-                    Gizmos.color = Color.lightBlue;        
-                    Gizmos.DrawCube(CoordsCellToWorld(c), size);  
-                } 
-                else if (c == goalPos)  
+                    Gizmos.color = Color.lightBlue;
+                    Gizmos.DrawCube(CoordsCellToWorld(c), size);
+                }
+                else if (c == goalPos)
                 {
-                    Gizmos.color = Color.yellow;        
-                    Gizmos.DrawCube(CoordsCellToWorld(c), size); 
+                    Gizmos.color = Color.yellow;
+                    Gizmos.DrawCube(CoordsCellToWorld(c), size);
                 }
                 else
                 {
                     Gizmos.DrawWireCube(CoordsCellToWorld(c), size);
                 }
-                
+
 
             }
         }
@@ -149,8 +152,8 @@ public class CellController : MonoBehaviour
     // Translate from cell coordinates to world coordinates
     private Vector3 CoordsCellToWorld(CellCoord coord)
     {
-        float worldX = (coord.X - (width-1) / 2f) * cellSizeMeters;
-        float worldZ = (coord.Z - (height-1) / 2f) * cellSizeMeters;
+        float worldX = (coord.X - (width - 1) / 2f) * cellSizeMeters;
+        float worldZ = (coord.Z - (height - 1) / 2f) * cellSizeMeters;
         return new Vector3(worldX, 0f, worldZ);
     }
 
@@ -181,14 +184,14 @@ public class CellController : MonoBehaviour
         if (hoveredCell != null)
         {
             CellCoord c = hoveredCell.Coord;
-            GridCell cell = cells[c.X, c.Z];
+            GridCell cell = Grid.At(c);
             if (cell.Kind != CellKind.Floor)
-                highlightColor = blockedColor;  
+                highlightColor = blockedColor;
             else if (cell.HasWall)
-                highlightColor = existingWallColor;  
+                highlightColor = existingWallColor;
             else
-                highlightColor = placeableColor; 
-            
+                highlightColor = placeableColor;
+
 
             Wall wall = wallObjects[c.X, c.Z];
             target = (wall != null) ? wall : hoveredCell;
@@ -208,30 +211,27 @@ public class CellController : MonoBehaviour
         return hit.collider.GetComponentInParent<CellView>();
     }
 
-    private bool CanPlaceWall(CellCoord c) => cells[c.X, c.Z].Kind == CellKind.Floor
-        && wallObjects[c.X, c.Z] == null;
-
     private void PlaceWallAtHovered()
     {
         if (hoveredCell == null) return;
-        if (!CanPlaceWall(hoveredCell.Coord)) return; // TODO: red ghost
+        if (!Grid.CanPlaceWall(hoveredCell.Coord)) return; // TODO: red ghost
         SpawnWall(hoveredCell.Coord);
-        
+
     }
 
     private void DestroyWallAtHovered()
     {
         if (hoveredCell == null) return;
         DespawnWall(hoveredCell.Coord);
-        
+
     }
 
     private void SpawnWall(CellCoord c)
     {
         if (wallObjects[c.X, c.Z] != null) return;
 
-        GridCell cell = cells[c.X, c.Z];
-        
+        GridCell cell = Grid.At(c);
+
         if (cell.Kind != CellKind.Floor)
         {
             Debug.LogError($"SpawnWall: {c} Kind was {cell.Kind}");
@@ -239,10 +239,10 @@ public class CellController : MonoBehaviour
         }
 
         cell.HasWall = true;
-        Wall wall = Instantiate(wallPrefab, wallsParent); 
+        Wall wall = Instantiate(wallPrefab, wallsParent);
         wall.transform.localPosition = CoordsCellToWorld(c);
         wall.name = $"Wall_{c.X}_{c.Z}";
-        wallObjects[c.X,c.Z] = wall;
+        wallObjects[c.X, c.Z] = wall;
         UpdateDistances();
     }
 
@@ -251,7 +251,7 @@ public class CellController : MonoBehaviour
         Wall wall = wallObjects[c.X, c.Z];
         if (wall == null) return;
 
-        GridCell cell = cells[c.X, c.Z];
+        GridCell cell = Grid.At(c);
 
         if (cell.Kind != CellKind.Floor)
         {
