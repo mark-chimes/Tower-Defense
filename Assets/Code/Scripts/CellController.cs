@@ -91,8 +91,22 @@ public class CellController : MonoBehaviour
     // Cannot use when multiple tile-costs are involved
     void UpdateDistances()
     {
-        DistanceCompute compute = new DistanceCompute();
-        compute.UpdateDistances(width, height, goalPos, cells, views);
+        DistanceCompute.RecomputeDistances(width, height, goalPos, cells);
+        RefreshDistanceLabels();
+    }
+
+    void RefreshDistanceLabels()
+    {
+        for (int x=0; x < width; x++)
+        {
+            for (int z = 0; z < height; z++)
+            {
+                GridCell cell = cells[x, z];
+                CellView view = views[x, z];
+                int? distanceToGoal = cell.DistanceToGoal;
+                view.UpdateDistance(distanceToGoal);
+            }
+        } 
     }
 
 

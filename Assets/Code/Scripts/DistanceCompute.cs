@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 public class DistanceCompute {
 
-    public void UpdateDistances(int width, int height, CellCoord goalPos, GridCell[,] cells,  CellView[,] views)
+    public static void RecomputeDistances(int width, int height, CellCoord goalPos, GridCell[,] cells)
     {   
         bool[,] visited = new bool[width, height];
         Queue<CellCoord> cellQueue = new Queue<CellCoord>();
@@ -27,15 +27,12 @@ public class DistanceCompute {
                 }
                 visited[c.X, c.Z] = true;
                 GridCell cell = cells[c.X, c.Z];
-                CellView view = views[c.X, c.Z];
                 if (cell.HasWall) {
                     cell.DistanceToGoal = null;
-                    view.UpdateDistance(null);
                     continue;
                 }
                 
                 cell.DistanceToGoal = dist+1;
-                view.UpdateDistance(dist+1);
 
                 cellQueue.Enqueue(c);
             }
@@ -48,17 +45,14 @@ public class DistanceCompute {
                 if (!visited[x,z])
                 {
                     GridCell cell = cells[x, z];
-                    CellView view = views[x, z];
                     cell.DistanceToGoal = null;
-                    view.UpdateDistance(null);
                 }
             }
-
         }
     }
 
     
-    private CellCoord[] Adjacents(CellCoord c, int minX, int minZ, int maxX, int maxZ)
+    static private CellCoord[] Adjacents(CellCoord c, int minX, int minZ, int maxX, int maxZ)
     { 
         // out of bounds
         if (c.X < minX || c.Z < minZ || c.X > maxX || c.Z > maxZ) {
