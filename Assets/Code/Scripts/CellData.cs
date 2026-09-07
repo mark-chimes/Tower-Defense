@@ -1,4 +1,4 @@
-public class GridCell
+public class CellData
 {
     public readonly CellCoord Coord;
 
@@ -7,7 +7,7 @@ public class GridCell
     public CellKind Kind;
     public bool HasWall;
 
-    public GridCell(CellCoord coord) {
+    public CellData(CellCoord coord) {
         this.Coord = coord;
         this.DistanceToGoal = -1;
     }

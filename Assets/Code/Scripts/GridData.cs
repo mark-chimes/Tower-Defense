@@ -1,45 +1,55 @@
 using System.Collections.Generic;
 
-public class GridData 
+public class GridData
 {
 
-    private GridCell[,] Cells;
+    private CellData[,] cells;
     public readonly int width;
     public readonly int height;
 
-    private CellCoord goalPos;
-
-
-    public GridData(GridCell[,] cells, CellCoord goalPos) { 
-        Cells = cells;
-        width = Cells.GetLength(0);
-        height = Cells.GetLength(1);
-    }
-
-    public GridCell At(CellCoord coord) => At(coord.X, coord.Z);
-    public GridCell At(int x, int z) => Cells[x, z];
-
-    public bool CanPlaceWall(CellCoord c) => Cells[c.X, c.Z].Kind == CellKind.Floor
-        && !Cells[c.X, c.Z].HasWall;
+    private CellCoord GoalPos;
 
     static readonly (int dx, int dz)[] Dirs = { (1, 0), (-1, 0), (0, 1), (0, -1) };
+
+    public GridData(CellData[,] cells, CellCoord goalPos)
+    {
+        this.cells = cells;
+        GoalPos = goalPos;
+        width = this.cells.GetLength(0);
+        height = this.cells.GetLength(1);
+    }
+
+    public CellSnapshot At(CellCoord coord) => At(coord.X, coord.Z);
+
+    public CellSnapshot At(int x, int z)
+    {
+        CellData data = cells[x, z];
+        return CellSnapshot.FromData(data);
+    }
+
+
+    public void SetWall(CellCoord c, bool hasWall) => cells[c.X, c.Z].HasWall = hasWall;
+
+    public bool CanPlaceWall(CellCoord c) => cells[c.X, c.Z].Kind == CellKind.Floor
+        && !cells[c.X, c.Z].HasWall;
+
 
     public void RecomputeDistances()
     {
         ClearDistances();
-        
+
         bool[,] visited = new bool[width, height];
         Queue<CellCoord> cellQueue = new Queue<CellCoord>();
 
-        CellCoord g = goalPos;
+        CellCoord g = GoalPos;
         visited[g.X, g.Z] = true;
-        GridCell goalCell = Cells[g.X, g.Z];
+        CellData goalCell = cells[g.X, g.Z];
         goalCell.DistanceToGoal = 0;
         cellQueue.Enqueue(g);
 
         while (cellQueue.TryDequeue(out var coord))
         {
-            GridCell topCell = Cells[coord.X, coord.Z];
+            CellData topCell = cells[coord.X, coord.Z];
             int dist = topCell.DistanceToGoal;
 
             foreach (var (dx, dz) in Dirs)
@@ -51,7 +61,7 @@ public class GridData
                 }
 
                 visited[c.X, c.Z] = true;
-                GridCell cell = Cells[c.X, c.Z];
+                CellData cell = cells[c.X, c.Z];
                 if (cell.HasWall)
                 {
                     cell.DistanceToGoal = -1;
@@ -71,7 +81,7 @@ public class GridData
         {
             for (int z = 0; z < height; z++)
             {
-                GridCell cell = Cells[x, z];
+                CellData cell = cells[x, z];
                 cell.DistanceToGoal = -1;
             }
         }

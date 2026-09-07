@@ -49,7 +49,7 @@ public class CellController : MonoBehaviour
 
     void GenerateGrid()
     {
-        GridCell[,] cells = new GridCell[width, height];
+        CellData[,] cells = new CellData[width, height];
         views = new CellView[width, height];
         wallObjects = new Wall[width, height];
 
@@ -62,7 +62,7 @@ public class CellController : MonoBehaviour
             for (int z = 0; z < height; z++)
             {
                 CellCoord coord = new CellCoord(x, z);
-                GridCell cell = new GridCell(coord);
+                CellData cell = new CellData(coord);
                 if (coord == spawnPos)
                 {
                     cell.Kind = CellKind.Spawn;
@@ -104,7 +104,7 @@ public class CellController : MonoBehaviour
         {
             for (int z = 0; z < height; z++)
             {
-                GridCell cell = Grid.At(x, z);
+                CellSnapshot cell = Grid.At(x, z);
                 CellView view = views[x, z];
                 int distanceToGoal = cell.DistanceToGoal;
                 view.UpdateDistance(distanceToGoal);
@@ -184,7 +184,7 @@ public class CellController : MonoBehaviour
         if (hoveredCell != null)
         {
             CellCoord c = hoveredCell.Coord;
-            GridCell cell = Grid.At(c);
+            CellSnapshot cell = Grid.At(c);
             if (cell.Kind != CellKind.Floor)
                 highlightColor = blockedColor;
             else if (cell.HasWall)
@@ -230,7 +230,7 @@ public class CellController : MonoBehaviour
     {
         if (wallObjects[c.X, c.Z] != null) return;
 
-        GridCell cell = Grid.At(c);
+        CellSnapshot cell = Grid.At(c);
 
         if (cell.Kind != CellKind.Floor)
         {
@@ -238,11 +238,11 @@ public class CellController : MonoBehaviour
             return;
         }
 
-        cell.HasWall = true;
         Wall wall = Instantiate(wallPrefab, wallsParent);
         wall.transform.localPosition = CoordsCellToWorld(c);
         wall.name = $"Wall_{c.X}_{c.Z}";
         wallObjects[c.X, c.Z] = wall;
+        Grid.SetWall(c, true);
         UpdateDistances();
     }
 
@@ -251,18 +251,17 @@ public class CellController : MonoBehaviour
         Wall wall = wallObjects[c.X, c.Z];
         if (wall == null) return;
 
-        GridCell cell = Grid.At(c);
+        CellSnapshot cell = Grid.At(c);
 
         if (cell.Kind != CellKind.Floor)
         {
             Debug.LogError($"DespawnWall: {c} Kind was {cell.Kind}", wall);
             return;
         }
-
-        cell.HasWall = false;
         wallObjects[c.X, c.Z] = null;
         if (ReferenceEquals(highlighted, wall)) highlighted = null;
         Destroy(wall.gameObject);
+        Grid.SetWall(c, false);
         UpdateDistances();
     }
 }
