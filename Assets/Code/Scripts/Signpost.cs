@@ -5,6 +5,10 @@ public class Signpost : MonoBehaviour, IHighlightable
 {
     [SerializeField] private MeshRenderer meshRenderer;
     [SerializeField] private TMPro.TextMeshPro numberLabel;
+
+    [SerializeField] private DirectionArrow arrow;
+
+
     public Coord Coord { get; private set; }
 
     private MaterialPropertyBlock block;
@@ -13,6 +17,8 @@ public class Signpost : MonoBehaviour, IHighlightable
     public void Awake()
     {
         block = new MaterialPropertyBlock();
+        arrow.TurnTo(DirectionArrow.Direction.North);
+        arrow.Show();
     }
 
     public void Initialize(Coord coord)
