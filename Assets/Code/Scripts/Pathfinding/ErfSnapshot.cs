@@ -6,14 +6,17 @@ public readonly struct ErfSnapshot
 
     public Cardinal CameFrom { get; }
 
+    public bool OnCriticalPath { get; }
+
     public bool HasWall { get; }
 
-    public ErfSnapshot(Coord coord, ErfKind kind, int distanceToGoal, Cardinal cameFrom, bool hasWall)
+    public ErfSnapshot(Coord coord, ErfKind kind, int distanceToGoal, Cardinal cameFrom, bool onCriticalPath, bool hasWall)
     {
         Coord = coord;
         Kind = kind;
         DistanceToGoal = distanceToGoal;
         CameFrom = cameFrom;
+        OnCriticalPath = onCriticalPath;
         HasWall = hasWall;
     }
 }

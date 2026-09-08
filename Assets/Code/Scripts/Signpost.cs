@@ -8,6 +8,8 @@ public class Signpost : MonoBehaviour, IHighlightable
 
     [SerializeField] private DirectionArrow arrow;
 
+    [SerializeField] private Color arrowHighlightColor;
+
 
     public Coord Coord { get; private set; }
 
@@ -37,8 +39,17 @@ public class Signpost : MonoBehaviour, IHighlightable
         numberLabel.text = distanceNum.ToString();
     }
 
-    public void UpdateArrow(Cardinal cameFrom) { 
+    public void UpdateArrow(Cardinal cameFrom, bool isCritical)
+    {
         arrow.TurnTo(cameFrom);
+        if (isCritical)
+        {
+            arrow.Highlight(arrowHighlightColor);
+        }
+        else
+        {
+            arrow.Unhighlight();
+        }
     }
 
     public void Highlight(Color color)

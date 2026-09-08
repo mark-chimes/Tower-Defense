@@ -110,8 +110,9 @@ public class GodClass : MonoBehaviour
             for (int z = 0; z < treasureMap.Height; z++)
             {
                 Signpost signpost = signposts[x, z];
-                signpost.UpdateDistance(treasureMap.DistanceToGoal(x,z));
-                signpost.UpdateArrow(treasureMap.CameFrom(x,z));
+                ErfSnapshot erf = treasureMap.At(x,z);
+                signpost.UpdateDistance(erf.DistanceToGoal);
+                signpost.UpdateArrow(erf.CameFrom, erf.OnCriticalPath);
             }
         }
     }
