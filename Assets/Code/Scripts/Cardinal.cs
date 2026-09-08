@@ -1,8 +1,9 @@
 public enum Cardinal
 {
     North,
-    South,
     East,
+
+    South,
     West,
     None,
 }
