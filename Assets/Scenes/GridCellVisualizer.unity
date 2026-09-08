@@ -333,7 +333,7 @@ MonoBehaviour:
   blockedColor: {r: 1, g: 0, b: 0, a: 1}
   existingWallColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   spawnPosXZ: {x: 0, y: 0}
-  goalPosXZ: {x: 0, y: 4}
+  goalPosXZ: {x: 8, y: 8}
 --- !u!1 &783511479
 GameObject:
   m_ObjectHideFlags: 0
