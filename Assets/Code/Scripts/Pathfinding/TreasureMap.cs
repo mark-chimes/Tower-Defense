@@ -4,29 +4,20 @@ public class TreasureMap
 {
 
     private Erf[,] map;
-    private int[,] distanceToGoal;
-    private Cardinal[,] dirToGoal;
-
-    private bool[,] onCriticalPath;
-
-
     public readonly int Width;
     public readonly int Height;
-
     public Coord SpawnPos { get; }
     public Coord GoalPos { get; }
 
+    private FlowField currentFlow;
+
     public TreasureMap(int width, int height, Coord spawnPos, Coord goalPos)
     {
+        map = new Erf[width, height];
         Width = width;
         Height = height;
         SpawnPos = spawnPos;
         GoalPos = goalPos;
-
-        map = new Erf[width, height];
-        distanceToGoal = new int[width, height];
-        dirToGoal = new Cardinal[width, height];
-        onCriticalPath = new bool[width, height];
 
         for (int x = 0; x < width; x++)
         {
@@ -46,14 +37,25 @@ public class TreasureMap
                 map[x, z] = erf;
             }
         }
+
+        Recompute();
     }
 
-    public ErfSnapshot At(Coord coord) => At(coord.X, coord.Z);
+    public void Recompute()
+    {
+        currentFlow = ComputeFlow();
+    }
+
+    public ErfSnapshot At(Coord coord)
+    {
+        Erf data = map[coord.X, coord.Z];
+        return new ErfSnapshot(coord, data.Kind, currentFlow, data.HasWall);
+    }
 
     public ErfSnapshot At(int x, int z)
     {
         Erf data = map[x, z];
-        return new ErfSnapshot(data.Coord, data.Kind, distanceToGoal[x, z], dirToGoal[x, z], onCriticalPath[x, z], data.HasWall);
+        return new ErfSnapshot(data.Coord, data.Kind, currentFlow, data.HasWall);
     }
 
     public void SetWall(Coord c, bool hasWall) => map[c.X, c.Z].HasWall = hasWall;
@@ -62,10 +64,31 @@ public class TreasureMap
         && !map[c.X, c.Z].HasWall;
 
 
-    public void RecomputeDistances()
+    public FlowField ComputeFlow()
     {
-        ClearMarkings();
+        int[,] distanceToGoal = new int[Width, Height];
+        Compass[,] dirToGoal = new Compass[Width, Height];
+        bool[,] onCriticalPath = new bool[Width, Height];
 
+        for (int x = 0; x < Width; x++)
+        {
+            for (int z = 0; z < Height; z++)
+            {
+                distanceToGoal[x, z] = -1;
+                dirToGoal[x, z] = Compass.None;
+                onCriticalPath[x, z] = false;
+            }
+        }
+
+        BreadthFirstFromGoal( distanceToGoal, dirToGoal);
+
+        MarkCriticalPath(dirToGoal, onCriticalPath);
+
+        return new FlowField(distanceToGoal, dirToGoal, onCriticalPath);
+    }
+
+    private void BreadthFirstFromGoal(int[,] distanceToGoal, Compass[,] dirToGoal)
+    {
         bool[,] visited = new bool[Width, Height];
         Queue<Coord> erfQueue = new Queue<Coord>();
 
@@ -78,7 +101,7 @@ public class TreasureMap
         {
             int dist = distanceToGoal[coord.X, coord.Z];
 
-            foreach (Cardinal dir in Compass.AllDirs)
+            foreach (Compass dir in CompassExtension.AllDirs)
             {
                 Coord c = coord.InDirection(dir);
                 if (!c.InBounds(Width, Height) || visited[c.X, c.Z])
@@ -99,35 +122,21 @@ public class TreasureMap
                 erfQueue.Enqueue(c);
             }
         }
-
-        ComputeCriticalPath();
     }
 
-    private void ComputeCriticalPath()
+    private void MarkCriticalPath(Compass[,] dirToGoal, bool[,] onCriticalPath)
     {
         Coord? c = SpawnPos;
         while (c != null && c != GoalPos)
         {
             Coord coord = (Coord)c;
             onCriticalPath[coord.X, coord.Z] = true;
-            Cardinal dir = dirToGoal[coord.X, coord.Z];
+            Compass dir = dirToGoal[coord.X, coord.Z];
             c = coord.InDirectionInBoundsNonSelf(dir, Width, Height);
         }
-
     }
 
-    private void ClearMarkings()
-    {
-        for (int x = 0; x < Width; x++)
-        {
-            for (int z = 0; z < Height; z++)
-            {
-                distanceToGoal[x, z] = -1;
-                dirToGoal[x, z] = Cardinal.None;
-                onCriticalPath[x, z] = false;
-            }
-        }
-    }
+
 }
 
 

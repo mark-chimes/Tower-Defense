@@ -4,19 +4,19 @@ public readonly struct ErfSnapshot
     public ErfKind Kind { get; }
     public int DistanceToGoal { get; }
 
-    public Cardinal DirToGoal { get; }
+    public Compass DirToGoal { get; }
 
     public bool OnCriticalPath { get; }
 
     public bool HasWall { get; }
 
-    public ErfSnapshot(Coord coord, ErfKind kind, int distanceToGoal, Cardinal dirToGoal, bool onCriticalPath, bool hasWall)
+    public ErfSnapshot(Coord coord, ErfKind kind, FlowField flow, bool hasWall)
     {
         Coord = coord;
         Kind = kind;
-        DistanceToGoal = distanceToGoal;
-        DirToGoal = dirToGoal;
-        OnCriticalPath = onCriticalPath;
+        DistanceToGoal = flow.DistanceAt(coord);
+        DirToGoal =flow.DirectionAt(coord);
+        OnCriticalPath =  flow.OnCriticalPath(coord);
         HasWall = hasWall;
     }
 }

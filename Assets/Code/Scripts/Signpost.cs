@@ -8,7 +8,7 @@ public class Signpost : MonoBehaviour, IHighlightable
 
     [SerializeField] private DirectionArrow arrow;
 
-    [SerializeField] private Color arrowHighlightColor;
+    [SerializeField] private Color arrowHighlightColor ;
 
 
     public Coord Coord { get; private set; }
@@ -19,7 +19,7 @@ public class Signpost : MonoBehaviour, IHighlightable
     public void Awake()
     {
         block = new MaterialPropertyBlock();
-        arrow.TurnTo(Cardinal.North);
+        arrow.TurnTo(Compass.North);
         arrow.Show();
     }
 
@@ -39,7 +39,7 @@ public class Signpost : MonoBehaviour, IHighlightable
         numberLabel.text = distanceNum.ToString();
     }
 
-    public void UpdateArrow(Cardinal dirToGoal, bool isCritical)
+    public void UpdateArrow(Compass dirToGoal, bool isCritical)
     {
         arrow.TurnTo(dirToGoal);
         if (isCritical)

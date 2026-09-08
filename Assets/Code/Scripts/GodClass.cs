@@ -99,7 +99,7 @@ public class GodClass : MonoBehaviour
     // Cannot use when multiple tile-costs are involved
     void UpdateDistances()
     {
-        treasureMap.RecomputeDistances();
+        treasureMap.Recompute();
         RefreshDistanceLabels();
     }
 

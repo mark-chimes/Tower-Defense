@@ -32,14 +32,14 @@ public class DirectionArrow : MonoBehaviour, IHighlightable
         Show();
     }
 
-    public void TurnTo(Cardinal dir) { 
+    public void TurnTo(Compass dir) { 
         switch (dir) 
         {
-            case Cardinal.North: TurnTo(0,1); break;
-            case Cardinal.East: TurnTo(1,0);  break;
-            case Cardinal.South: TurnTo(0,-1); break;
-            case Cardinal.West: TurnTo(-1,0);  break;
-            case Cardinal.None: Hide(); break;  
+            case Compass.North: TurnTo(0,1); break;
+            case Compass.East: TurnTo(1,0);  break;
+            case Compass.South: TurnTo(0,-1); break;
+            case Compass.West: TurnTo(-1,0);  break;
+            case Compass.None: Hide(); break;  
         }
     }
 
