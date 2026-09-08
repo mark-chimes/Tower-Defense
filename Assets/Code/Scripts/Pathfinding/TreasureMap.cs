@@ -5,7 +5,7 @@ public class TreasureMap
 
     private Erf[,] map;
     private int[,] distanceToGoal;
-    private Cardinal[,] cameFrom;
+    private Cardinal[,] dirToGoal;
 
     private bool[,] onCriticalPath;
 
@@ -16,8 +16,6 @@ public class TreasureMap
     public Coord SpawnPos { get; }
     public Coord GoalPos { get; }
 
-    static readonly (int dx, int dz)[] Dirs = { (1, 0), (-1, 0), (0, 1), (0, -1) };
-
     public TreasureMap(int width, int height, Coord spawnPos, Coord goalPos)
     {
         Width = width;
@@ -27,7 +25,7 @@ public class TreasureMap
 
         map = new Erf[width, height];
         distanceToGoal = new int[width, height];
-        cameFrom = new Cardinal[width, height];
+        dirToGoal = new Cardinal[width, height];
         onCriticalPath = new bool[width, height];
 
         for (int x = 0; x < width; x++)
@@ -55,17 +53,7 @@ public class TreasureMap
     public ErfSnapshot At(int x, int z)
     {
         Erf data = map[x, z];
-        return new ErfSnapshot(data.Coord, data.Kind, distanceToGoal[x, z], cameFrom[x, z], onCriticalPath[x, z], data.HasWall);
-    }
-
-    public int DistanceToGoal(int x, int z)
-    {
-        return distanceToGoal[x, z];
-    }
-
-    public Cardinal CameFrom(int x, int z)
-    {
-        return cameFrom[x, z];
+        return new ErfSnapshot(data.Coord, data.Kind, distanceToGoal[x, z], dirToGoal[x, z], onCriticalPath[x, z], data.HasWall);
     }
 
     public void SetWall(Coord c, bool hasWall) => map[c.X, c.Z].HasWall = hasWall;
@@ -90,9 +78,9 @@ public class TreasureMap
         {
             int dist = distanceToGoal[coord.X, coord.Z];
 
-            foreach (var (dx, dz) in Dirs)
+            foreach (Cardinal dir in Compass.AllDirs)
             {
-                Coord c = coord.Shifted(dx, dz);
+                Coord c = coord.InDirection(dir);
                 if (!c.InBounds(Width, Height) || visited[c.X, c.Z])
                 {
                     continue;
@@ -107,7 +95,7 @@ public class TreasureMap
                 }
 
                 distanceToGoal[c.X, c.Z] = dist + 1;
-                cameFrom[c.X, c.Z] = c.DirTo(coord);
+                dirToGoal[c.X, c.Z] = dir.Opposite();
                 erfQueue.Enqueue(c);
             }
         }
@@ -122,7 +110,7 @@ public class TreasureMap
         {
             Coord coord = (Coord)c;
             onCriticalPath[coord.X, coord.Z] = true;
-            Cardinal dir = cameFrom[coord.X, coord.Z];
+            Cardinal dir = dirToGoal[coord.X, coord.Z];
             c = coord.InDirectionInBoundsNonSelf(dir, Width, Height);
         }
 
@@ -135,7 +123,7 @@ public class TreasureMap
             for (int z = 0; z < Height; z++)
             {
                 distanceToGoal[x, z] = -1;
-                cameFrom[x, z] = Cardinal.None;
+                dirToGoal[x, z] = Cardinal.None;
                 onCriticalPath[x, z] = false;
             }
         }

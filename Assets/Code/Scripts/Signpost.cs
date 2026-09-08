@@ -39,9 +39,9 @@ public class Signpost : MonoBehaviour, IHighlightable
         numberLabel.text = distanceNum.ToString();
     }
 
-    public void UpdateArrow(Cardinal cameFrom, bool isCritical)
+    public void UpdateArrow(Cardinal dirToGoal, bool isCritical)
     {
-        arrow.TurnTo(cameFrom);
+        arrow.TurnTo(dirToGoal);
         if (isCritical)
         {
             arrow.Highlight(arrowHighlightColor);
