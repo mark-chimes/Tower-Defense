@@ -17,7 +17,7 @@ public class Signpost : MonoBehaviour, IHighlightable
     public void Awake()
     {
         block = new MaterialPropertyBlock();
-        arrow.TurnTo(DirectionArrow.Direction.North);
+        arrow.TurnTo(Cardinal.North);
         arrow.Show();
     }
 
@@ -35,6 +35,10 @@ public class Signpost : MonoBehaviour, IHighlightable
             return;
         }
         numberLabel.text = distanceNum.ToString();
+    }
+
+    public void UpdateArrow(Cardinal cameFrom) { 
+        arrow.TurnTo(cameFrom);
     }
 
     public void Highlight(Color color)

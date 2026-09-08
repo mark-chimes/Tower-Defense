@@ -5,6 +5,7 @@ public class TreasureMap
 
     private Erf[,] map;
     private int[,] distanceToGoal;
+    private Cardinal[,] cameFrom;
 
 
     public readonly int Width;
@@ -23,6 +24,7 @@ public class TreasureMap
 
         map = new Erf[width, height];
         distanceToGoal = new int[width, height];
+        cameFrom = new Cardinal[width, height];
 
         for (int x = 0; x < width; x++)
         {
@@ -49,11 +51,17 @@ public class TreasureMap
     public ErfSnapshot At(int x, int z)
     {
         Erf data = map[x, z];
-        return new ErfSnapshot(data.Coord, data.Kind, distanceToGoal[x,z], data.HasWall);
+        return new ErfSnapshot(data.Coord, data.Kind, distanceToGoal[x,z], cameFrom[x,z], data.HasWall);
     }
+
     public int DistanceToGoal(int x, int z)
     {
         return distanceToGoal[x,z];
+    }
+
+    public Cardinal CameFrom(int x, int z) 
+    {
+        return cameFrom[x,z];
     }
 
     public void SetWall(Coord c, bool hasWall) => map[c.X, c.Z].HasWall = hasWall;
@@ -64,7 +72,7 @@ public class TreasureMap
 
     public void RecomputeDistances()
     {
-        ClearDistances();
+        ClearMarkings();
 
         bool[,] visited = new bool[Width, Height];
         Queue<Coord> erfQueue = new Queue<Coord>();
@@ -95,19 +103,21 @@ public class TreasureMap
                 }
 
                 distanceToGoal[c.X, c.Z] = dist + 1;
+                cameFrom[c.X, c.Z] = c.DirTo(coord);
                 erfQueue.Enqueue(c);
             }
         }
 
     }
 
-    private void ClearDistances()
+    private void ClearMarkings()
     {
         for (int x = 0; x < Width; x++)
         {
             for (int z = 0; z < Height; z++)
             {
                 distanceToGoal[x, z]= -1;
+                cameFrom[x,z] = Cardinal.None;
             }
         }
     }

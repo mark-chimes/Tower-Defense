@@ -111,6 +111,7 @@ public class GodClass : MonoBehaviour
             {
                 Signpost signpost = signposts[x, z];
                 signpost.UpdateDistance(treasureMap.DistanceToGoal(x,z));
+                signpost.UpdateArrow(treasureMap.CameFrom(x,z));
             }
         }
     }
