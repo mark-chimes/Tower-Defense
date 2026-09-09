@@ -10,7 +10,7 @@ public class DebugGUI : MonoBehaviour
 
     void OnGUI ()
     {
-        GUI.Box(new Rect(10,10,140,110), "VISUALIZE");
+        GUI.Box(new Rect(10,10,140,150), "VISUALIZE");
     
         if(GUI.Button(new Rect(20,40,120,20), "Instant Refresh"))
         {
@@ -18,12 +18,19 @@ public class DebugGUI : MonoBehaviour
             visualizer.OnRefreshPressed();
         }
 
-        // if(GUI.Button(new Rect(20,65,80,20), "Button"))
-        // {
-        //     Debug.Log("Button");
-        // }
+        if(GUI.Button(new Rect(20,65,80,20), "Clear Field"))
+        {
+            Debug.Log("Clear Field");
+            visualizer.OnClearFieldPressed();        
+        }
 
-        visualizeEnabled = GUI.Toggle(new Rect(20,90,80,20), visualizeEnabled, "Visualize");
+        if(GUI.Button(new Rect(20,90,80,20), "Single Step"))
+        {
+            Debug.Log("Single Step");
+            visualizer.OnSingleStepPressed();        
+        }
+
+        visualizeEnabled = GUI.Toggle(new Rect(20,115,80,20), visualizeEnabled, "Visualize");
         if (wasEnabled != visualizeEnabled) { 
             wasEnabled = visualizeEnabled;
             visualizer.SetSlowPathfindingMode(visualizeEnabled);

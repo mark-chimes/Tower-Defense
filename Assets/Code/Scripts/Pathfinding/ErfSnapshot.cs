@@ -10,6 +10,7 @@ public readonly struct ErfSnapshot
 
     public bool HasWall { get; }
 
+    // Snapshot should never return the FlowField or any of its components directly.
     public ErfSnapshot(Coord coord, ErfKind kind, FlowField flow, bool hasWall)
     {
         Coord = coord;

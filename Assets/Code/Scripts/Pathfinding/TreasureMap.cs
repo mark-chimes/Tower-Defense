@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 public class TreasureMap
 {
@@ -10,6 +11,13 @@ public class TreasureMap
     public Coord GoalPos { get; }
 
     private FlowField currentFlow;
+    public bool isDistanceCalcComplete = false;
+
+    bool[,] visited;
+    Queue<Coord> erfQueue;
+    Coord? pathC;
+
+
 
     public TreasureMap(int width, int height, Coord spawnPos, Coord goalPos)
     {
@@ -41,9 +49,29 @@ public class TreasureMap
         Recompute();
     }
 
+    public void ClearField()
+    {
+        visited = new bool[Width, Height];
+        erfQueue = new Queue<Coord>();
+        currentFlow = new FlowField(Width, Height);
+        isDistanceCalcComplete = false;
+
+        Coord g = GoalPos;
+        visited[g.X, g.Z] = true;
+        currentFlow.distanceToGoal[g.X, g.Z] = 0;
+        erfQueue.Enqueue(g);
+        pathC = SpawnPos;
+    }
+
+    public void SingleStep()
+    {
+        ComputeSingleStep();
+    }
+
     public void Recompute()
     {
-        currentFlow = ComputeFlow();
+        ClearField();
+        ComputeFlow();
     }
 
     public ErfSnapshot At(Coord coord)
@@ -52,7 +80,7 @@ public class TreasureMap
         return new ErfSnapshot(coord, data.Kind, currentFlow, data.HasWall);
     }
 
-    public ErfSnapshot At(int x, int z) => At(new Coord(x,z));
+    public ErfSnapshot At(int x, int z) => At(new Coord(x, z));
 
     public void SetWall(Coord c, bool hasWall) => map[c.X, c.Z].HasWall = hasWall;
 
@@ -60,42 +88,73 @@ public class TreasureMap
         && !map[c.X, c.Z].HasWall;
 
 
-
-    private FlowField ComputeFlow()
+    private void ComputeSingleStep()
     {
-        int[,] distanceToGoal = new int[Width, Height];
-        Compass[,] dirToGoal = new Compass[Width, Height];
-        bool[,] onCriticalPath = new bool[Width, Height];
-
-        for (int x = 0; x < Width; x++)
+        if (!isDistanceCalcComplete)
         {
-            for (int z = 0; z < Height; z++)
-            {
-                distanceToGoal[x, z] = -1;
-                dirToGoal[x, z] = Compass.None;
-                onCriticalPath[x, z] = false;
-            }
+            BFSSingleStep(currentFlow.distanceToGoal, currentFlow.dirToGoal);
         }
-
-        // Breadth-first search
-        // Cannot use when multiple tile-costs are involved
-        BreadthFirstFromGoal(distanceToGoal, dirToGoal);
-
-        MarkCriticalPath(dirToGoal, onCriticalPath);
-
-        return new FlowField(distanceToGoal, dirToGoal, onCriticalPath);
+        else
+        {
+            MarkCriticalPathSingleStep(currentFlow.dirToGoal, currentFlow.onCriticalPath);
+        }
     }
 
+    private void ComputeFlow()
+    {
+        BreadthFirstFromGoal(currentFlow.distanceToGoal, currentFlow.dirToGoal);
+        MarkCriticalPath(currentFlow.dirToGoal, currentFlow.onCriticalPath);
+    }
+
+    private void BFSSingleStep(int[,] distanceToGoal, Compass[,] dirToGoal)
+    {
+        if (isDistanceCalcComplete) return;
+
+        if (erfQueue.TryDequeue(out var coord))
+        {
+            int dist = distanceToGoal[coord.X, coord.Z];
+
+            foreach (Compass dir in CompassExtension.AllDirs)
+            {
+                Coord c = coord.InDirection(dir);
+                if (!c.InBounds(Width, Height) || visited[c.X, c.Z])
+                {
+                    continue;
+                }
+
+                visited[c.X, c.Z] = true;
+                Erf erf = map[c.X, c.Z];
+                if (erf.HasWall)
+                {
+                    distanceToGoal[c.X, c.Z] = -1;
+                    continue;
+                }
+
+                distanceToGoal[c.X, c.Z] = dist + 1;
+                dirToGoal[c.X, c.Z] = dir.Opposite();
+                erfQueue.Enqueue(c);
+            }
+        } else { 
+            isDistanceCalcComplete = true;
+        }
+    }
+
+    private void MarkCriticalPathSingleStep(Compass[,] dirToGoal, bool[,] onCriticalPath)
+    {
+        if (!isDistanceCalcComplete) return;
+        if (pathC != null && pathC != GoalPos)
+        {
+            Coord coord = (Coord)pathC;
+            onCriticalPath[coord.X, coord.Z] = true;
+            Compass dir = dirToGoal[coord.X, coord.Z];
+            pathC = coord.InDirectionInBoundsNonSelf(dir, Width, Height);
+        }
+    }
+
+    // Breadth-first search
+    // Cannot use when multiple tile-costs are involved
     private void BreadthFirstFromGoal(int[,] distanceToGoal, Compass[,] dirToGoal)
     {
-        bool[,] visited = new bool[Width, Height];
-        Queue<Coord> erfQueue = new Queue<Coord>();
-
-        Coord g = GoalPos;
-        visited[g.X, g.Z] = true;
-        distanceToGoal[g.X, g.Z] = 0;
-        erfQueue.Enqueue(g);
-
         while (erfQueue.TryDequeue(out var coord))
         {
             int dist = distanceToGoal[coord.X, coord.Z];
@@ -121,20 +180,19 @@ public class TreasureMap
                 erfQueue.Enqueue(c);
             }
         }
+        isDistanceCalcComplete = true;
     }
 
     private void MarkCriticalPath(Compass[,] dirToGoal, bool[,] onCriticalPath)
     {
-        Coord? c = SpawnPos;
-        while (c != null && c != GoalPos)
+        while (pathC != null && pathC != GoalPos)
         {
-            Coord coord = (Coord)c;
+            Coord coord = (Coord)pathC;
             onCriticalPath[coord.X, coord.Z] = true;
             Compass dir = dirToGoal[coord.X, coord.Z];
-            c = coord.InDirectionInBoundsNonSelf(dir, Width, Height);
+            pathC = coord.InDirectionInBoundsNonSelf(dir, Width, Height);
         }
     }
-
 
 }
 

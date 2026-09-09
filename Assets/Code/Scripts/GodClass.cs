@@ -61,7 +61,7 @@ public class GodClass : MonoBehaviour
         // TODO out-of-bounds check.
         Coord spawnPos = new Coord(spawnPosXZ.x, spawnPosXZ.y);
         Coord goalPos = new Coord(goalPosXZ.x, goalPosXZ.y);
-       
+
         treasureMap = new TreasureMap(width, height, spawnPos, goalPos);
 
         signposts = new Signpost[width, height];
@@ -71,7 +71,7 @@ public class GodClass : MonoBehaviour
         {
             for (int z = 0; z < height; z++)
             {
-                Coord coord = new Coord(x,z);
+                Coord coord = new Coord(x, z);
 
                 Signpost signpost = Instantiate(signpostPrefab, transform);
                 Vector3 pos = CoordsToWorld(coord);
@@ -82,26 +82,27 @@ public class GodClass : MonoBehaviour
 
                 ErfSnapshot snap = treasureMap.At(coord);
 
-                switch (snap.Kind) 
+                switch (snap.Kind)
                 {
                     case ErfKind.Spawn: InstantiateMarker(spawnPrefab, coord); break;
-                    case ErfKind.Goal:  InstantiateMarker(goalPrefab, coord);  break;
+                    case ErfKind.Goal: InstantiateMarker(goalPrefab, coord); break;
                 }
             }
         }
 
         UpdateDistances();
     }
-    
+
     void InstantiateMarker(GameObject prefab, Coord coord)
     {
         GameObject obj = Instantiate(prefab, transform);
         obj.transform.localPosition = CoordsToWorld(coord);
     }
-    
+
     /** Slow pathfinding and refresh code **/
 
-    public void SetSlowPathfindingMode(bool isEnabled) { 
+    public void SetSlowPathfindingMode(bool isEnabled)
+    {
         isSlowPathfindingMode = isEnabled;
     }
 
@@ -111,10 +112,26 @@ public class GodClass : MonoBehaviour
         RefreshDistanceLabels();
     }
 
+    public void OnClearFieldPressed()
+    {
+        treasureMap.ClearField();
+        RefreshDistanceLabels();
+    }
+
+    public void OnSingleStepPressed()
+    {
+        Debug.Log("Single Step pressed");
+        treasureMap.SingleStep();
+        Debug.Log("GOD CLASS: Single Step from treasure map finished, refreshing distance labels");
+        RefreshDistanceLabels();
+    }
 
     void UpdateDistances()
     {
-        if (isSlowPathfindingMode) {
+        if (isSlowPathfindingMode)
+        {
+            Debug.Log("Slow pathfinding mode, not updating distances");
+
             return;
         }
         treasureMap.Recompute();
@@ -123,12 +140,14 @@ public class GodClass : MonoBehaviour
 
     void RefreshDistanceLabels()
     {
+        Debug.Log("RefreshDistanceLabels");
+
         for (int x = 0; x < treasureMap.Width; x++)
         {
             for (int z = 0; z < treasureMap.Height; z++)
             {
                 Signpost signpost = signposts[x, z];
-                ErfSnapshot erf = treasureMap.At(x,z);
+                ErfSnapshot erf = treasureMap.At(x, z);
                 signpost.UpdateDistance(erf.DistanceToGoal);
                 signpost.UpdateArrow(erf.DirToGoal, erf.OnCriticalPath);
             }
