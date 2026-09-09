@@ -5,12 +5,12 @@ public class DebugGUI : MonoBehaviour
 
     [SerializeField] private GodClass visualizer;
 
-    bool visualizeEnabled = false;
+    bool autoRefreshEnabled = false;
     bool wasEnabled = false;
 
     void OnGUI ()
     {
-        GUI.Box(new Rect(10,10,140,150), "VISUALIZE");
+        GUI.Box(new Rect(10,10,170,150), "VISUALIZE");
     
         if(GUI.Button(new Rect(20,40,120,20), "Instant Refresh"))
         {
@@ -30,10 +30,16 @@ public class DebugGUI : MonoBehaviour
             visualizer.OnSingleStepPressed();        
         }
 
-        visualizeEnabled = GUI.Toggle(new Rect(20,115,80,20), visualizeEnabled, "Visualize");
-        if (wasEnabled != visualizeEnabled) { 
-            wasEnabled = visualizeEnabled;
-            visualizer.SetSlowPathfindingMode(visualizeEnabled);
+        if(GUI.Button(new Rect(20,115,80,20), "VISUALIZE"))
+        {
+            Debug.Log("VISUALIZE");
+            visualizer.OnVisualizePressed();        
+        }
+        
+        autoRefreshEnabled = GUI.Toggle(new Rect(20,140,120,20), autoRefreshEnabled, "Auto-Refresh");
+        if (wasEnabled != autoRefreshEnabled) { 
+            wasEnabled = autoRefreshEnabled;
+            visualizer.SetAutoRefreshMode(autoRefreshEnabled);
         }
     }
 }

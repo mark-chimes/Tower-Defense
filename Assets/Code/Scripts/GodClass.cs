@@ -36,6 +36,10 @@ public class GodClass : MonoBehaviour
     // or as the same square. 
     // Improving it to add checks deferred to later
 
+    [SerializeField] private float visualizeFPS = 60f;
+    private float visualizeTime;
+
+
     private TreasureMap treasureMap;
 
     private Signpost[,] signposts;
@@ -47,11 +51,19 @@ public class GodClass : MonoBehaviour
     private Signpost hoveredErf;
     private IHighlightable highlighted;
 
-    private bool isSlowPathfindingMode = false;
+    private bool isAutoRefreshMode = false;
+    private bool isVisualizeMode = false;
 
     void Start()
     {
+        visualizeTime = 1f/visualizeFPS;
         GenerateGrid();
+    }
+
+    void Update()
+    {
+        HandleMouse();
+        ContinuallySingleStep();
     }
 
 
@@ -90,6 +102,7 @@ public class GodClass : MonoBehaviour
             }
         }
 
+        treasureMap.ClearField();
         UpdateDistances();
     }
 
@@ -101,9 +114,14 @@ public class GodClass : MonoBehaviour
 
     /** Slow pathfinding and refresh code **/
 
-    public void SetSlowPathfindingMode(bool isEnabled)
+    public void SetAutoRefreshMode(bool isEnabled)
     {
-        isSlowPathfindingMode = isEnabled;
+        isAutoRefreshMode = isEnabled;
+        if (isAutoRefreshMode) { 
+            isVisualizeMode = false;
+            treasureMap.Recompute();
+            RefreshDistanceLabels();
+        }
     }
 
     public void OnRefreshPressed()
@@ -114,8 +132,14 @@ public class GodClass : MonoBehaviour
 
     public void OnClearFieldPressed()
     {
+        isVisualizeMode = false;
         treasureMap.ClearField();
         RefreshDistanceLabels();
+    }
+
+    public void OnVisualizePressed()
+    {
+        isVisualizeMode = true;
     }
 
     public void OnSingleStepPressed()
@@ -126,15 +150,32 @@ public class GodClass : MonoBehaviour
         RefreshDistanceLabels();
     }
 
+    float tempTime;
+    
+
+    void ContinuallySingleStep()
+    {
+        if (isAutoRefreshMode) return;
+        if (!isVisualizeMode) return;
+
+        tempTime += Time.deltaTime;
+        if (tempTime > visualizeTime)
+        {
+            tempTime = 0;
+            treasureMap.SingleStep();
+            RefreshDistanceLabels();
+        }
+
+    }
+
     void UpdateDistances()
     {
-        if (isSlowPathfindingMode)
+        if (!isAutoRefreshMode)
         {
-            Debug.Log("Slow pathfinding mode, not updating distances");
-
-            return;
+            Debug.Log("Auto refresh mode disabled, not updating distances");
+        } else {
+            treasureMap.Recompute();
         }
-        treasureMap.Recompute();
         RefreshDistanceLabels();
     }
 
@@ -204,11 +245,6 @@ public class GodClass : MonoBehaviour
     void Awake()
     {
         cam = Camera.main;
-    }
-
-    void Update()
-    {
-        HandleMouse();
     }
 
     private void HandleMouse()
