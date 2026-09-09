@@ -95,8 +95,6 @@ public class GodClass : MonoBehaviour
         obj.transform.localPosition = CoordsToWorld(coord);
     }
     
-    // Breadth-first search
-    // Cannot use when multiple tile-costs are involved
     void UpdateDistances()
     {
         treasureMap.Recompute();

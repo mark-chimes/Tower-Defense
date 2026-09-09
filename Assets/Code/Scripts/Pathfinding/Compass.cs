@@ -1,3 +1,5 @@
+using System;
+
 public enum Compass
 {
     North,
@@ -9,13 +11,15 @@ public enum Compass
 
 public static class CompassExtension
 {
-    public static readonly Compass[] AllDirs =
+    private static readonly Compass[] allDirs =
     {
         Compass.North,
         Compass.East,
         Compass.South,
         Compass.West,
     };
+
+    public static ReadOnlySpan<Compass> AllDirs => allDirs;
 
     public static Compass Opposite(this Compass dir) {
         return dir switch

@@ -8,7 +8,7 @@ public class Signpost : MonoBehaviour, IHighlightable
 
     [SerializeField] private DirectionArrow arrow;
 
-    [SerializeField] private Color arrowHighlightColor ;
+    [SerializeField] private Color arrowHighlightColor = Color.cyan;
 
 
     public Coord Coord { get; private set; }
@@ -20,7 +20,6 @@ public class Signpost : MonoBehaviour, IHighlightable
     {
         block = new MaterialPropertyBlock();
         arrow.TurnTo(Compass.North);
-        arrow.Show();
     }
 
     public void Initialize(Coord coord)

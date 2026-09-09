@@ -52,11 +52,7 @@ public class TreasureMap
         return new ErfSnapshot(coord, data.Kind, currentFlow, data.HasWall);
     }
 
-    public ErfSnapshot At(int x, int z)
-    {
-        Erf data = map[x, z];
-        return new ErfSnapshot(data.Coord, data.Kind, currentFlow, data.HasWall);
-    }
+    public ErfSnapshot At(int x, int z) => At(new Coord(x,z));
 
     public void SetWall(Coord c, bool hasWall) => map[c.X, c.Z].HasWall = hasWall;
 
@@ -64,7 +60,8 @@ public class TreasureMap
         && !map[c.X, c.Z].HasWall;
 
 
-    public FlowField ComputeFlow()
+
+    private FlowField ComputeFlow()
     {
         int[,] distanceToGoal = new int[Width, Height];
         Compass[,] dirToGoal = new Compass[Width, Height];
@@ -80,7 +77,9 @@ public class TreasureMap
             }
         }
 
-        BreadthFirstFromGoal( distanceToGoal, dirToGoal);
+        // Breadth-first search
+        // Cannot use when multiple tile-costs are involved
+        BreadthFirstFromGoal(distanceToGoal, dirToGoal);
 
         MarkCriticalPath(dirToGoal, onCriticalPath);
 

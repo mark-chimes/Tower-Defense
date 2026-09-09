@@ -50,7 +50,7 @@ MonoBehaviour:
   meshRenderer: {fileID: 4170649281639531863}
   numberLabel: {fileID: 6881207868284940184}
   arrow: {fileID: 5923265562715845978}
-  arrowHighlightColor: {r: 0, g: 0.75172865, b: 1, a: 0}
+  arrowHighlightColor: {r: 0, g: 1, b: 0.69411767, a: 0}
 --- !u!1 &6026215810807360004
 GameObject:
   m_ObjectHideFlags: 0
