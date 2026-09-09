@@ -47,10 +47,14 @@ public class GodClass : MonoBehaviour
     private Signpost hoveredErf;
     private IHighlightable highlighted;
 
+    private bool isSlowPathfindingMode = false;
+
     void Start()
     {
         GenerateGrid();
     }
+
+
 
     void GenerateGrid()
     {
@@ -95,8 +99,24 @@ public class GodClass : MonoBehaviour
         obj.transform.localPosition = CoordsToWorld(coord);
     }
     
+    /** Slow pathfinding and refresh code **/
+
+    public void SetSlowPathfindingMode(bool isEnabled) { 
+        isSlowPathfindingMode = isEnabled;
+    }
+
+    public void OnRefreshPressed()
+    {
+        treasureMap.Recompute();
+        RefreshDistanceLabels();
+    }
+
+
     void UpdateDistances()
     {
+        if (isSlowPathfindingMode) {
+            return;
+        }
         treasureMap.Recompute();
         RefreshDistanceLabels();
     }
