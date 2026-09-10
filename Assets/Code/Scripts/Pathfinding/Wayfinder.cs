@@ -14,15 +14,15 @@ public class Wayfinder
 
     private FlowField currentFlow;
 
-    private SearchState searchState = SearchState.DistanceCalc;
+    private Phase phase = Phase.ExpandFrontier;
 
     private bool isStopOnPathFound = false;
 
-    private enum SearchState
+    public enum Phase
     {
-        DistanceCalc,
-        PathCalc,
-        Complete,
+        ExpandFrontier,
+        TracePath,
+        Done,
     }
 
     public enum SearchDir
@@ -58,7 +58,7 @@ public class Wayfinder
         visited = new bool[Width, Height];
         erfQueue = new Queue<Coord>();
         currentFlow = new FlowField(Width, Height);
-        searchState = SearchState.DistanceCalc;
+        phase = Phase.ExpandFrontier;
 
         Coord c;
         switch (SearchDirection)
@@ -89,7 +89,7 @@ public class Wayfinder
 
     public void ComputeFlow(Erf[,] map)
     {
-        while (searchState != SearchState.Complete)
+        while (phase != Phase.Done)
         {
             ComputeSingleStep(map);
         }
@@ -98,17 +98,17 @@ public class Wayfinder
 
     public void ComputeSingleStep(Erf[,] map)
     {
-        switch (searchState)
+        switch (phase)
         {
-            case SearchState.DistanceCalc: BFSOneDirSingleStep(map); break;
-            case SearchState.PathCalc: MarkCriticalPathSingleStep(); break;
-            case SearchState.Complete: break;
+            case Phase.ExpandFrontier: BFSOneDirSingleStep(map); break;
+            case Phase.TracePath: MarkCriticalPathSingleStep(); break;
+            case Phase.Done: break;
         }
     }
 
     private void BFSOneDirSingleStep(Erf[,] map)
     {
-        if (searchState != SearchState.DistanceCalc) return;
+        if (phase != Phase.ExpandFrontier) return;
 
         int[,] distances = currentFlow.distance;
         Compass[,] dirsToGoal = currentFlow.dirToGoal;
@@ -141,7 +141,7 @@ public class Wayfinder
                             dirsToGoal[c.X, c.Z] = dir;
                             if (isStopOnPathFound && c == GoalPos)
                             {
-                                searchState = SearchState.PathCalc;
+                                phase = Phase.TracePath;
                                 return;
                             }
                             break;
@@ -151,33 +151,33 @@ public class Wayfinder
                             dirsToGoal[c.X, c.Z] = dir.Opposite();
                             if (isStopOnPathFound && c == SpawnPos)
                             {
-                                searchState = SearchState.PathCalc;
+                                phase = Phase.TracePath;
                                 return;
 
                             }
                             break;
                         }
-                    default: { searchState = SearchState.Complete; return; } // TODO
+                    default: { phase = Phase.Done; return; } // TODO
                 }
                 erfQueue.Enqueue(c);
             }
         }
         else
         {
-            searchState = SearchState.PathCalc;
+            phase = Phase.TracePath;
         }
     }
 
     private void MarkCriticalPathSingleStep()
     {
-        if (searchState != SearchState.PathCalc) { searchState = SearchState.Complete; return; }
+        if (phase != Phase.TracePath) { phase = Phase.Done; return; }
 
         bool[,] onCriticalPath = currentFlow.onCriticalPath;
         Compass[,] dirsToGoal = currentFlow.dirToGoal;
 
-        if (SearchDirection == SearchDir.Dual) { searchState = SearchState.Complete; return; } // TODO
+        if (SearchDirection == SearchDir.Dual) { phase = Phase.Done; return; } // TODO
 
-        if (pathC == null) { searchState = SearchState.Complete; return; }
+        if (pathC == null) { phase = Phase.Done; return; }
 
         Coord coord = (Coord)pathC;
         onCriticalPath[coord.X, coord.Z] = true;
@@ -189,9 +189,6 @@ public class Wayfinder
             default: dir = Compass.None; break; // TODO
         }
         pathC = coord.InDirectionInBoundsNonSelf(dir, Width, Height);
-
-        // if (SearchDirection == SearchDir.FromStart && pathC == GoalPos) { searchState = SearchState.Complete; return; }
-        // if (SearchDirection == SearchDir.Dual && pathC == SpawnPos) { searchState = SearchState.Complete; return; }
     }
 
     public Signpost SignpostAt(Coord coord)
