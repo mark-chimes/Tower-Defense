@@ -92,9 +92,9 @@ public class GodClass : MonoBehaviour
                 directionMarker.Initialize(coord);
                 directionMarkers[x, z] = directionMarker;
 
-                ErfAndWaypointSnapshot snap = treasureMap.At(coord);
+                ErfSnapshot erf = treasureMap.At(coord);
 
-                switch (snap.Kind)
+                switch (erf.Kind)
                 {
                     case ErfKind.Spawn: InstantiateMarker(spawnPrefab, coord); break;
                     case ErfKind.Goal: InstantiateMarker(goalPrefab, coord); break;
@@ -203,9 +203,9 @@ public class GodClass : MonoBehaviour
             for (int z = 0; z < treasureMap.Height(); z++)
             {
                 DirectionMarker directionMarker = directionMarkers[x, z];
-                ErfAndWaypointSnapshot erf = treasureMap.At(x, z);
-                directionMarker.UpdateDistance(erf.DistanceToGoal);
-                directionMarker.UpdateArrow(erf.DirToGoal, erf.OnCriticalPath);
+                Signpost sign = treasureMap.SignpostAt(x, z);
+                directionMarker.UpdateDistance(sign.DistanceToGoal);
+                directionMarker.UpdateArrow(sign.DirToGoal, sign.OnCriticalPath);
             }
         }
     }
@@ -279,7 +279,7 @@ public class GodClass : MonoBehaviour
         if (hoveredErf != null)
         {
             Coord c = hoveredErf.Coord;
-            ErfAndWaypointSnapshot erf = treasureMap.At(c);
+            ErfSnapshot erf = treasureMap.At(c);
             if (erf.Kind != ErfKind.Floor)
                 highlightColor = blockedColor;
             else if (erf.HasWall)
@@ -325,7 +325,7 @@ public class GodClass : MonoBehaviour
     {
         if (walls[c.X, c.Z] != null) return;
 
-        ErfAndWaypointSnapshot erf = treasureMap.At(c);
+        ErfSnapshot erf = treasureMap.At(c);
 
         if (erf.Kind != ErfKind.Floor)
         {
@@ -346,7 +346,7 @@ public class GodClass : MonoBehaviour
         Wall wall = walls[c.X, c.Z];
         if (wall == null) return;
 
-        ErfAndWaypointSnapshot erf = treasureMap.At(c);
+        ErfSnapshot erf = treasureMap.At(c);
 
         if (erf.Kind != ErfKind.Floor)
         {

@@ -33,8 +33,8 @@ public class TreasureMap
         Recompute();
     }
 
-    public void SetModeAndClear(Wayfinder.SearchDir searchDir) 
-    { 
+    public void SetModeAndClear(Wayfinder.SearchDir searchDir)
+    {
         wayfinder = wayfinder.WithNewSearchDir(searchDir);
         ClearField(); // code smell: feels weird I have to clear field after spawning new one
     }
@@ -67,13 +67,21 @@ public class TreasureMap
     }
 
 
-    public ErfAndWaypointSnapshot At(Coord coord)
+    public ErfSnapshot At(Coord coord)
     {
         Erf data = map[coord.X, coord.Z];
-        return new ErfAndWaypointSnapshot(coord, data.Kind, wayfinder.SignpostAt(coord), data.HasWall);
+        return new ErfSnapshot(coord, data.Kind, data.HasWall);
     }
 
-    public ErfAndWaypointSnapshot At(int x, int z) => At(new Coord(x, z));
+    // TODO Deprecate this? 
+    public ErfSnapshot At(int x, int z) => At(new Coord(x, z));
+
+    public Signpost SignpostAt(Coord coord)
+    {
+        return wayfinder.SignpostAt(coord);
+    }
+
+    public Signpost SignpostAt(int x, int z) => SignpostAt(new Coord(x, z));
 
     public void SetWall(Coord c, bool hasWall) => map[c.X, c.Z].HasWall = hasWall;
 
