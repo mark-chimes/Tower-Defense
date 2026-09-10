@@ -125,6 +125,18 @@ public class GodClass : MonoBehaviour
         }
     }
 
+    public void OnFromStartModePressed() {
+        isVisualizeMode = false;
+        treasureMap.SetModeAndClear(Wayfinder.SearchDir.FromStart);
+        RefreshDistanceLabels();
+    }
+
+    public void OnFromEndModePressed () {
+        isVisualizeMode = false;
+        treasureMap.SetModeAndClear(Wayfinder.SearchDir.FromEnd);
+        RefreshDistanceLabels();
+    }
+
     public void OnRefreshPressed()
     {
         treasureMap.Recompute();

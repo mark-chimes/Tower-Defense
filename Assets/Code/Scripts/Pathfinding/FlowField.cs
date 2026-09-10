@@ -4,7 +4,7 @@ public class FlowField
     public readonly int Width;
     public readonly int Height;
 
-    public readonly int[,] distanceToGoal;
+    public readonly int[,] distance;
     public readonly Compass[,] dirToGoal;
     public readonly bool[,] onCriticalPath;
     
@@ -13,7 +13,7 @@ public class FlowField
         Compass[,] dirToGoal,
         bool[,] onCriticalPath)
     {
-        this.distanceToGoal = distanceToGoal;
+        this.distance = distanceToGoal;
         this.dirToGoal = dirToGoal;
         this.onCriticalPath = onCriticalPath;
     }
@@ -24,7 +24,7 @@ public class FlowField
         Width = width;
         Height = height;
 
-        distanceToGoal = new int[Width, Height];
+        distance = new int[Width, Height];
         dirToGoal = new Compass[Width, Height];
         onCriticalPath = new bool[Width, Height];
 
@@ -32,16 +32,16 @@ public class FlowField
         {
             for (int z = 0; z < Height; z++)
             {
-                distanceToGoal[x, z] = -1;
+                distance[x, z] = -1;
                 dirToGoal[x, z] = Compass.None;
                 onCriticalPath[x, z] = false;
             }
         }
     }
 
-    public int DistanceAt(Coord c) => distanceToGoal[c.X, c.Z];
+    public int DistanceAt(Coord c) => distance[c.X, c.Z];
     public Compass DirectionAt(Coord c) => dirToGoal[c.X, c.Z];
     public bool OnCriticalPath(Coord c) => onCriticalPath[c.X, c.Z];
-    public bool Reachable(Coord c) => distanceToGoal[c.X, c.Z] >= 0;
+    public bool Reachable(Coord c) => distance[c.X, c.Z] >= 0;
 
 }

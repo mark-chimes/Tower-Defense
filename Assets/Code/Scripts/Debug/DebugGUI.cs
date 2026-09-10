@@ -10,7 +10,7 @@ public class DebugGUI : MonoBehaviour
 
     void OnGUI ()
     {
-        GUI.Box(new Rect(10,10,170,150), "VISUALIZE");
+        GUI.Box(new Rect(10,10,210,200), "VISUALIZE");
     
         if(GUI.Button(new Rect(20,40,120,20), "Instant Refresh"))
         {
@@ -40,6 +40,18 @@ public class DebugGUI : MonoBehaviour
         if (wasEnabled != autoRefreshEnabled) { 
             wasEnabled = autoRefreshEnabled;
             visualizer.SetAutoRefreshMode(autoRefreshEnabled);
+        }
+
+        if(GUI.Button(new Rect(20,160,160,20), "From-Start Mode (clears)"))
+        {
+            Debug.Log("From-Start Mode");
+            visualizer.OnFromStartModePressed();        
+        }
+
+        if(GUI.Button(new Rect(20,180,160,20), "From-End Mode (clears)"))
+        {
+            Debug.Log("From-End Mode");
+            visualizer.OnFromEndModePressed();        
         }
     }
 }
