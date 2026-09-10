@@ -164,15 +164,15 @@ public class Wayfinder
 
     private IReadOnlyCollection<Signpost> MarkCriticalPathSingleStep()
     {
-        IReadOnlyCollection<Signpost> EMPTY = System.Array.Empty<Signpost>();
-        if (phase != Search.Phase.TracePath) { phase = Search.Phase.Done; return EMPTY; }
+        IReadOnlyCollection<Signpost> empty = System.Array.Empty<Signpost>();
+        if (phase != Search.Phase.TracePath) { phase = Search.Phase.Done; return empty; }
 
         bool[,] onCriticalPath = currentFlow.onCriticalPath;
         Compass[,] dirsToGoal = currentFlow.dirToGoal;
 
-        if (SearchDirection == Search.Dir.Dual) { phase = Search.Phase.Done; return EMPTY; } // TODO
+        if (SearchDirection == Search.Dir.Dual) { phase = Search.Phase.Done; return empty; } // TODO
 
-        if (pathC == null) { phase = Search.Phase.Done; return EMPTY; }
+        if (pathC == null) { phase = Search.Phase.Done; return empty; }
 
         Coord coord = (Coord)pathC;
         onCriticalPath[coord.X, coord.Z] = true;
@@ -191,4 +191,10 @@ public class Wayfinder
     {
         return new Signpost(coord, currentFlow);
     }
+
+    public IReadOnlyCollection<Signpost> Signposts()
+    {
+        return currentFlow.Signposts();
+    }
+
 }

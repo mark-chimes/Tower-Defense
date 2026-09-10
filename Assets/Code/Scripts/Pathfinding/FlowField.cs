@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+
 public class FlowField
 {
 
@@ -37,6 +40,21 @@ public class FlowField
                 onCriticalPath[x, z] = false;
             }
         }
+    }
+
+    public IReadOnlyCollection<Signpost> Signposts() { 
+        var list = new List<Signpost>();
+
+        for (int x = 0; x < Width; x++)
+        {
+            for (int z = 0; z < Height; z++)
+            {
+                if(onCriticalPath[x, z]) {
+                    list.Append(new Signpost(new Coord(x,z), this));
+                }
+            }
+        }
+        return list;
     }
 
     public int DistanceAt(Coord c) => distance[c.X, c.Z];

@@ -81,6 +81,11 @@ public class TreasureMap
         return wayfinder.SignpostAt(coord);
     }
 
+    public System.Collections.Generic.IReadOnlyCollection<Signpost> Signposts()
+    {
+        return wayfinder.Signposts();
+    }
+
     public Signpost SignpostAt(int x, int z) => SignpostAt(new Coord(x, z));
 
     public void SetWall(Coord c, bool hasWall) => map[c.X, c.Z].HasWall = hasWall;
