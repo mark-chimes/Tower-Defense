@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-
 public class Wayfinder
 {
     public Coord SpawnPos { get; }
@@ -82,26 +81,20 @@ public class Wayfinder
         }
     }
 
-    // TODO return PathfindingDelta
-    public void ComputeSingleStep(Erf[,] map)
+    public Search.Delta ComputeSingleStep(Erf[,] map)
     {
-        switch (phase)
+        Search.Phase phaseAtStart = phase;
+        IReadOnlyCollection<Signpost> changed = phase switch
         {
-            case Search.Phase.ExpandFrontier:
-                {
-                    BFSOneDirSingleStep(map);
-                    return; // TODO return PathfindingDelta
-                }
-            case Search.Phase.TracePath:
-                {
-                    MarkCriticalPathSingleStep();
-                    return; // TODO return PathfindingDelta
-                }
-            case Search.Phase.Done: return;
-        }
+            Search.Phase.ExpandFrontier => BFSOneDirSingleStep(map),
+            Search.Phase.TracePath => MarkCriticalPathSingleStep(),
+            _ => System.Array.Empty<Signpost>(),
+        };
+        return new Search.Delta(phaseAtStart, changed);
     }
 
-    private List<Signpost> BFSOneDirSingleStep(Erf[,] map)
+
+    private IReadOnlyCollection<Signpost> BFSOneDirSingleStep(Erf[,] map)
     {
         var list = new List<Signpost>();
 
@@ -169,16 +162,17 @@ public class Wayfinder
         return list;
     }
 
-    private void MarkCriticalPathSingleStep()
+    private IReadOnlyCollection<Signpost> MarkCriticalPathSingleStep()
     {
-        if (phase != Search.Phase.TracePath) { phase = Search.Phase.Done; return; }
+        IReadOnlyCollection<Signpost> EMPTY = System.Array.Empty<Signpost>();
+        if (phase != Search.Phase.TracePath) { phase = Search.Phase.Done; return EMPTY; }
 
         bool[,] onCriticalPath = currentFlow.onCriticalPath;
         Compass[,] dirsToGoal = currentFlow.dirToGoal;
 
-        if (SearchDirection == Search.Dir.Dual) { phase = Search.Phase.Done; return; } // TODO
+        if (SearchDirection == Search.Dir.Dual) { phase = Search.Phase.Done; return EMPTY; } // TODO
 
-        if (pathC == null) { phase = Search.Phase.Done; return; }
+        if (pathC == null) { phase = Search.Phase.Done; return EMPTY; }
 
         Coord coord = (Coord)pathC;
         onCriticalPath[coord.X, coord.Z] = true;
@@ -190,6 +184,7 @@ public class Wayfinder
             default: dir = Compass.None; break; // TODO
         }
         pathC = coord.InDirectionInBoundsNonSelf(dir, Width, Height);
+        return new[] { new Signpost(coord, currentFlow) };
     }
 
     public Signpost SignpostAt(Coord coord)

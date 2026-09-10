@@ -39,9 +39,9 @@ public class TreasureMap
         ClearField(); // code smell: feels weird I have to clear field after spawning new one
     }
 
-    public void SingleStep()
+    public Search.Delta SingleStep()
     {
-        wayfinder.ComputeSingleStep(map);
+        return wayfinder.ComputeSingleStep(map);
     }
 
     public void Recompute()

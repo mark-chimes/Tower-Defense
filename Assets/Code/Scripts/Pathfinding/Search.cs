@@ -19,9 +19,9 @@ public static class Search
     public readonly struct Delta
     {
         public readonly Phase Phase;
-        public readonly IReadOnlyList<Signpost> Changed;
+        public readonly IReadOnlyCollection<Signpost> Changed;
 
-        public Delta(Phase phase, IReadOnlyList<Signpost> changed)
+        public Delta(Phase phase, IReadOnlyCollection<Signpost> changed)
         {
             Phase = phase;
             Changed = changed;
