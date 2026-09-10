@@ -1,4 +1,4 @@
-public readonly struct ErfSnapshot
+public readonly struct ErfAndWaypointSnapshot
 {
     public Coord Coord { get; }
     public ErfKind Kind { get; }
@@ -11,7 +11,7 @@ public readonly struct ErfSnapshot
     public bool HasWall { get; }
 
     // Snapshot should never return the FlowField or any of its components directly.
-    public ErfSnapshot(Coord coord, ErfKind kind, FlowField flow, bool hasWall)
+    public ErfAndWaypointSnapshot(Coord coord, ErfKind kind, FlowField flow, bool hasWall)
     {
         Coord = coord;
         Kind = kind;
@@ -21,7 +21,7 @@ public readonly struct ErfSnapshot
         HasWall = hasWall;
     }
 
-    public ErfSnapshot(Coord coord, ErfKind kind, Signpost sign, bool hasWall)
+    public ErfAndWaypointSnapshot(Coord coord, ErfKind kind, Signpost sign, bool hasWall)
     {
         Coord = coord;
         Kind = kind;

@@ -67,13 +67,13 @@ public class TreasureMap
     }
 
 
-    public ErfSnapshot At(Coord coord)
+    public ErfAndWaypointSnapshot At(Coord coord)
     {
         Erf data = map[coord.X, coord.Z];
-        return new ErfSnapshot(coord, data.Kind, wayfinder.SignpostAt(coord), data.HasWall);
+        return new ErfAndWaypointSnapshot(coord, data.Kind, wayfinder.SignpostAt(coord), data.HasWall);
     }
 
-    public ErfSnapshot At(int x, int z) => At(new Coord(x, z));
+    public ErfAndWaypointSnapshot At(int x, int z) => At(new Coord(x, z));
 
     public void SetWall(Coord c, bool hasWall) => map[c.X, c.Z].HasWall = hasWall;
 

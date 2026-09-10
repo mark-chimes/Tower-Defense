@@ -92,7 +92,7 @@ public class GodClass : MonoBehaviour
                 directionMarker.Initialize(coord);
                 directionMarkers[x, z] = directionMarker;
 
-                ErfSnapshot snap = treasureMap.At(coord);
+                ErfAndWaypointSnapshot snap = treasureMap.At(coord);
 
                 switch (snap.Kind)
                 {
@@ -203,7 +203,7 @@ public class GodClass : MonoBehaviour
             for (int z = 0; z < treasureMap.Height(); z++)
             {
                 DirectionMarker directionMarker = directionMarkers[x, z];
-                ErfSnapshot erf = treasureMap.At(x, z);
+                ErfAndWaypointSnapshot erf = treasureMap.At(x, z);
                 directionMarker.UpdateDistance(erf.DistanceToGoal);
                 directionMarker.UpdateArrow(erf.DirToGoal, erf.OnCriticalPath);
             }
@@ -279,7 +279,7 @@ public class GodClass : MonoBehaviour
         if (hoveredErf != null)
         {
             Coord c = hoveredErf.Coord;
-            ErfSnapshot erf = treasureMap.At(c);
+            ErfAndWaypointSnapshot erf = treasureMap.At(c);
             if (erf.Kind != ErfKind.Floor)
                 highlightColor = blockedColor;
             else if (erf.HasWall)
@@ -325,7 +325,7 @@ public class GodClass : MonoBehaviour
     {
         if (walls[c.X, c.Z] != null) return;
 
-        ErfSnapshot erf = treasureMap.At(c);
+        ErfAndWaypointSnapshot erf = treasureMap.At(c);
 
         if (erf.Kind != ErfKind.Floor)
         {
@@ -346,7 +346,7 @@ public class GodClass : MonoBehaviour
         Wall wall = walls[c.X, c.Z];
         if (wall == null) return;
 
-        ErfSnapshot erf = treasureMap.At(c);
+        ErfAndWaypointSnapshot erf = treasureMap.At(c);
 
         if (erf.Kind != ErfKind.Floor)
         {
