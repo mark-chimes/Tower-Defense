@@ -56,7 +56,7 @@ public class GodClass : MonoBehaviour
 
     void Start()
     {
-        visualizeTime = 1f/visualizeFPS;
+        visualizeTime = 1f / visualizeFPS;
         GenerateGrid();
     }
 
@@ -117,7 +117,8 @@ public class GodClass : MonoBehaviour
     public void SetAutoRefreshMode(bool isEnabled)
     {
         isAutoRefreshMode = isEnabled;
-        if (isAutoRefreshMode) { 
+        if (isAutoRefreshMode)
+        {
             isVisualizeMode = false;
             treasureMap.Recompute();
             RefreshDistanceLabels();
@@ -151,7 +152,7 @@ public class GodClass : MonoBehaviour
     }
 
     float tempTime;
-    
+
 
     void ContinuallySingleStep()
     {
@@ -173,7 +174,9 @@ public class GodClass : MonoBehaviour
         if (!isAutoRefreshMode)
         {
             Debug.Log("Auto refresh mode disabled, not updating distances");
-        } else {
+        }
+        else
+        {
             treasureMap.Recompute();
         }
         RefreshDistanceLabels();
@@ -183,9 +186,9 @@ public class GodClass : MonoBehaviour
     {
         Debug.Log("RefreshDistanceLabels");
 
-        for (int x = 0; x < treasureMap.Width; x++)
+        for (int x = 0; x < treasureMap.Width(); x++)
         {
-            for (int z = 0; z < treasureMap.Height; z++)
+            for (int z = 0; z < treasureMap.Height(); z++)
             {
                 Signpost signpost = signposts[x, z];
                 ErfSnapshot erf = treasureMap.At(x, z);

@@ -1,5 +1,5 @@
-public readonly struct ErfSnapshot 
-{ 
+public readonly struct ErfSnapshot
+{
     public Coord Coord { get; }
     public ErfKind Kind { get; }
     public int DistanceToGoal { get; }
@@ -16,8 +16,18 @@ public readonly struct ErfSnapshot
         Coord = coord;
         Kind = kind;
         DistanceToGoal = flow.DistanceAt(coord);
-        DirToGoal =flow.DirectionAt(coord);
-        OnCriticalPath =  flow.OnCriticalPath(coord);
+        DirToGoal = flow.DirectionAt(coord);
+        OnCriticalPath = flow.OnCriticalPath(coord);
+        HasWall = hasWall;
+    }
+
+    public ErfSnapshot(Coord coord, ErfKind kind, Wayfinder.Signpost sign, bool hasWall)
+    {
+        Coord = coord;
+        Kind = kind;
+        DistanceToGoal = sign.DistanceToGoal;
+        DirToGoal = sign.DirToGoal;
+        OnCriticalPath = sign.OnCriticalPath;
         HasWall = hasWall;
     }
 }
