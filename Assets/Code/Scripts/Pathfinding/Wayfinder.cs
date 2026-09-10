@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 
 public class Wayfinder
@@ -30,6 +31,14 @@ public class Wayfinder
         FromStart,
         FromEnd,
         Dual
+    }
+
+    readonly struct PathfindingDelta
+    {
+        readonly Phase phase;
+        readonly IReadOnlyList<(Coord, Signpost)> Changed;
+
+
     }
 
     bool[,] visited;
@@ -95,20 +104,33 @@ public class Wayfinder
         }
     }
 
-
+    // TODO return PathfindingDelta
     public void ComputeSingleStep(Erf[,] map)
     {
         switch (phase)
         {
-            case Phase.ExpandFrontier: BFSOneDirSingleStep(map); break;
-            case Phase.TracePath: MarkCriticalPathSingleStep(); break;
-            case Phase.Done: break;
+            case Phase.ExpandFrontier:
+                {
+                    BFSOneDirSingleStep(map);
+                    // TODO this part won't work because phase 
+                    // gets changed before this return
+
+                    return; // TODO return PathfindingDelta
+                }
+            case Phase.TracePath:
+                {
+                    MarkCriticalPathSingleStep();
+                    return; // TODO return PathfindingDelta
+                }
+            case Phase.Done: return;
         }
     }
 
-    private void BFSOneDirSingleStep(Erf[,] map)
+    private List<Signpost> BFSOneDirSingleStep(Erf[,] map)
     {
-        if (phase != Phase.ExpandFrontier) return;
+        var list = new List<Signpost>();
+
+        if (phase != Phase.ExpandFrontier) return list;
 
         int[,] distances = currentFlow.distance;
         Compass[,] dirsToGoal = currentFlow.dirToGoal;
@@ -139,33 +161,40 @@ public class Wayfinder
                     case SearchDir.FromStart:
                         {
                             dirsToGoal[c.X, c.Z] = dir;
+                            list.Append(new Signpost(c, currentFlow));
+
                             if (isStopOnPathFound && c == GoalPos)
                             {
+                                // TODO this part won't work
                                 phase = Phase.TracePath;
-                                return;
+                                return list;
                             }
                             break;
                         }
                     case SearchDir.FromEnd:
                         {
                             dirsToGoal[c.X, c.Z] = dir.Opposite();
+                            list.Append(new Signpost(c, currentFlow));
+
                             if (isStopOnPathFound && c == SpawnPos)
                             {
+                                // TODO this part won't work
                                 phase = Phase.TracePath;
-                                return;
-
+                                return list;
                             }
                             break;
                         }
-                    default: { phase = Phase.Done; return; } // TODO
+                    default: { phase = Phase.Done; return list; } // TODO
                 }
                 erfQueue.Enqueue(c);
             }
         }
         else
         {
+            // TODO phase change here, too
             phase = Phase.TracePath;
         }
+        return list;
     }
 
     private void MarkCriticalPathSingleStep()
