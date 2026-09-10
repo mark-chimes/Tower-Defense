@@ -14,8 +14,6 @@ public class Wayfinder
 
     private FlowField currentFlow;
 
-
-    // TODO State Machine (enum?)
     private SearchState searchState = SearchState.DistanceCalc;
 
     private bool isStopOnPathFound = false;
@@ -199,7 +197,13 @@ public class Wayfinder
 
         Coord coord = (Coord)pathC;
         onCriticalPath[coord.X, coord.Z] = true;
-        Compass dir = dirsToGoal[coord.X, coord.Z];
+        Compass dir;
+        switch (SearchDirection)
+        {
+            case SearchDir.FromStart: dir = dirsToGoal[coord.X, coord.Z].Opposite(); break;
+            case SearchDir.FromEnd: dir = dirsToGoal[coord.X, coord.Z]; break;
+            default: dir = Compass.None; break; // TODO
+        }
         pathC = coord.InDirectionInBoundsNonSelf(dir, Width, Height);
 
         if (SearchDirection == SearchDir.FromStart && pathC == GoalPos) { searchState = SearchState.Complete; return; }
