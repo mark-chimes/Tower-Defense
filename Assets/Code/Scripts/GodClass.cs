@@ -14,7 +14,7 @@ using System.Collections.Generic;
 // displays gizmos
 public class GodClass : MonoBehaviour
 {
-    [SerializeField] private Signpost signpostPrefab;
+    [SerializeField] private DirectionMarker directionMarkerPrefab;
     [SerializeField] private int width = 9;
     [SerializeField] private int height = 9;
     [SerializeField] private float erfSizeMeters = 10f;
@@ -42,13 +42,13 @@ public class GodClass : MonoBehaviour
 
     private TreasureMap treasureMap;
 
-    private Signpost[,] signposts;
+    private DirectionMarker[,] directionMarkers;
     private Wall[,] walls;
 
     private Camera cam;
     private const float MaxRayDistance = 500f;
 
-    private Signpost hoveredErf;
+    private DirectionMarker hoveredErf;
     private IHighlightable highlighted;
 
     private bool isAutoRefreshMode = false;
@@ -76,7 +76,7 @@ public class GodClass : MonoBehaviour
 
         treasureMap = new TreasureMap(width, height, spawnPos, goalPos);
 
-        signposts = new Signpost[width, height];
+        directionMarkers = new DirectionMarker[width, height];
         walls = new Wall[width, height];
 
         for (int x = 0; x < width; x++)
@@ -85,12 +85,12 @@ public class GodClass : MonoBehaviour
             {
                 Coord coord = new Coord(x, z);
 
-                Signpost signpost = Instantiate(signpostPrefab, transform);
+                DirectionMarker directionMarker = Instantiate(directionMarkerPrefab, transform);
                 Vector3 pos = CoordsToWorld(coord);
-                signpost.transform.localPosition = pos;
-                signpost.name = $"Signpost_{x}_{z}";
-                signpost.Initialize(coord);
-                signposts[x, z] = signpost;
+                directionMarker.transform.localPosition = pos;
+                directionMarker.name = $"DirectionMarker_{x}_{z}";
+                directionMarker.Initialize(coord);
+                directionMarkers[x, z] = directionMarker;
 
                 ErfSnapshot snap = treasureMap.At(coord);
 
@@ -202,10 +202,10 @@ public class GodClass : MonoBehaviour
         {
             for (int z = 0; z < treasureMap.Height(); z++)
             {
-                Signpost signpost = signposts[x, z];
+                DirectionMarker directionMarker = directionMarkers[x, z];
                 ErfSnapshot erf = treasureMap.At(x, z);
-                signpost.UpdateDistance(erf.DistanceToGoal);
-                signpost.UpdateArrow(erf.DirToGoal, erf.OnCriticalPath);
+                directionMarker.UpdateDistance(erf.DistanceToGoal);
+                directionMarker.UpdateArrow(erf.DirToGoal, erf.OnCriticalPath);
             }
         }
     }
@@ -298,12 +298,12 @@ public class GodClass : MonoBehaviour
 
 
     /// Currently assumes Walls have colliders off. Revisit if colliders turned on.
-    private Signpost RaycastForErf()
+    private DirectionMarker RaycastForErf()
     {
         Vector2 mousePos = Mouse.current.position.ReadValue();
         Ray ray = cam.ScreenPointToRay(mousePos);
         if (!Physics.Raycast(ray, out RaycastHit hit, MaxRayDistance)) return null;
-        return hit.collider.GetComponentInParent<Signpost>();
+        return hit.collider.GetComponentInParent<DirectionMarker>();
     }
 
     private void PlaceWallAtHovered()

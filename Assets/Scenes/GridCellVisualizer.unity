@@ -366,7 +366,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20ec6210b674a5c43aa8e7ab94981719, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CellController
-  signpostPrefab: {fileID: 428911081246246679, guid: cecf6f74b6087a1499f50fcadd62b46c, type: 3}
+  directionMarkerPrefab: {fileID: 428911081246246679, guid: cecf6f74b6087a1499f50fcadd62b46c, type: 3}
   width: 20
   height: 20
   erfSizeMeters: 10

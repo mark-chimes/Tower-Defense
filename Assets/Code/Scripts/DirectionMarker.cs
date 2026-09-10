@@ -1,7 +1,7 @@
 using UnityEngine;
 
 // It tells you how far you are
-public class Signpost : MonoBehaviour, IHighlightable
+public class DirectionMarker : MonoBehaviour, IHighlightable
 {
     [SerializeField] private MeshRenderer meshRenderer;
     [SerializeField] private TMPro.TextMeshPro numberLabel;
