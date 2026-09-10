@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 
 public class FlowField
 {
@@ -10,7 +9,7 @@ public class FlowField
     public readonly int[,] distance;
     public readonly Compass[,] dirToGoal;
     public readonly bool[,] onCriticalPath;
-    
+
     public FlowField(
         int[,] distanceToGoal,
         Compass[,] dirToGoal,
@@ -42,16 +41,15 @@ public class FlowField
         }
     }
 
-    public IReadOnlyCollection<Signpost> Signposts() { 
+    public IReadOnlyCollection<Signpost> Signposts()
+    {
         var list = new List<Signpost>();
 
         for (int x = 0; x < Width; x++)
         {
             for (int z = 0; z < Height; z++)
             {
-                if(onCriticalPath[x, z]) {
-                    list.Append(new Signpost(new Coord(x,z), this));
-                }
+                list.Add(new Signpost(new Coord(x, z), this));
             }
         }
         return list;

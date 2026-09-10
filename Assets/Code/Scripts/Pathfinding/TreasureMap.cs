@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 public class TreasureMap
 {
 
@@ -81,7 +83,7 @@ public class TreasureMap
         return wayfinder.SignpostAt(coord);
     }
 
-    public System.Collections.Generic.IReadOnlyCollection<Signpost> Signposts()
+    public IReadOnlyCollection<Signpost> Signposts()
     {
         return wayfinder.Signposts();
     }

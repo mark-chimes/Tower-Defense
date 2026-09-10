@@ -377,8 +377,8 @@ MonoBehaviour:
   placeableColor: {r: 0, g: 1, b: 0, a: 1}
   blockedColor: {r: 1, g: 0, b: 0, a: 1}
   existingWallColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  spawnPosXZ: {x: 8, y: 8}
-  goalPosXZ: {x: 10, y: 10}
+  spawnPosXZ: {x: 5, y: 5}
+  goalPosXZ: {x: 14, y: 14}
   visualizeFPS: 60
 --- !u!1 &783511479
 GameObject:
