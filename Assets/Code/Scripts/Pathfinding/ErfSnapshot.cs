@@ -21,7 +21,7 @@ public readonly struct ErfSnapshot
         HasWall = hasWall;
     }
 
-    public ErfSnapshot(Coord coord, ErfKind kind, Wayfinder.Signpost sign, bool hasWall)
+    public ErfSnapshot(Coord coord, ErfKind kind, Signpost sign, bool hasWall)
     {
         Coord = coord;
         Kind = kind;
