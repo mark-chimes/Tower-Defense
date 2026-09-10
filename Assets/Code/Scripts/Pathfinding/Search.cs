@@ -1,14 +1,7 @@
 using System.Collections.Generic;
 
-public class Search
+public static class Search
 {
-
-    readonly struct Delta
-    {
-        readonly Phase phase;
-        readonly IReadOnlyList<Signpost> Changed;
-    }
-
     public enum Phase
     {
         ExpandFrontier,
@@ -16,14 +9,22 @@ public class Search
         Done,
     }
 
-    
     public enum Dir
     {
         FromStart,
         FromEnd,
-        Dual
+        Dual,
     }
 
+    public readonly struct Delta
+    {
+        public readonly Phase Phase;
+        public readonly IReadOnlyList<Signpost> Changed;
 
-
+        public Delta(Phase phase, IReadOnlyList<Signpost> changed)
+        {
+            Phase = phase;
+            Changed = changed;
+        }
+    }
 }
