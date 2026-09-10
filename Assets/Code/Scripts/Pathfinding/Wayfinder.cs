@@ -9,7 +9,7 @@ public class Wayfinder
     public readonly int Width;
     public readonly int Height;
 
-    private SearchDir SearchDirection;
+    private readonly SearchDir SearchDirection;
 
 
     private FlowField currentFlow;
@@ -48,14 +48,8 @@ public class Wayfinder
         isStopOnPathFound = true; // TODO pass as parameter
     }
 
-    // TODO not sure if wayfinder should clear, or if we should actually spawn
-    // A brand new wayfinder from the old one - see below - or something else.
-    public void SetSearchDirAndClear(SearchDir searchDirection) {
-        SearchDirection = searchDirection;
-        ClearField();
-    }
-
-    public Wayfinder WithNewSearchDir( SearchDir searchDirection) { 
+    public Wayfinder WithNewSearchDir(SearchDir searchDirection)
+    {
         return new Wayfinder(Width, Height, SpawnPos, GoalPos, searchDirection);
     }
 
@@ -106,19 +100,9 @@ public class Wayfinder
     {
         switch (searchState)
         {
-            case SearchState.DistanceCalc: BFSSingleStep(map); break;
+            case SearchState.DistanceCalc: BFSOneDirSingleStep(map); break;
             case SearchState.PathCalc: MarkCriticalPathSingleStep(); break;
             case SearchState.Complete: break;
-        }
-    }
-
-    private void BFSSingleStep(Erf[,] map)
-    {
-        switch (SearchDirection)
-        {
-            case SearchDir.FromStart: BFSOneDirSingleStep(map); break;
-            case SearchDir.FromEnd: BFSOneDirSingleStep(map); break;
-            default: return; // TODO
         }
     }
 
@@ -173,7 +157,7 @@ public class Wayfinder
                             }
                             break;
                         }
-                    default: return; // TODO
+                    default: { searchState = SearchState.Complete; return; } // TODO
                 }
                 erfQueue.Enqueue(c);
             }
@@ -186,7 +170,7 @@ public class Wayfinder
 
     private void MarkCriticalPathSingleStep()
     {
-        if (searchState != SearchState.PathCalc) return;
+        if (searchState != SearchState.PathCalc) { searchState = SearchState.Complete; return; }
 
         bool[,] onCriticalPath = currentFlow.onCriticalPath;
         Compass[,] dirsToGoal = currentFlow.dirToGoal;
@@ -206,8 +190,8 @@ public class Wayfinder
         }
         pathC = coord.InDirectionInBoundsNonSelf(dir, Width, Height);
 
-        if (SearchDirection == SearchDir.FromStart && pathC == GoalPos) { searchState = SearchState.Complete; return; }
-        if (SearchDirection == SearchDir.Dual && pathC == SpawnPos) { searchState = SearchState.Complete; return; }
+        // if (SearchDirection == SearchDir.FromStart && pathC == GoalPos) { searchState = SearchState.Complete; return; }
+        // if (SearchDirection == SearchDir.Dual && pathC == SpawnPos) { searchState = SearchState.Complete; return; }
     }
 
     public Signpost SignpostAt(Coord coord)

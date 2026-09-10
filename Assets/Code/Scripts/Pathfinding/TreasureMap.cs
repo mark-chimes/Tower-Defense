@@ -35,7 +35,8 @@ public class TreasureMap
 
     public void SetModeAndClear(Wayfinder.SearchDir searchDir) 
     { 
-        wayfinder.SetSearchDirAndClear(searchDir);
+        wayfinder = wayfinder.WithNewSearchDir(searchDir);
+        ClearField(); // code smell: feels weird I have to clear field after spawning new one
     }
 
     public void SingleStep()
