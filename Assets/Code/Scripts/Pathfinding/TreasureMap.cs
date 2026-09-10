@@ -9,7 +9,7 @@ public class TreasureMap
     public TreasureMap(int width, int height, Coord spawnPos, Coord goalPos)
     {
         map = new Erf[width, height];
-        wayfinder = new Wayfinder(width, height, spawnPos, goalPos, Wayfinder.SearchDir.FromEnd);
+        wayfinder = new Wayfinder(width, height, spawnPos, goalPos, Search.Dir.FromEnd);
 
         for (int x = 0; x < width; x++)
         {
@@ -33,7 +33,7 @@ public class TreasureMap
         Recompute();
     }
 
-    public void SetModeAndClear(Wayfinder.SearchDir searchDir)
+    public void SetModeAndClear(Search.Dir searchDir)
     {
         wayfinder = wayfinder.WithNewSearchDir(searchDir);
         ClearField(); // code smell: feels weird I have to clear field after spawning new one

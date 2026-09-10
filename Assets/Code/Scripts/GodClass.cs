@@ -127,13 +127,13 @@ public class GodClass : MonoBehaviour
 
     public void OnFromStartModePressed() {
         isVisualizeMode = false;
-        treasureMap.SetModeAndClear(Wayfinder.SearchDir.FromStart);
+        treasureMap.SetModeAndClear(Search.Dir.FromStart);
         RefreshDistanceLabels();
     }
 
     public void OnFromEndModePressed () {
         isVisualizeMode = false;
-        treasureMap.SetModeAndClear(Wayfinder.SearchDir.FromEnd);
+        treasureMap.SetModeAndClear(Search.Dir.FromEnd);
         RefreshDistanceLabels();
     }
 

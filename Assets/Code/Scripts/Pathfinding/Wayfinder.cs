@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
-
 
 public class Wayfinder
 {
@@ -10,43 +8,23 @@ public class Wayfinder
     public readonly int Width;
     public readonly int Height;
 
-    private readonly SearchDir SearchDirection;
+    private readonly Search.Dir SearchDirection;
 
 
     private FlowField currentFlow;
 
-    private Phase phase = Phase.ExpandFrontier;
+    private Search.Phase phase = Search.Phase.ExpandFrontier;
 
     private bool isStopOnPathFound = false;
 
-    public enum Phase
-    {
-        ExpandFrontier,
-        TracePath,
-        Done,
-    }
 
-    public enum SearchDir
-    {
-        FromStart,
-        FromEnd,
-        Dual
-    }
-
-    readonly struct PathfindingDelta
-    {
-        readonly Phase phase;
-        readonly IReadOnlyList<(Coord, Signpost)> Changed;
-
-
-    }
 
     bool[,] visited;
     Queue<Coord> erfQueue;
     Coord? pathC;
 
 
-    public Wayfinder(int width, int height, Coord spawnPos, Coord goalPos, SearchDir searchDirection)
+    public Wayfinder(int width, int height, Coord spawnPos, Coord goalPos, Search.Dir searchDirection)
     {
         currentFlow = new FlowField(width, height);
         SpawnPos = spawnPos;
@@ -57,7 +35,7 @@ public class Wayfinder
         isStopOnPathFound = true; // TODO pass as parameter
     }
 
-    public Wayfinder WithNewSearchDir(SearchDir searchDirection)
+    public Wayfinder WithNewSearchDir(Search.Dir searchDirection)
     {
         return new Wayfinder(Width, Height, SpawnPos, GoalPos, searchDirection);
     }
@@ -67,18 +45,18 @@ public class Wayfinder
         visited = new bool[Width, Height];
         erfQueue = new Queue<Coord>();
         currentFlow = new FlowField(Width, Height);
-        phase = Phase.ExpandFrontier;
+        phase = Search.Phase.ExpandFrontier;
 
         Coord c;
         switch (SearchDirection)
         {
-            case SearchDir.FromStart:
+            case Search.Dir.FromStart:
                 {
                     c = SpawnPos;
                     pathC = GoalPos;
                     break;
                 }
-            case SearchDir.FromEnd:
+            case Search.Dir.FromEnd:
                 {
                     c = GoalPos;
                     pathC = SpawnPos;
@@ -98,7 +76,7 @@ public class Wayfinder
 
     public void ComputeFlow(Erf[,] map)
     {
-        while (phase != Phase.Done)
+        while (phase != Search.Phase.Done)
         {
             ComputeSingleStep(map);
         }
@@ -109,20 +87,17 @@ public class Wayfinder
     {
         switch (phase)
         {
-            case Phase.ExpandFrontier:
+            case Search.Phase.ExpandFrontier:
                 {
                     BFSOneDirSingleStep(map);
-                    // TODO this part won't work because phase 
-                    // gets changed before this return
-
                     return; // TODO return PathfindingDelta
                 }
-            case Phase.TracePath:
+            case Search.Phase.TracePath:
                 {
                     MarkCriticalPathSingleStep();
                     return; // TODO return PathfindingDelta
                 }
-            case Phase.Done: return;
+            case Search.Phase.Done: return;
         }
     }
 
@@ -130,7 +105,7 @@ public class Wayfinder
     {
         var list = new List<Signpost>();
 
-        if (phase != Phase.ExpandFrontier) return list;
+        if (phase != Search.Phase.ExpandFrontier) return list;
 
         int[,] distances = currentFlow.distance;
         Compass[,] dirsToGoal = currentFlow.dirToGoal;
@@ -158,63 +133,60 @@ public class Wayfinder
                 distances[c.X, c.Z] = dist + 1;
                 switch (SearchDirection)
                 {
-                    case SearchDir.FromStart:
+                    case Search.Dir.FromStart:
                         {
                             dirsToGoal[c.X, c.Z] = dir;
-                            list.Append(new Signpost(c, currentFlow));
+                            list.Add(new Signpost(c, currentFlow));
 
                             if (isStopOnPathFound && c == GoalPos)
                             {
-                                // TODO this part won't work
-                                phase = Phase.TracePath;
+                                phase = Search.Phase.TracePath;
                                 return list;
                             }
                             break;
                         }
-                    case SearchDir.FromEnd:
+                    case Search.Dir.FromEnd:
                         {
                             dirsToGoal[c.X, c.Z] = dir.Opposite();
-                            list.Append(new Signpost(c, currentFlow));
+                            list.Add(new Signpost(c, currentFlow));
 
                             if (isStopOnPathFound && c == SpawnPos)
                             {
-                                // TODO this part won't work
-                                phase = Phase.TracePath;
+                                phase = Search.Phase.TracePath;
                                 return list;
                             }
                             break;
                         }
-                    default: { phase = Phase.Done; return list; } // TODO
+                    default: { phase = Search.Phase.Done; return list; } // TODO
                 }
                 erfQueue.Enqueue(c);
             }
         }
         else
         {
-            // TODO phase change here, too
-            phase = Phase.TracePath;
+            phase = Search.Phase.TracePath;
         }
         return list;
     }
 
     private void MarkCriticalPathSingleStep()
     {
-        if (phase != Phase.TracePath) { phase = Phase.Done; return; }
+        if (phase != Search.Phase.TracePath) { phase = Search.Phase.Done; return; }
 
         bool[,] onCriticalPath = currentFlow.onCriticalPath;
         Compass[,] dirsToGoal = currentFlow.dirToGoal;
 
-        if (SearchDirection == SearchDir.Dual) { phase = Phase.Done; return; } // TODO
+        if (SearchDirection == Search.Dir.Dual) { phase = Search.Phase.Done; return; } // TODO
 
-        if (pathC == null) { phase = Phase.Done; return; }
+        if (pathC == null) { phase = Search.Phase.Done; return; }
 
         Coord coord = (Coord)pathC;
         onCriticalPath[coord.X, coord.Z] = true;
         Compass dir;
         switch (SearchDirection)
         {
-            case SearchDir.FromStart: dir = dirsToGoal[coord.X, coord.Z].Opposite(); break;
-            case SearchDir.FromEnd: dir = dirsToGoal[coord.X, coord.Z]; break;
+            case Search.Dir.FromStart: dir = dirsToGoal[coord.X, coord.Z].Opposite(); break;
+            case Search.Dir.FromEnd: dir = dirsToGoal[coord.X, coord.Z]; break;
             default: dir = Compass.None; break; // TODO
         }
         pathC = coord.InDirectionInBoundsNonSelf(dir, Width, Height);
