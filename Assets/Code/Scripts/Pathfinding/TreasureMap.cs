@@ -35,7 +35,8 @@ public class TreasureMap
         Recompute();
     }
 
-    public IReadOnlyCollection<Coord> CurrentFrontier() { 
+    public IReadOnlyCollection<Coord> CurrentFrontier()
+    {
         return wayfinder.CurrentFrontier();
     }
 
@@ -78,9 +79,6 @@ public class TreasureMap
         Erf data = map[coord.X, coord.Z];
         return new ErfSnapshot(coord, data.Kind, data.HasWall);
     }
-
-    // TODO Deprecate this? 
-    public ErfSnapshot At(int x, int z) => At(new Coord(x, z));
 
     public Signpost SignpostAt(Coord coord)
     {

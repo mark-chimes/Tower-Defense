@@ -11,16 +11,6 @@ public class FlowField
     public readonly bool[,] onCriticalPath;
 
     public FlowField(
-        int[,] distanceToGoal,
-        Compass[,] dirToGoal,
-        bool[,] onCriticalPath)
-    {
-        this.distance = distanceToGoal;
-        this.dirToGoal = dirToGoal;
-        this.onCriticalPath = onCriticalPath;
-    }
-
-    public FlowField(
         int width, int height)
     {
         Width = width;

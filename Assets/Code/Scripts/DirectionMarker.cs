@@ -3,7 +3,6 @@ using UnityEngine;
 // It tells you how far you are
 public class DirectionMarker : MonoBehaviour
 {
-    [SerializeField] private MeshRenderer meshRenderer;
     [SerializeField] private TMPro.TextMeshPro numberLabel;
 
     [SerializeField] private DirectionArrow arrow;
