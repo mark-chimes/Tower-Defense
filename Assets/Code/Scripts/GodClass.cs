@@ -37,6 +37,9 @@ public class GodClass : MonoBehaviour
     // Improving it to add checks deferred to later
 
     [SerializeField] private float visualizeFPS = 60f;
+
+    [SerializeField] private bool shouldHighlightFrontier = false;
+
     private float visualizeTime;
 
 
@@ -102,6 +105,7 @@ public class GodClass : MonoBehaviour
             }
         }
 
+        previousSigns = System.Array.Empty<Signpost>();
         treasureMap.ClearField();
         UpdateDistances();
     }
@@ -125,13 +129,15 @@ public class GodClass : MonoBehaviour
         }
     }
 
-    public void OnFromStartModePressed() {
+    public void OnFromStartModePressed()
+    {
         isVisualizeMode = false;
         treasureMap.SetModeAndClear(Search.Dir.FromStart);
         RefreshDistanceLabels();
     }
 
-    public void OnFromEndModePressed () {
+    public void OnFromEndModePressed()
+    {
         isVisualizeMode = false;
         treasureMap.SetModeAndClear(Search.Dir.FromEnd);
         RefreshDistanceLabels();
@@ -145,6 +151,7 @@ public class GodClass : MonoBehaviour
 
     public void OnClearFieldPressed()
     {
+        previousSigns = System.Array.Empty<Signpost>();
         isVisualizeMode = false;
         treasureMap.ClearField();
         RefreshDistanceLabels();
@@ -177,7 +184,8 @@ public class GodClass : MonoBehaviour
 
     }
 
-    private void SingleStep() { 
+    private void SingleStep()
+    {
         Search.Delta delta = treasureMap.SingleStep();
         RefreshFromDelta(delta);
     }
@@ -195,18 +203,48 @@ public class GodClass : MonoBehaviour
         RefreshDistanceLabels();
     }
 
+
+    private IReadOnlyCollection<Signpost> previousSigns; // = System.Array.Empty<Signpost>();
+
     void RefreshFromDelta(Search.Delta delta)
     {
         Debug.Log("Refresh from delta");
 
-        foreach(Signpost sign in delta.Changed)
+        switch (delta.Phase)
         {
-            Coord c = sign.Coord;
-            DirectionMarker directionMarker = directionMarkers[c.X, c.Z];
-            directionMarker.UpdateDistance(sign.DistanceToGoal);
-            directionMarker.UpdateArrow(sign.DirToGoal, sign.OnCriticalPath);
+            case Search.Phase.ExpandFrontier:
+                {
+                    foreach (Signpost sign in previousSigns)
+                    {
+                        Coord c = sign.Coord;
+                        DirectionMarker directionMarker = directionMarkers[c.X, c.Z];
+                        directionMarker.UnhighlightArrow();
+                    }
+                    previousSigns = delta.Changed;
+                    foreach (Signpost sign in delta.Changed)
+                    {
+                        Coord c = sign.Coord;
+                        DirectionMarker directionMarker = directionMarkers[c.X, c.Z];
+                        directionMarker.UpdateDistance(sign.DistanceToGoal);
+                        directionMarker.TurnAndHighlightArrowFrontier(sign.DirToGoal, shouldHighlightFrontier);
+                    }
+                    break;
+                }
+            case Search.Phase.TracePath:
+                {
+                    foreach (Signpost sign in delta.Changed)
+                    {
+                        Coord c = sign.Coord;
+                        DirectionMarker directionMarker = directionMarkers[c.X, c.Z];
+                        directionMarker.HighlightArrowOnPath();
+                    }
+                    break;
+                }
+            case Search.Phase.Done:
+                {
+                    return;
+                }
         }
-        
     }
 
     void RefreshDistanceLabels()

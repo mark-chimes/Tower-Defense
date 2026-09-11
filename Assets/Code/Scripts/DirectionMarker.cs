@@ -8,7 +8,9 @@ public class DirectionMarker : MonoBehaviour, IHighlightable
 
     [SerializeField] private DirectionArrow arrow;
 
-    [SerializeField] private Color arrowHighlightColor = Color.cyan;
+    [SerializeField] private Color pathHighlightColor = Color.cyan;
+    [SerializeField] private Color frontierHighlightColor = Color.red;
+
 
 
     public Coord Coord { get; private set; }
@@ -38,12 +40,30 @@ public class DirectionMarker : MonoBehaviour, IHighlightable
         numberLabel.text = distanceNum.ToString();
     }
 
+    public void UnhighlightArrow()
+    {
+        arrow.Unhighlight();
+    }
+
+    public void TurnAndHighlightArrowFrontier(Compass dir, bool shouldHighlightFrontier)
+    {
+        arrow.TurnTo(dir);
+        if (shouldHighlightFrontier) arrow.Highlight(frontierHighlightColor);
+        else arrow.Unhighlight();
+    }
+
+    public void HighlightArrowOnPath()
+    {
+        arrow.Highlight(pathHighlightColor);
+    }
+
+
     public void UpdateArrow(Compass dirToGoal, bool isCritical)
     {
         arrow.TurnTo(dirToGoal);
         if (isCritical)
         {
-            arrow.Highlight(arrowHighlightColor);
+            arrow.Highlight(pathHighlightColor);
         }
         else
         {
