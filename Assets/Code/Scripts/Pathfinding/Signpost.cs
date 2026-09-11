@@ -10,7 +10,7 @@ public readonly struct Signpost
     public readonly Coord Coord;
 
 
-    // Stepshot should never return the FlowField or any of its components directly.
+    // Signpost should never return the FlowField or any of its components directly.
     public Signpost(Coord coord, FlowField flow)
     {
         Coord = coord;

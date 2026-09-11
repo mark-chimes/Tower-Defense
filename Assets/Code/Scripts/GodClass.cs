@@ -157,10 +157,7 @@ public class GodClass : MonoBehaviour
 
     public void OnSingleStepPressed()
     {
-        Debug.Log("Single Step pressed");
-        treasureMap.SingleStep();
-        Debug.Log("GOD CLASS: Single Step from treasure map finished, refreshing distance labels");
-        RefreshDistanceLabels();
+        SingleStep();
     }
 
     float tempTime;
@@ -175,10 +172,14 @@ public class GodClass : MonoBehaviour
         if (tempTime > visualizeTime)
         {
             tempTime = 0;
-            treasureMap.SingleStep();
-            RefreshDistanceLabels();
+            SingleStep();
         }
 
+    }
+
+    private void SingleStep() { 
+        Search.Delta delta = treasureMap.SingleStep();
+        RefreshFromDelta(delta);
     }
 
     void UpdateDistances()
@@ -192,6 +193,20 @@ public class GodClass : MonoBehaviour
             treasureMap.Recompute();
         }
         RefreshDistanceLabels();
+    }
+
+    void RefreshFromDelta(Search.Delta delta)
+    {
+        Debug.Log("Refresh from delta");
+
+        foreach(Signpost sign in delta.Changed)
+        {
+            Coord c = sign.Coord;
+            DirectionMarker directionMarker = directionMarkers[c.X, c.Z];
+            directionMarker.UpdateDistance(sign.DistanceToGoal);
+            directionMarker.UpdateArrow(sign.DirToGoal, sign.OnCriticalPath);
+        }
+        
     }
 
     void RefreshDistanceLabels()
