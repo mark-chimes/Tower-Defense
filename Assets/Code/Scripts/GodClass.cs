@@ -38,7 +38,12 @@ public class GodClass : MonoBehaviour
 
     [SerializeField] private float visualizeFPS = 60f;
 
-    [SerializeField] private bool shouldHighlightFrontier = false;
+    [SerializeField] private bool isStopOnPathFound = true; // TODO this should be via debug buttons in-game
+
+
+    // TODO this is an ugly way of doing this - temp debug only
+    [SerializeField] private bool shouldHighlight = false;
+    [SerializeField] private bool isHighlightPulse = false;
 
     private float visualizeTime;
 
@@ -77,7 +82,7 @@ public class GodClass : MonoBehaviour
         Coord spawnPos = new Coord(spawnPosXZ.x, spawnPosXZ.y);
         Coord goalPos = new Coord(goalPosXZ.x, goalPosXZ.y);
 
-        treasureMap = new TreasureMap(width, height, spawnPos, goalPos);
+        treasureMap = new TreasureMap(width, height, spawnPos, goalPos, isStopOnPathFound);
 
         directionMarkers = new DirectionMarker[width, height];
         walls = new Wall[width, height];
@@ -187,7 +192,16 @@ public class GodClass : MonoBehaviour
     private void SingleStep()
     {
         Search.Delta delta = treasureMap.SingleStep();
-        RefreshFromDelta(delta);
+
+        // TODO Ugly way to handle this - temporary debug only.
+        if (isHighlightPulse)
+        {
+            RefreshFromDeltaHighlightPulse(delta);
+        }
+        else
+        {
+            RefreshFromDeltaHighlightFrontier(delta);
+        }
     }
 
     void UpdateDistances()
@@ -204,9 +218,64 @@ public class GodClass : MonoBehaviour
     }
 
 
-    private IReadOnlyCollection<Signpost> previousSigns; // = System.Array.Empty<Signpost>();
+    void RefreshFromDeltaHighlightFrontier(Search.Delta delta)
+    {
+        Debug.Log("Refresh from delta");
 
-    void RefreshFromDelta(Search.Delta delta)
+
+        switch (delta.Phase)
+        {
+            case Search.Phase.ExpandFrontier:
+                {
+                    UnhighlightAllArrows(); 
+                    foreach (Signpost sign in delta.Changed)
+                    {
+                        Coord c = sign.Coord;
+                        DirectionMarker directionMarker = directionMarkers[c.X, c.Z];
+                        directionMarker.UpdateDistance(sign.DistanceToGoal);
+                        directionMarker.PointTo(sign.DirToGoal);
+                    }
+
+                    foreach (Coord c in treasureMap.CurrentFrontier())
+                    {
+                        DirectionMarker directionMarker = directionMarkers[c.X, c.Z];
+                        directionMarker.HighlightFrontierArrow();
+                    }
+
+                    break;
+                }
+            case Search.Phase.TracePath:
+                {
+                    foreach (Signpost sign in delta.Changed)
+                    {
+                        Coord c = sign.Coord;
+                        DirectionMarker directionMarker = directionMarkers[c.X, c.Z];
+                        directionMarker.HighlightArrowOnPath();
+                    }
+                    break;
+                }
+            case Search.Phase.Done:
+                {
+                    return;
+                }
+        }
+    }
+
+    private void UnhighlightAllArrows()
+    {
+        for (int x = 0; x < width; x++)
+        {
+            for (int z = 0; z < height; z++)
+            {
+                DirectionMarker directionMarker = directionMarkers[x, z];
+                directionMarker.UnhighlightArrow();
+            }
+        }
+
+    }
+
+    private IReadOnlyCollection<Signpost> previousSigns; // = System.Array.Empty<Signpost>();
+    void RefreshFromDeltaHighlightPulse(Search.Delta delta)
     {
         Debug.Log("Refresh from delta");
 
@@ -226,12 +295,14 @@ public class GodClass : MonoBehaviour
                         Coord c = sign.Coord;
                         DirectionMarker directionMarker = directionMarkers[c.X, c.Z];
                         directionMarker.UpdateDistance(sign.DistanceToGoal);
-                        directionMarker.TurnAndHighlightArrowFrontier(sign.DirToGoal, shouldHighlightFrontier);
+                        directionMarker.TurnAndHighlightArrowFrontier(sign.DirToGoal, shouldHighlight);
                     }
                     break;
                 }
             case Search.Phase.TracePath:
                 {
+                    UnhighlightAllPreviousSigns();
+
                     foreach (Signpost sign in delta.Changed)
                     {
                         Coord c = sign.Coord;
@@ -242,9 +313,22 @@ public class GodClass : MonoBehaviour
                 }
             case Search.Phase.Done:
                 {
+                    UnhighlightAllPreviousSigns();
+
                     return;
                 }
         }
+    }
+
+    private void UnhighlightAllPreviousSigns()
+    {
+        foreach (Signpost sign in previousSigns)
+        {
+            Coord c = sign.Coord;
+            DirectionMarker directionMarker = directionMarkers[c.X, c.Z];
+            directionMarker.UnhighlightArrow();
+        }
+        previousSigns = System.Array.Empty<Signpost>();
     }
 
     void RefreshDistanceLabels()
@@ -342,7 +426,7 @@ public class GodClass : MonoBehaviour
 
 
             Wall wall = walls[c.X, c.Z];
-            target = (wall != null) ? wall : hoveredErf;
+            target = (wall != null) ? wall : hoveredErf.HighlightableTile();
         }
         highlighted?.Unhighlight();
         target?.Highlight(highlightColor);

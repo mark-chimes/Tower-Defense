@@ -8,10 +8,10 @@ public class TreasureMap
 
     private Wayfinder wayfinder;
 
-    public TreasureMap(int width, int height, Coord spawnPos, Coord goalPos)
+    public TreasureMap(int width, int height, Coord spawnPos, Coord goalPos, bool isStopOnPathFound)
     {
         map = new Erf[width, height];
-        wayfinder = new Wayfinder(width, height, spawnPos, goalPos, Search.Dir.FromEnd);
+        wayfinder = new Wayfinder(width, height, spawnPos, goalPos, Search.Dir.FromEnd, isStopOnPathFound);
 
         for (int x = 0; x < width; x++)
         {
@@ -33,6 +33,10 @@ public class TreasureMap
         }
 
         Recompute();
+    }
+
+    public IReadOnlyCollection<Coord> CurrentFrontier() { 
+        return wayfinder.CurrentFrontier();
     }
 
     public void SetModeAndClear(Search.Dir searchDir)

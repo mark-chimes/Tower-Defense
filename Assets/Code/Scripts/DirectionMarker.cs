@@ -1,7 +1,7 @@
 using UnityEngine;
 
 // It tells you how far you are
-public class DirectionMarker : MonoBehaviour, IHighlightable
+public class DirectionMarker : MonoBehaviour
 {
     [SerializeField] private MeshRenderer meshRenderer;
     [SerializeField] private TMPro.TextMeshPro numberLabel;
@@ -11,7 +11,7 @@ public class DirectionMarker : MonoBehaviour, IHighlightable
     [SerializeField] private Color pathHighlightColor = Color.cyan;
     [SerializeField] private Color frontierHighlightColor = Color.red;
 
-
+    [SerializeField] private IHighlightable highlightableTile;
 
     public Coord Coord { get; private set; }
 
@@ -21,7 +21,7 @@ public class DirectionMarker : MonoBehaviour, IHighlightable
     public void Awake()
     {
         block = new MaterialPropertyBlock();
-        arrow.TurnTo(Compass.North);
+        PointTo(Compass.North);
     }
 
     public void Initialize(Coord coord)
@@ -45,22 +45,34 @@ public class DirectionMarker : MonoBehaviour, IHighlightable
         arrow.Unhighlight();
     }
 
-    public void TurnAndHighlightArrowFrontier(Compass dir, bool shouldHighlightFrontier)
+    public void TurnAndHighlightArrowFrontier(Compass dir, bool shouldHighlight)
     {
-        arrow.TurnTo(dir);
-        if (shouldHighlightFrontier) arrow.Highlight(frontierHighlightColor);
+        PointTo(dir);
+        if (shouldHighlight) arrow.Highlight(frontierHighlightColor);
         else arrow.Unhighlight();
     }
+
+
+    public void HighlightFrontierArrow()
+    {
+        arrow.Highlight(frontierHighlightColor);
+    }
+
 
     public void HighlightArrowOnPath()
     {
         arrow.Highlight(pathHighlightColor);
     }
 
-
-    public void UpdateArrow(Compass dirToGoal, bool isCritical)
+    public void PointTo(Compass dir)
     {
-        arrow.TurnTo(dirToGoal);
+        arrow.TurnTo(dir);
+    }
+
+
+    public void UpdateArrow(Compass dir, bool isCritical)
+    {
+        PointTo(dir);
         if (isCritical)
         {
             arrow.Highlight(pathHighlightColor);
@@ -71,15 +83,9 @@ public class DirectionMarker : MonoBehaviour, IHighlightable
         }
     }
 
-    public void Highlight(Color color)
+    public IHighlightable HighlightableTile()
     {
-        block.SetColor(BaseColorId, color);
-        meshRenderer.SetPropertyBlock(block);
-    }
-
-    public void Unhighlight()
-    {
-        meshRenderer.SetPropertyBlock(null);
+        return highlightableTile;
     }
 
 

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.Immutable;
 public class Wayfinder
 {
     public Coord SpawnPos { get; }
@@ -14,6 +15,7 @@ public class Wayfinder
 
     private Search.Phase phase = Search.Phase.ExpandFrontier;
 
+    // TODO should pass this in as a parameter
     private bool isStopOnPathFound = false;
 
 
@@ -23,7 +25,7 @@ public class Wayfinder
     Coord? pathC;
 
 
-    public Wayfinder(int width, int height, Coord spawnPos, Coord goalPos, Search.Dir searchDirection)
+    public Wayfinder(int width, int height, Coord spawnPos, Coord goalPos, Search.Dir searchDirection, bool isStopOnPathFound)
     {
         currentFlow = new FlowField(width, height);
         SpawnPos = spawnPos;
@@ -31,12 +33,12 @@ public class Wayfinder
         Width = width;
         Height = height;
         SearchDirection = searchDirection;
-        isStopOnPathFound = true; // TODO pass as parameter
+        this.isStopOnPathFound = isStopOnPathFound;
     }
 
     public Wayfinder WithNewSearchDir(Search.Dir searchDirection)
     {
-        return new Wayfinder(Width, Height, SpawnPos, GoalPos, searchDirection);
+        return new Wayfinder(Width, Height, SpawnPos, GoalPos, searchDirection, isStopOnPathFound);
     }
 
     public void ClearField()
@@ -71,6 +73,10 @@ public class Wayfinder
         visited[c.X, c.Z] = true;
         currentFlow.distance[c.X, c.Z] = 0;
         erfQueue.Enqueue(c);
+    }
+
+    public IReadOnlyCollection<Coord> CurrentFrontier() { 
+        return erfQueue.ToArray();
     }
 
     public void ComputeFlow(Erf[,] map)
