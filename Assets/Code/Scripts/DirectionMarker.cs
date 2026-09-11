@@ -11,16 +11,13 @@ public class DirectionMarker : MonoBehaviour
     [SerializeField] private Color pathHighlightColor = Color.cyan;
     [SerializeField] private Color frontierHighlightColor = Color.red;
 
-    [SerializeField] private IHighlightable highlightableTile;
+    private IHighlightable highlightableTile;
 
     public Coord Coord { get; private set; }
 
-    private MaterialPropertyBlock block;
-    private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
-
     public void Awake()
     {
-        block = new MaterialPropertyBlock();
+        highlightableTile = GetComponentInChildren<Tile>();
         PointTo(Compass.North);
     }
 

@@ -50,7 +50,8 @@ MonoBehaviour:
   meshRenderer: {fileID: 4170649281639531863}
   numberLabel: {fileID: 6881207868284940184}
   arrow: {fileID: 5923265562715845978}
-  arrowHighlightColor: {r: 0, g: 1, b: 0.69411767, a: 0}
+  pathHighlightColor: {r: 0, g: 1, b: 1, a: 1}
+  frontierHighlightColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!1 &6026215810807360004
 GameObject:
   m_ObjectHideFlags: 0
@@ -244,8 +245,9 @@ GameObject:
   - component: {fileID: 5599657025548691239}
   - component: {fileID: 4170649281639531863}
   - component: {fileID: 5825520172513493528}
+  - component: {fileID: 3647990737002632942}
   m_Layer: 0
-  m_Name: Mesh
+  m_Name: Tile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -345,6 +347,19 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &3647990737002632942
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7019392113587382894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43226c394eb1eb14ab7f60da002c0e9a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Tile
+  meshRenderer: {fileID: 4170649281639531863}
 --- !u!1001 &6884996067327029886
 PrefabInstance:
   m_ObjectHideFlags: 0
