@@ -109,7 +109,7 @@ public class GodClass : MonoBehaviour
             }
         }
 
-       ClearField();
+        ClearField();
     }
 
     void InstantiateMarker(GameObject prefab, Coord coord)
@@ -165,6 +165,7 @@ public class GodClass : MonoBehaviour
 
     public void OnVisualizePressed()
     {
+        treasureMap.ClearField();
         isVisualizeMode = true;
     }
 
@@ -252,6 +253,8 @@ public class GodClass : MonoBehaviour
                 }
             case Search.Phase.Done:
                 {
+                    isVisualizeMode = false;
+                    tempTime = 0;
                     return;
                 }
         }
@@ -274,15 +277,12 @@ public class GodClass : MonoBehaviour
     {
         Debug.Log("RefreshDistanceLabels");
 
-        for (int x = 0; x < treasureMap.Width(); x++)
+        foreach (Signpost sign in treasureMap.Signposts())
         {
-            for (int z = 0; z < treasureMap.Height(); z++)
-            {
-                DirectionMarker directionMarker = directionMarkers[x, z];
-                Signpost sign = treasureMap.SignpostAt(x, z);
-                directionMarker.UpdateDistance(sign.DistanceToGoal);
-                directionMarker.UpdateArrow(sign.DirToGoal, sign.OnCriticalPath);
-            }
+            Coord c = sign.Coord;
+            DirectionMarker directionMarker = directionMarkers[c.X, c.Z];
+            directionMarker.UpdateDistance(sign.DistanceToGoal);
+            directionMarker.UpdateArrow(sign.DirToGoal, sign.OnCriticalPath);
         }
     }
 
