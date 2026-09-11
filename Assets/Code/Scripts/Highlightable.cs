@@ -1,13 +1,11 @@
 using UnityEngine;
 
-// TODO this is an empty class for now, but its a default implementation for IHighlightable
-// I don't really know how to put this on objects properly so I've been copy-pasting
-
 public class Highlightable : MonoBehaviour, IHighlightable
 {
-
-    [SerializeField] private MeshRenderer meshRenderer;
-
+    private MeshRenderer meshRenderer;
+    protected MeshRenderer MeshRenderer =>
+        meshRenderer ??= GetComponentInChildren<MeshRenderer>();
+        
     private MaterialPropertyBlock block;
     private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
 
@@ -19,12 +17,12 @@ public class Highlightable : MonoBehaviour, IHighlightable
     public void Highlight(Color color)
     {
         block.SetColor(BaseColorId, color);
-        meshRenderer.SetPropertyBlock(block);
+        MeshRenderer.SetPropertyBlock(block);
     }
 
     public void Unhighlight()
     {
-        meshRenderer.SetPropertyBlock(null);
+        MeshRenderer.SetPropertyBlock(null);
     }
 
 

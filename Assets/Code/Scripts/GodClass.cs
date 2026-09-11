@@ -109,8 +109,7 @@ public class GodClass : MonoBehaviour
             }
         }
 
-        treasureMap.ClearField();
-        UpdateDistances();
+       ClearField();
     }
 
     void InstantiateMarker(GameObject prefab, Coord coord)
@@ -155,6 +154,11 @@ public class GodClass : MonoBehaviour
     public void OnClearFieldPressed()
     {
         isVisualizeMode = false;
+        ClearField();
+    }
+
+    private void ClearField()
+    {
         treasureMap.ClearField();
         RefreshDistanceLabels();
     }
@@ -206,7 +210,7 @@ public class GodClass : MonoBehaviour
         RefreshDistanceLabels();
     }
 
-    
+
     void RefreshFromDeltaHighlightFrontier(Search.Delta delta)
     {
         Debug.Log("Refresh from delta");
@@ -216,7 +220,7 @@ public class GodClass : MonoBehaviour
         {
             case Search.Phase.ExpandFrontier:
                 {
-                    UnhighlightAllArrows(); 
+                    UnhighlightAllArrows();
                     foreach (Signpost sign in delta.Changed)
                     {
                         Coord c = sign.Coord;
@@ -225,10 +229,13 @@ public class GodClass : MonoBehaviour
                         directionMarker.PointTo(sign.DirToGoal);
                     }
 
-                    foreach (Coord c in treasureMap.CurrentFrontier())
+                    if (shouldHighlight)
                     {
-                        DirectionMarker directionMarker = directionMarkers[c.X, c.Z];
-                        directionMarker.HighlightFrontierArrow();
+                        foreach (Coord c in treasureMap.CurrentFrontier())
+                        {
+                            DirectionMarker directionMarker = directionMarkers[c.X, c.Z];
+                            directionMarker.HighlightFrontierArrow();
+                        }
                     }
 
                     break;

@@ -1,30 +1,16 @@
 using UnityEngine;
 
-public class DirectionArrow : MonoBehaviour, IHighlightable
+public class DirectionArrow : Highlightable
 {
-    [SerializeField] private MeshRenderer meshRenderer;
-
-    private MaterialPropertyBlock block;
-    private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
-
-    public void Awake()
-    {
-        block = new MaterialPropertyBlock();
-    }
-
-    void Reset() 
-    { 
-        meshRenderer = GetComponent<MeshRenderer>();
-    }
 
     public void Show()
     {
-        meshRenderer.enabled = true;
+        MeshRenderer.enabled = true;
     }
 
     public void Hide()
     {
-        meshRenderer.enabled = false;
+        MeshRenderer.enabled = false;
     }
 
     public void TurnTo(float x, float z) { 
@@ -41,16 +27,5 @@ public class DirectionArrow : MonoBehaviour, IHighlightable
             case Compass.West: TurnTo(-1,0);  break;
             case Compass.None: Hide(); break;  
         }
-    }
-
-    public void Highlight(Color color)
-    {
-        block.SetColor(BaseColorId, color);
-        meshRenderer.SetPropertyBlock(block);
-    }
-
-    public void Unhighlight()
-    {
-        meshRenderer.SetPropertyBlock(null);
     }
 }

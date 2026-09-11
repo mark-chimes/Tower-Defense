@@ -18,13 +18,14 @@ public class DirectionMarker : MonoBehaviour
     public void Awake()
     {
         highlightableTile = GetComponentInChildren<Tile>();
-        PointTo(Compass.North);
+
     }
 
     public void Initialize(Coord coord)
     {
-        this.Coord = coord;
+        Coord = coord;
         UpdateDistance(-1);
+        PointTo(Compass.None);
     }
 
     public void UpdateDistance(int distanceNum)
@@ -41,14 +42,6 @@ public class DirectionMarker : MonoBehaviour
     {
         arrow.Unhighlight();
     }
-
-    public void TurnAndHighlightArrowFrontier(Compass dir, bool shouldHighlight)
-    {
-        PointTo(dir);
-        if (shouldHighlight) arrow.Highlight(frontierHighlightColor);
-        else arrow.Unhighlight();
-    }
-
 
     public void HighlightFrontierArrow()
     {
