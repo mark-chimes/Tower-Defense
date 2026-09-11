@@ -380,6 +380,9 @@ MonoBehaviour:
   spawnPosXZ: {x: 8, y: 8}
   goalPosXZ: {x: 11, y: 11}
   visualizeFPS: 20
+  isStopOnPathFound: 1
+  shouldHighlight: 1
+  isHighlightPulse: 1
 --- !u!1 &783511479
 GameObject:
   m_ObjectHideFlags: 0
