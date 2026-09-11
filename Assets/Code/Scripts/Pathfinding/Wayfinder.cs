@@ -75,7 +75,8 @@ public class Wayfinder
         erfQueue.Enqueue(c);
     }
 
-    public IReadOnlyCollection<Coord> CurrentFrontier() { 
+    public IReadOnlyCollection<Coord> CurrentFrontier()
+    {
         return erfQueue.ToArray();
     }
 

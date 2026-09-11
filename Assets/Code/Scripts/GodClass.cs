@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using System.Collections.Generic;
+using static DirectionMarker;
 
 
 // May as well call it this until I figure out what it does 
@@ -165,7 +165,7 @@ public class GodClass : MonoBehaviour
 
     public void OnVisualizePressed()
     {
-        treasureMap.ClearField();
+        ClearField();
         isVisualizeMode = true;
     }
 
@@ -226,8 +226,7 @@ public class GodClass : MonoBehaviour
                     {
                         Coord c = sign.Coord;
                         DirectionMarker directionMarker = directionMarkers[c.X, c.Z];
-                        directionMarker.UpdateDistance(sign.DistanceToGoal);
-                        directionMarker.PointTo(sign.DirToGoal);
+                        directionMarker.ExhibitSignpost(sign);
                     }
 
                     if (shouldHighlight)
@@ -235,7 +234,7 @@ public class GodClass : MonoBehaviour
                         foreach (Coord c in treasureMap.CurrentFrontier())
                         {
                             DirectionMarker directionMarker = directionMarkers[c.X, c.Z];
-                            directionMarker.HighlightFrontierArrow();
+                            directionMarker.ExhibitAccent(ArrowAccent.Frontier);
                         }
                     }
 
@@ -247,7 +246,7 @@ public class GodClass : MonoBehaviour
                     {
                         Coord c = sign.Coord;
                         DirectionMarker directionMarker = directionMarkers[c.X, c.Z];
-                        directionMarker.HighlightArrowOnPath();
+                        directionMarker.ExhibitAccent(ArrowAccent.Path);
                     }
                     break;
                 }
@@ -267,7 +266,7 @@ public class GodClass : MonoBehaviour
             for (int z = 0; z < height; z++)
             {
                 DirectionMarker directionMarker = directionMarkers[x, z];
-                directionMarker.UnhighlightArrow();
+                directionMarker.ExhibitAccent(ArrowAccent.Normal);
             }
         }
 
@@ -281,8 +280,8 @@ public class GodClass : MonoBehaviour
         {
             Coord c = sign.Coord;
             DirectionMarker directionMarker = directionMarkers[c.X, c.Z];
-            directionMarker.UpdateDistance(sign.DistanceToGoal);
-            directionMarker.UpdateArrow(sign.DirToGoal, sign.OnCriticalPath);
+            directionMarker.ExhibitSignpost(sign);
+            directionMarker.ExhibitAccent(sign.OnCriticalPath ? ArrowAccent.Path : ArrowAccent.Normal);
         }
     }
 

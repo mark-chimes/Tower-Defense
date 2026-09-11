@@ -37,44 +37,37 @@ public class DirectionMarker : MonoBehaviour
         numberLabel.text = distanceNum.ToString();
     }
 
-    public void UnhighlightArrow()
-    {
-        arrow.Unhighlight();
-    }
-
-    public void HighlightFrontierArrow()
-    {
-        arrow.Highlight(frontierHighlightColor);
-    }
-
-
-    public void HighlightArrowOnPath()
-    {
-        arrow.Highlight(pathHighlightColor);
-    }
-
-    public void PointTo(Compass dir)
+    private void PointTo(Compass dir)
     {
         arrow.TurnTo(dir);
-    }
-
-
-    public void UpdateArrow(Compass dir, bool isCritical)
-    {
-        PointTo(dir);
-        if (isCritical)
-        {
-            arrow.Highlight(pathHighlightColor);
-        }
-        else
-        {
-            arrow.Unhighlight();
-        }
     }
 
     public IHighlightable HighlightableTile()
     {
         return highlightableTile;
+    }
+
+    public enum ArrowAccent
+    {
+        Normal,
+        Frontier,
+        Path
+    }
+
+    public void ExhibitSignpost(Signpost sign)
+    {
+        UpdateDistance(sign.DistanceToGoal);
+        PointTo(sign.DirToGoal);
+    }
+
+    public void ExhibitAccent(ArrowAccent accent)
+    {
+        switch (accent)
+        {
+            case ArrowAccent.Normal: arrow.Unhighlight(); break;
+            case ArrowAccent.Frontier: arrow.Highlight(frontierHighlightColor); break;
+            case ArrowAccent.Path: arrow.Highlight(pathHighlightColor); break;
+        }
     }
 
 
