@@ -66,7 +66,7 @@ public class TreasureMap
     public ErfSnapshot At(Coord coord)
     {
         Erf data = map[coord.X, coord.Z];
-        return new ErfSnapshot(coord, erfKind(coord), data.HasWall);
+        return new ErfSnapshot(coord, spawnGoalKind(coord), data.HasWall);
     }
 
     public Signpost SignpostAt(Coord coord)
@@ -83,14 +83,14 @@ public class TreasureMap
 
     public void SetWall(Coord c, bool hasWall) => map[c.X, c.Z].HasWall = hasWall;
 
-    public bool CanPlaceWall(Coord c) => erfKind(c) == ErfKind.Floor
+    public bool CanPlaceWall(Coord c) => spawnGoalKind(c) == SpawnGoalKind.Floor
         && !map[c.X, c.Z].HasWall;
 
-    private ErfKind erfKind(Coord coord)
+    private SpawnGoalKind spawnGoalKind(Coord coord)
     {
-        if (coord == SpawnPos) return ErfKind.Spawn;
-        else if (coord == GoalPos) return ErfKind.Goal;
-        return ErfKind.Floor;
+        if (coord == SpawnPos) return SpawnGoalKind.Spawn;
+        else if (coord == GoalPos) return SpawnGoalKind.Goal;
+        return SpawnGoalKind.Floor;
     }
 }
 

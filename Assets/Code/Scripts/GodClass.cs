@@ -103,8 +103,8 @@ public class GodClass : MonoBehaviour
 
                 switch (erf.Kind)
                 {
-                    case ErfKind.Spawn: InstantiateMarker(spawnPrefab, coord); break;
-                    case ErfKind.Goal: InstantiateMarker(goalPrefab, coord); break;
+                    case SpawnGoalKind.Spawn: InstantiateMarker(spawnPrefab, coord); break;
+                    case SpawnGoalKind.Goal: InstantiateMarker(goalPrefab, coord); break;
                 }
             }
         }
@@ -355,7 +355,7 @@ public class GodClass : MonoBehaviour
         {
             Coord c = hoveredErf.Coord;
             ErfSnapshot erf = treasureMap.At(c);
-            if (erf.Kind != ErfKind.Floor)
+            if (erf.Kind != SpawnGoalKind.Floor)
                 highlightColor = blockedColor;
             else if (erf.HasWall)
                 highlightColor = existingWallColor;
@@ -402,7 +402,7 @@ public class GodClass : MonoBehaviour
 
         ErfSnapshot erf = treasureMap.At(c);
 
-        if (erf.Kind != ErfKind.Floor)
+        if (erf.Kind != SpawnGoalKind.Floor)
         {
             Debug.LogError($"SpawnWall: {c} Kind was {erf.Kind}");
             return;
@@ -423,7 +423,7 @@ public class GodClass : MonoBehaviour
 
         ErfSnapshot erf = treasureMap.At(c);
 
-        if (erf.Kind != ErfKind.Floor)
+        if (erf.Kind != SpawnGoalKind.Floor)
         {
             Debug.LogError($"DespawnWall: {c} Kind was {erf.Kind}", wall);
             return;

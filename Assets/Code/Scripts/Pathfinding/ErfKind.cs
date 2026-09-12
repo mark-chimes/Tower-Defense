@@ -1,6 +1,5 @@
 
-// TODO Split / rename / reconsider this later, and consider walls
-public enum ErfKind
+public enum SpawnGoalKind
 {
     Floor,
     Spawn,
