@@ -4,12 +4,16 @@ public class TreasureMap
 {
 
     private Erf[,] map;
+    public readonly int Width;
+    public readonly int Height;
 
 
     private Wayfinder wayfinder;
 
     public TreasureMap(int width, int height, Coord spawnPos, Coord goalPos, bool isStopOnPathFound)
     {
+        Width = width;
+        Height = height;
         map = new Erf[width, height];
         wayfinder = new Wayfinder(width, height, spawnPos, goalPos, Search.Dir.FromEnd, isStopOnPathFound);
 
@@ -32,7 +36,7 @@ public class TreasureMap
             }
         }
 
-        Recompute();
+        wayfinder.ComputeFlow(map);
     }
 
     public IReadOnlyCollection<Coord> CurrentFrontier()
@@ -43,7 +47,6 @@ public class TreasureMap
     public void SetModeAndClear(Search.Dir searchDir)
     {
         wayfinder = wayfinder.WithNewSearchDir(searchDir);
-        ClearField(); // code smell: feels weird I have to clear field after spawning new one
     }
 
     public Search.Delta SingleStep()
@@ -53,26 +56,15 @@ public class TreasureMap
 
     public void Recompute()
     {
-        ClearField();
+        wayfinder.ClearField();
         wayfinder.ComputeFlow(map);
     }
 
-    // TODO code smell
+    // Just used to clear and not do anything - never a required external call
     public void ClearField()
     {
         wayfinder.ClearField();
     }
-
-    public int Width()
-    {
-        return wayfinder.Width;
-    }
-
-    public int Height()
-    {
-        return wayfinder.Height;
-    }
-
 
     public ErfSnapshot At(Coord coord)
     {

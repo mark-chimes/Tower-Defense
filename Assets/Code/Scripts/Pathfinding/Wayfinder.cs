@@ -34,6 +34,7 @@ public class Wayfinder
         Height = height;
         SearchDirection = searchDirection;
         this.isStopOnPathFound = isStopOnPathFound;
+        ClearField();
     }
 
     public Wayfinder WithNewSearchDir(Search.Dir searchDirection)
