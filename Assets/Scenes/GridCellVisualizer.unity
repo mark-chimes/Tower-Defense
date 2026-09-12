@@ -290,7 +290,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c595bef1fd05a34eb2e8490c8e01fda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DebugGUI
-  visualizer: {fileID: 742519895}
+  godClass: {fileID: 742519895}
 --- !u!1 &652559274
 GameObject:
   m_ObjectHideFlags: 0
@@ -375,9 +375,7 @@ MonoBehaviour:
     height: 15
     spawnPosInitXZ: {x: 13, y: 13}
     goalPosInitXZ: {x: 10, y: 10}
-  visualizeFPS: 120
   isStopOnPathFound: 1
-  shouldHighlight: 1
 --- !u!1 &783511479
 GameObject:
   m_ObjectHideFlags: 0
