@@ -15,26 +15,19 @@ using static DirectionMarker;
 public class GodClass : MonoBehaviour
 {
     [SerializeField] private DirectionMarker directionMarkerPrefab;
-    [SerializeField] private int width = 9;
-    [SerializeField] private int height = 9;
-    private readonly float erfSizeMeters = 10f;
 
     [SerializeField] private Transform wallsParent;
     [SerializeField] private Wall wallPrefab;
     [SerializeField] private GameObject spawnPrefab;
 
     [SerializeField] private GameObject goalPrefab;
-
+    [SerializeField] private GridAuthor gridAuthor;
+    private GridLayout layout;
 
     [SerializeField] private Color placeableColor = Color.green;
     [SerializeField] private Color blockedColor = Color.red;
     [SerializeField] private Color existingWallColor = Color.yellow;
 
-    [SerializeField] private Vector2Int spawnPosInitXZ = new(0, 0);
-    [SerializeField] private Vector2Int goalPosInitXZ = new(1, 1);
-    // Note it is possible to specify the above as out-of-bounds,
-    // or as the same square. 
-    // Improving it to add checks deferred to later
 
     [SerializeField] private float visualizeFPS = 60f;
 
@@ -77,9 +70,11 @@ public class GodClass : MonoBehaviour
 
     void GenerateGrid()
     {
-        // TODO out-of-bounds check.
-        Coord spawnPos = new Coord(spawnPosInitXZ.x, spawnPosInitXZ.y);
-        Coord goalPos = new Coord(goalPosInitXZ.x, goalPosInitXZ.y);
+        layout = gridAuthor.Layout;
+        int width = layout.Width;
+        int height = layout.Height; 
+        Coord spawnPos = gridAuthor.SpawnPos;
+        Coord goalPos = gridAuthor.GoalPos;
 
         treasureMap = new TreasureMap(width, height, spawnPos, goalPos, isStopOnPathFound);
 
@@ -93,7 +88,7 @@ public class GodClass : MonoBehaviour
                 Coord coord = new Coord(x, z);
 
                 DirectionMarker directionMarker = Instantiate(directionMarkerPrefab, transform);
-                Vector3 pos = CoordsToWorld(coord);
+                Vector3 pos = layout.CoordsToWorld(coord);
                 directionMarker.transform.localPosition = pos;
                 directionMarker.name = $"DirectionMarker_{x}_{z}";
                 directionMarker.Initialize(coord);
@@ -115,7 +110,7 @@ public class GodClass : MonoBehaviour
     void InstantiateMarker(GameObject prefab, Coord coord)
     {
         GameObject obj = Instantiate(prefab, transform);
-        obj.transform.localPosition = CoordsToWorld(coord);
+        obj.transform.localPosition = layout.CoordsToWorld(coord);
     }
 
     /** Slow pathfinding and refresh code **/
@@ -261,9 +256,9 @@ public class GodClass : MonoBehaviour
 
     private void UnhighlightAllArrows()
     {
-        for (int x = 0; x < width; x++)
+        for (int x = 0; x < layout.Width; x++)
         {
-            for (int z = 0; z < height; z++)
+            for (int z = 0; z < layout.Height; z++)
             {
                 DirectionMarker directionMarker = directionMarkers[x, z];
                 directionMarker.ExhibitAccent(ArrowAccent.Normal);
@@ -291,11 +286,15 @@ public class GodClass : MonoBehaviour
         Matrix4x4 originalMatrix = Gizmos.matrix;
         Color originalColor = Gizmos.color;
 
-        Gizmos.matrix = transform.localToWorldMatrix;
-        Vector3 size = new Vector3(erfSizeMeters, 1f, erfSizeMeters);
+        GridLayout layout = gridAuthor.Layout;
+        int width = layout.Width;
+        int height = layout.Height; 
 
-        Coord spawnPos = new Coord(spawnPosInitXZ.x, spawnPosInitXZ.y);
-        Coord goalPos = new Coord(goalPosInitXZ.x, goalPosInitXZ.y);
+        Gizmos.matrix = transform.localToWorldMatrix;
+        Vector3 size = new Vector3(GridLayout.CellSize, 1f, GridLayout.CellSize);
+
+        Coord spawnPos = gridAuthor.SpawnPos;
+        Coord goalPos = gridAuthor.GoalPos;
 
         for (int x = 0; x < width; x++)
         {
@@ -306,16 +305,16 @@ public class GodClass : MonoBehaviour
                 if (c == spawnPos)
                 {
                     Gizmos.color = Color.lightBlue;
-                    Gizmos.DrawCube(CoordsToWorld(c), size);
+                    Gizmos.DrawCube(layout.CoordsToWorld(c), size);
                 }
                 else if (c == goalPos)
                 {
                     Gizmos.color = Color.yellow;
-                    Gizmos.DrawCube(CoordsToWorld(c), size);
+                    Gizmos.DrawCube(layout.CoordsToWorld(c), size);
                 }
                 else
                 {
-                    Gizmos.DrawWireCube(CoordsToWorld(c), size);
+                    Gizmos.DrawWireCube(layout.CoordsToWorld(c), size);
                 }
 
 
@@ -323,13 +322,6 @@ public class GodClass : MonoBehaviour
         }
         Gizmos.matrix = originalMatrix;
         Gizmos.color = originalColor;
-    }
-
-    private Vector3 CoordsToWorld(Coord coord)
-    {
-        float worldX = (coord.X - (width - 1) / 2f) * erfSizeMeters;
-        float worldZ = (coord.Z - (height - 1) / 2f) * erfSizeMeters;
-        return new Vector3(worldX, 0f, worldZ);
     }
 
     void Awake()
@@ -409,7 +401,7 @@ public class GodClass : MonoBehaviour
         }
 
         Wall wall = Instantiate(wallPrefab, wallsParent);
-        wall.transform.localPosition = CoordsToWorld(c);
+        wall.transform.localPosition = layout.CoordsToWorld(c);
         wall.name = $"Wall_{c.X}_{c.Z}";
         walls[c.X, c.Z] = wall;
         treasureMap.SetWall(c, true);
