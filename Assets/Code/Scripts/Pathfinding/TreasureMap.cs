@@ -69,7 +69,7 @@ public class TreasureMap
 
     public void SetWall(Coord c, bool hasWall) => this.wallMap[c.X, c.Z] = hasWall;
 
-    public bool CanPlaceWall(Coord c) => SpawnGoalKindAt(c) == global::SpawnGoalKind.Floor
+    public bool CanPlaceWall(Coord c) => SpawnGoalKindAt(c) == SpawnGoalKind.Floor
         && !wallMap[c.X, c.Z];
 
     private SpawnGoalKind SpawnGoalKindAt(Coord coord)
