@@ -4,7 +4,12 @@ public class GridLayout
 {
     public readonly int Width;
     public readonly int Height;
-    public readonly float CellSize;
+    public const float CellSize = 10f;
+
+    public GridLayout(int width, int height) { 
+        Width = width;
+        Height = height;
+    }
 
     public Vector3 CoordsToWorld(Coord coord)
     {

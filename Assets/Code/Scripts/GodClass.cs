@@ -17,7 +17,7 @@ public class GodClass : MonoBehaviour
     [SerializeField] private DirectionMarker directionMarkerPrefab;
     [SerializeField] private int width = 9;
     [SerializeField] private int height = 9;
-    [SerializeField] private float erfSizeMeters = 10f;
+    private readonly float erfSizeMeters = 10f;
 
     [SerializeField] private Transform wallsParent;
     [SerializeField] private Wall wallPrefab;
