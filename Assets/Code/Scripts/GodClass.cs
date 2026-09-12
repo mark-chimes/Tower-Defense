@@ -24,11 +24,6 @@ public class GodClass : MonoBehaviour
     [SerializeField] private GridAuthor gridAuthor;
     private GridLayout layout;
 
-    [SerializeField] private Color placeableColor = Color.green;
-    [SerializeField] private Color blockedColor = Color.red;
-    [SerializeField] private Color existingWallColor = Color.yellow;
-
-
     [SerializeField] private float visualizeFPS = 60f;
 
     [SerializeField] private bool isStopOnPathFound = true; // TODO this should be via debug buttons in-game
@@ -45,25 +40,47 @@ public class GodClass : MonoBehaviour
     private DirectionMarker[,] directionMarkers;
     private Wall[,] walls;
 
-    private Camera cam;
-    private const float MaxRayDistance = 500f;
-
-    private DirectionMarker hoveredErf;
-    private IHighlightable highlighted;
-
     private bool isAutoRefreshMode = false;
     private bool isVisualizeMode = false;
+
+    GridIO gridIO;
 
     void Start()
     {
         visualizeTime = 1f / visualizeFPS;
         GenerateGrid();
+
+        GridIO.IWallHandler wallHandler = new WallHandler(this);
+        // TODO don't forget to update camera method if main camera can change
+        gridIO = new GridIO(wallHandler, treasureMap, Camera.main);
     }
 
     void Update()
     {
-        HandleMouse();
+        gridIO.HandleMouse();
         ContinuallySingleStep();
+    }
+
+    // TODO temporary implementation class during refactoring
+    private class WallHandler : GridIO.IWallHandler
+    {
+        private readonly GodClass godClass;
+        public WallHandler(GodClass godClass) { this.godClass = godClass; }
+
+        void GridIO.IWallHandler.DespawnWall(Coord c)
+        {
+            godClass.DespawnWall(c);
+        }
+
+        IHighlightable GridIO.IWallHandler.MaybeWall(Coord c)
+        {
+            return godClass.walls[c.X, c.Z];
+        }
+
+        void GridIO.IWallHandler.SpawnWall(Coord c)
+        {
+            godClass.SpawnWall(c);
+        }
     }
 
 
@@ -72,7 +89,7 @@ public class GodClass : MonoBehaviour
     {
         layout = gridAuthor.Layout;
         int width = layout.Width;
-        int height = layout.Height; 
+        int height = layout.Height;
         Coord spawnPos = gridAuthor.SpawnPos;
         Coord goalPos = gridAuthor.GoalPos;
 
@@ -286,70 +303,6 @@ public class GodClass : MonoBehaviour
         GridGizmo.Draw(gridAuthor, transform);
     }
 
-    void Awake()
-    {
-        cam = Camera.main;
-    }
-
-    private void HandleMouse()
-    {
-        if (Mouse.current == null) return;
-
-        HighlightAtHoveredErf();
-        if (Mouse.current.leftButton.wasPressedThisFrame) PlaceWallAtHovered();
-        if (Mouse.current.rightButton.wasPressedThisFrame) DestroyWallAtHovered();
-    }
-
-    private void HighlightAtHoveredErf()
-    {
-        hoveredErf = RaycastForErf();
-        IHighlightable target = null;
-        Color highlightColor = Color.magenta; // something went wrong if this is the highlight color
-        if (hoveredErf != null)
-        {
-            Coord c = hoveredErf.Coord;
-            ErfSnapshot erf = treasureMap.At(c);
-            if (erf.Kind != SpawnGoalKind.Floor)
-                highlightColor = blockedColor;
-            else if (erf.HasWall)
-                highlightColor = existingWallColor;
-            else
-                highlightColor = placeableColor;
-
-
-            Wall wall = walls[c.X, c.Z];
-            target = (wall != null) ? wall : hoveredErf.HighlightableTile();
-        }
-        highlighted?.Unhighlight();
-        target?.Highlight(highlightColor);
-        highlighted = target;
-    }
-
-
-    /// Currently assumes Walls have colliders off. Revisit if colliders turned on.
-    private DirectionMarker RaycastForErf()
-    {
-        Vector2 mousePos = Mouse.current.position.ReadValue();
-        Ray ray = cam.ScreenPointToRay(mousePos);
-        if (!Physics.Raycast(ray, out RaycastHit hit, MaxRayDistance)) return null;
-        return hit.collider.GetComponentInParent<DirectionMarker>();
-    }
-
-    private void PlaceWallAtHovered()
-    {
-        if (hoveredErf == null) return;
-        if (!treasureMap.CanPlaceWall(hoveredErf.Coord)) return; // TODO: red ghost
-        SpawnWall(hoveredErf.Coord);
-
-    }
-
-    private void DestroyWallAtHovered()
-    {
-        if (hoveredErf == null) return;
-        DespawnWall(hoveredErf.Coord);
-
-    }
-
     private void SpawnWall(Coord c)
     {
         if (walls[c.X, c.Z] != null) return;
@@ -383,7 +336,7 @@ public class GodClass : MonoBehaviour
             return;
         }
         walls[c.X, c.Z] = null;
-        if (ReferenceEquals(highlighted, wall)) highlighted = null;
+        gridIO.ClearHighlightIfMatching(wall);
         Destroy(wall.gameObject);
         treasureMap.SetWall(c, false);
         UpdateDistances();
