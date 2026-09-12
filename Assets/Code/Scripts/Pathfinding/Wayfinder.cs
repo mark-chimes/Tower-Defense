@@ -2,8 +2,8 @@ using System.Collections.Generic;
 
 public class Wayfinder
 {
-    public Coord SpawnPos { get; }
-    public Coord GoalPos { get; }
+    public readonly Coord SpawnPos;
+    public readonly Coord GoalPos;
 
     public readonly int Width;
     public readonly int Height;

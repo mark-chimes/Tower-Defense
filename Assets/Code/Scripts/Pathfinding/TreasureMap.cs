@@ -7,6 +7,9 @@ public class TreasureMap
     public readonly int Width;
     public readonly int Height;
 
+    public readonly Coord SpawnPos;
+    public readonly Coord GoalPos;
+
 
     private Wayfinder wayfinder;
 
@@ -14,6 +17,8 @@ public class TreasureMap
     {
         Width = width;
         Height = height;
+        SpawnPos = spawnPos;
+        GoalPos = goalPos;
         map = new Erf[width, height];
         wayfinder = new Wayfinder(width, height, spawnPos, goalPos, Search.Dir.FromEnd, isStopOnPathFound);
 
@@ -24,14 +29,6 @@ public class TreasureMap
                 Coord coord = new Coord(x, z);
                 Erf erf = new Erf(coord);
 
-                if (coord == spawnPos)
-                {
-                    erf.Kind = ErfKind.Spawn;
-                }
-                else if (coord == goalPos)
-                {
-                    erf.Kind = ErfKind.Goal;
-                }
                 map[x, z] = erf;
             }
         }
@@ -69,7 +66,7 @@ public class TreasureMap
     public ErfSnapshot At(Coord coord)
     {
         Erf data = map[coord.X, coord.Z];
-        return new ErfSnapshot(coord, data.Kind, data.HasWall);
+        return new ErfSnapshot(coord, erfKind(coord), data.HasWall);
     }
 
     public Signpost SignpostAt(Coord coord)
@@ -86,9 +83,15 @@ public class TreasureMap
 
     public void SetWall(Coord c, bool hasWall) => map[c.X, c.Z].HasWall = hasWall;
 
-    public bool CanPlaceWall(Coord c) => map[c.X, c.Z].Kind == ErfKind.Floor
+    public bool CanPlaceWall(Coord c) => erfKind(c) == ErfKind.Floor
         && !map[c.X, c.Z].HasWall;
 
+    private ErfKind erfKind(Coord coord)
+    {
+        if (coord == SpawnPos) return ErfKind.Spawn;
+        else if (coord == GoalPos) return ErfKind.Goal;
+        return ErfKind.Floor;
+    }
 }
 
 

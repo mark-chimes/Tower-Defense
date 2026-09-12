@@ -30,8 +30,8 @@ public class GodClass : MonoBehaviour
     [SerializeField] private Color blockedColor = Color.red;
     [SerializeField] private Color existingWallColor = Color.yellow;
 
-    [SerializeField] private Vector2Int spawnPosXZ = new(0, 0);
-    [SerializeField] private Vector2Int goalPosXZ = new(1, 1);
+    [SerializeField] private Vector2Int spawnPosInitXZ = new(0, 0);
+    [SerializeField] private Vector2Int goalPosInitXZ = new(1, 1);
     // Note it is possible to specify the above as out-of-bounds,
     // or as the same square. 
     // Improving it to add checks deferred to later
@@ -78,8 +78,8 @@ public class GodClass : MonoBehaviour
     void GenerateGrid()
     {
         // TODO out-of-bounds check.
-        Coord spawnPos = new Coord(spawnPosXZ.x, spawnPosXZ.y);
-        Coord goalPos = new Coord(goalPosXZ.x, goalPosXZ.y);
+        Coord spawnPos = new Coord(spawnPosInitXZ.x, spawnPosInitXZ.y);
+        Coord goalPos = new Coord(goalPosInitXZ.x, goalPosInitXZ.y);
 
         treasureMap = new TreasureMap(width, height, spawnPos, goalPos, isStopOnPathFound);
 
@@ -294,8 +294,8 @@ public class GodClass : MonoBehaviour
         Gizmos.matrix = transform.localToWorldMatrix;
         Vector3 size = new Vector3(erfSizeMeters, 1f, erfSizeMeters);
 
-        Coord spawnPos = new Coord(spawnPosXZ.x, spawnPosXZ.y);
-        Coord goalPos = new Coord(goalPosXZ.x, goalPosXZ.y);
+        Coord spawnPos = new Coord(spawnPosInitXZ.x, spawnPosInitXZ.y);
+        Coord goalPos = new Coord(goalPosInitXZ.x, goalPosInitXZ.y);
 
         for (int x = 0; x < width; x++)
         {
