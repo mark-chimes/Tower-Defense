@@ -367,18 +367,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CellController
   directionMarkerPrefab: {fileID: 428911081246246679, guid: cecf6f74b6087a1499f50fcadd62b46c, type: 3}
-  width: 20
-  height: 20
-  erfSizeMeters: 10
   wallsParent: {fileID: 652559275}
   wallPrefab: {fileID: 5586528569971646673, guid: 34992e6def475eb45b94617ae694c16b, type: 3}
   spawnPrefab: {fileID: 7843005997107329825, guid: db2164dec387741419d8b3c4b1121cf3, type: 3}
   goalPrefab: {fileID: 1768357886822621515, guid: f44c1ba509c38054783b63fdaf98d8e9, type: 3}
+  gridAuthor:
+    width: 15
+    height: 15
+    spawnPosInitXZ: {x: 13, y: 13}
+    goalPosInitXZ: {x: 10, y: 10}
   placeableColor: {r: 0, g: 1, b: 0, a: 1}
   blockedColor: {r: 1, g: 0, b: 0, a: 1}
   existingWallColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  spawnPosInitXZ: {x: 8, y: 8}
-  goalPosInitXZ: {x: 11, y: 11}
   visualizeFPS: 120
   isStopOnPathFound: 1
   shouldHighlight: 1
