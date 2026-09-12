@@ -14,13 +14,11 @@ using static DirectionMarker;
 // displays gizmos
 public class GodClass : MonoBehaviour
 {
-    [SerializeField] private DirectionMarker directionMarkerPrefab;
+    [SerializeField] private GridView gridView;
 
     [SerializeField] private Transform wallsParent;
     [SerializeField] private Wall wallPrefab;
-    [SerializeField] private GameObject spawnPrefab;
 
-    [SerializeField] private GameObject goalPrefab;
     [SerializeField] private GridAuthor gridAuthor;
     private GridLayout layout;
 
@@ -37,7 +35,6 @@ public class GodClass : MonoBehaviour
 
     private TreasureMap treasureMap;
 
-    private DirectionMarker[,] directionMarkers;
     private Wall[,] walls;
 
     private bool isAutoRefreshMode = false;
@@ -94,41 +91,13 @@ public class GodClass : MonoBehaviour
         Coord goalPos = gridAuthor.GoalPos;
 
         treasureMap = new TreasureMap(width, height, spawnPos, goalPos, isStopOnPathFound);
-
-        directionMarkers = new DirectionMarker[width, height];
         walls = new Wall[width, height];
 
-        for (int x = 0; x < width; x++)
-        {
-            for (int z = 0; z < height; z++)
-            {
-                Coord coord = new Coord(x, z);
-
-                DirectionMarker directionMarker = Instantiate(directionMarkerPrefab, transform);
-                Vector3 pos = layout.CoordsToWorld(coord);
-                directionMarker.transform.localPosition = pos;
-                directionMarker.name = $"DirectionMarker_{x}_{z}";
-                directionMarker.Initialize(coord);
-                directionMarkers[x, z] = directionMarker;
-
-                ErfSnapshot erf = treasureMap.At(coord);
-
-                switch (erf.Kind)
-                {
-                    case SpawnGoalKind.Spawn: InstantiateMarker(spawnPrefab, coord); break;
-                    case SpawnGoalKind.Goal: InstantiateMarker(goalPrefab, coord); break;
-                }
-            }
-        }
-
+        gridView.GenerateGridView(layout, spawnPos, goalPos);
         ClearField();
     }
 
-    void InstantiateMarker(GameObject prefab, Coord coord)
-    {
-        GameObject obj = Instantiate(prefab, transform);
-        obj.transform.localPosition = layout.CoordsToWorld(coord);
-    }
+
 
     /** Slow pathfinding and refresh code **/
 
@@ -139,7 +108,7 @@ public class GodClass : MonoBehaviour
         {
             isVisualizeMode = false;
             treasureMap.Recompute();
-            RefreshDistanceLabels();
+            gridView.RefreshDistanceLabels(treasureMap.Signposts());
         }
     }
 
@@ -147,20 +116,20 @@ public class GodClass : MonoBehaviour
     {
         isVisualizeMode = false;
         treasureMap.SetModeAndClear(Search.Dir.FromStart);
-        RefreshDistanceLabels();
+        gridView.RefreshDistanceLabels(treasureMap.Signposts());
     }
 
     public void OnFromEndModePressed()
     {
         isVisualizeMode = false;
         treasureMap.SetModeAndClear(Search.Dir.FromEnd);
-        RefreshDistanceLabels();
+        gridView.RefreshDistanceLabels(treasureMap.Signposts());
     }
 
     public void OnRefreshPressed()
     {
         treasureMap.Recompute();
-        RefreshDistanceLabels();
+        gridView.RefreshDistanceLabels(treasureMap.Signposts());
     }
 
     public void OnClearFieldPressed()
@@ -172,7 +141,7 @@ public class GodClass : MonoBehaviour
     private void ClearField()
     {
         treasureMap.ClearField();
-        RefreshDistanceLabels();
+        gridView.RefreshDistanceLabels(treasureMap.Signposts());
     }
 
     public void OnVisualizePressed()
@@ -220,7 +189,7 @@ public class GodClass : MonoBehaviour
         {
             treasureMap.Recompute();
         }
-        RefreshDistanceLabels();
+        gridView.RefreshDistanceLabels(treasureMap.Signposts());
     }
 
 
@@ -233,33 +202,12 @@ public class GodClass : MonoBehaviour
         {
             case Search.Phase.ExpandFrontier:
                 {
-                    UnhighlightAllArrows();
-                    foreach (Signpost sign in delta.Changed)
-                    {
-                        Coord c = sign.Coord;
-                        DirectionMarker directionMarker = directionMarkers[c.X, c.Z];
-                        directionMarker.ExhibitSignpost(sign);
-                    }
-
-                    if (shouldHighlight)
-                    {
-                        foreach (Coord c in treasureMap.CurrentFrontier())
-                        {
-                            DirectionMarker directionMarker = directionMarkers[c.X, c.Z];
-                            directionMarker.ExhibitAccent(ArrowAccent.Frontier);
-                        }
-                    }
-
+                    gridView.HighlightChangedOrFrontier(shouldHighlight, delta.Changed, treasureMap.CurrentFrontier());
                     break;
                 }
             case Search.Phase.TracePath:
                 {
-                    foreach (Signpost sign in delta.Changed)
-                    {
-                        Coord c = sign.Coord;
-                        DirectionMarker directionMarker = directionMarkers[c.X, c.Z];
-                        directionMarker.ExhibitAccent(ArrowAccent.Path);
-                    }
+                    gridView.HighlightPath(delta.Changed);
                     break;
                 }
             case Search.Phase.Done:
@@ -270,33 +218,6 @@ public class GodClass : MonoBehaviour
                 }
         }
     }
-
-    private void UnhighlightAllArrows()
-    {
-        for (int x = 0; x < layout.Width; x++)
-        {
-            for (int z = 0; z < layout.Height; z++)
-            {
-                DirectionMarker directionMarker = directionMarkers[x, z];
-                directionMarker.ExhibitAccent(ArrowAccent.Normal);
-            }
-        }
-
-    }
-
-    void RefreshDistanceLabels()
-    {
-        Debug.Log("RefreshDistanceLabels");
-
-        foreach (Signpost sign in treasureMap.Signposts())
-        {
-            Coord c = sign.Coord;
-            DirectionMarker directionMarker = directionMarkers[c.X, c.Z];
-            directionMarker.ExhibitSignpost(sign);
-            directionMarker.ExhibitAccent(sign.OnCriticalPath ? ArrowAccent.Path : ArrowAccent.Normal);
-        }
-    }
-
 
     void OnDrawGizmos()
     {
