@@ -97,8 +97,6 @@ public class GodClass : MonoBehaviour
         ClearField();
     }
 
-
-
     /** Slow pathfinding and refresh code **/
 
     public void SetAutoRefreshMode(bool isEnabled)

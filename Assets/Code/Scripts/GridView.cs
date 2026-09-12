@@ -44,14 +44,14 @@ public class GridView : MonoBehaviour
         }
     }
 
-    public void InstantiateMarker(GameObject prefab, Coord coord)
+    private void InstantiateMarker(GameObject prefab, Coord coord)
     {
         GameObject obj = Instantiate(prefab, transform);
         obj.transform.localPosition = layout.CoordsToWorld(coord);
     }
 
 
-    public void UnhighlightAllArrows()
+    private void UnhighlightAllArrows()
     {
         for (int x = 0; x < layout.Width; x++)
         {
