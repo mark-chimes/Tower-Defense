@@ -43,16 +43,16 @@ public class GodClass : MonoBehaviour
     private bool isAutoRefreshMode = false;
     private bool isVisualizeMode = false;
 
-    GridIO gridIO;
+    GridMouseHighlightIO gridIO;
 
     void Start()
     {
         visualizeTime = 1f / visualizeFPS;
         GenerateGrid();
 
-        GridIO.IWallHandler wallHandler = new WallHandler(this);
+        GridMouseHighlightIO.IWallHandler wallHandler = new WallHandler(this);
         // TODO don't forget to update camera method if main camera can change
-        gridIO = new GridIO(wallHandler, treasureMap, Camera.main);
+        gridIO = new GridMouseHighlightIO(wallHandler, treasureMap, Camera.main);
     }
 
     void Update()
@@ -62,22 +62,22 @@ public class GodClass : MonoBehaviour
     }
 
     // TODO temporary implementation class during refactoring
-    private class WallHandler : GridIO.IWallHandler
+    private class WallHandler : GridMouseHighlightIO.IWallHandler
     {
         private readonly GodClass godClass;
         public WallHandler(GodClass godClass) { this.godClass = godClass; }
 
-        void GridIO.IWallHandler.DespawnWall(Coord c)
+        void GridMouseHighlightIO.IWallHandler.DespawnWall(Coord c)
         {
             godClass.DespawnWall(c);
         }
 
-        IHighlightable GridIO.IWallHandler.MaybeWall(Coord c)
+        IHighlightable GridMouseHighlightIO.IWallHandler.MaybeWall(Coord c)
         {
             return godClass.walls[c.X, c.Z];
         }
 
-        void GridIO.IWallHandler.SpawnWall(Coord c)
+        void GridMouseHighlightIO.IWallHandler.SpawnWall(Coord c)
         {
             godClass.SpawnWall(c);
         }

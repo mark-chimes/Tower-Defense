@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 [System.Serializable]
-public class GridIO
+public class GridMouseHighlightIO
 {
 
 
@@ -29,7 +29,7 @@ public class GridIO
 
     private IWallHandler wallHandler;
 
-    public GridIO(IWallHandler wallHandler, TreasureMap treasureMap, Camera cam)
+    public GridMouseHighlightIO(IWallHandler wallHandler, TreasureMap treasureMap, Camera cam)
     {
         this.wallHandler = wallHandler;
         this.treasureMap = treasureMap;
@@ -79,8 +79,6 @@ public class GridIO
         return hit.collider.GetComponentInParent<DirectionMarker>();
     }
 
-    // TODO unsure if wall checking is correct here
-    // revisit when walls gets its own class
     private void PlaceWallAtHovered()
     {
         if (hoveredErf == null) return;
