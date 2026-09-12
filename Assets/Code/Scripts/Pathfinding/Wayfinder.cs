@@ -5,6 +5,8 @@ public class Wayfinder
     public readonly Coord SpawnPos;
     public readonly Coord GoalPos;
 
+    private bool[,] wallMap; // Do not modify
+
     public readonly int Width;
     public readonly int Height;
 
@@ -25,13 +27,14 @@ public class Wayfinder
     Coord? pathC;
 
 
-    public Wayfinder(int width, int height, Coord spawnPos, Coord goalPos, Search.Dir searchDirection, bool isStopOnPathFound)
+    public Wayfinder(int width, int height, bool[,] wallMap, Coord spawnPos, Coord goalPos, Search.Dir searchDirection, bool isStopOnPathFound)
     {
         currentFlow = new FlowField(width, height);
         SpawnPos = spawnPos;
         GoalPos = goalPos;
         Width = width;
         Height = height;
+        this.wallMap = wallMap;
         SearchDirection = searchDirection;
         this.isStopOnPathFound = isStopOnPathFound;
         ClearField();
@@ -39,7 +42,7 @@ public class Wayfinder
 
     public Wayfinder WithNewSearchDir(Search.Dir searchDirection)
     {
-        return new Wayfinder(Width, Height, SpawnPos, GoalPos, searchDirection, isStopOnPathFound);
+        return new Wayfinder(Width, Height, wallMap, SpawnPos, GoalPos, searchDirection, isStopOnPathFound);
     }
 
     public void ClearField()
@@ -81,20 +84,20 @@ public class Wayfinder
         return erfQueue.ToArray();
     }
 
-    public void ComputeFlow(Erf[,] map)
+    public void ComputeFlow()
     {
         while (phase != Search.Phase.Done)
         {
-            ComputeSingleStep(map);
+            ComputeSingleStep();
         }
     }
 
-    public Search.Delta ComputeSingleStep(Erf[,] map)
+    public Search.Delta ComputeSingleStep()
     {
         Search.Phase phaseAtStart = phase;
         IReadOnlyCollection<Signpost> changed = phase switch
         {
-            Search.Phase.ExpandFrontier => BFSOneDirSingleStep(map),
+            Search.Phase.ExpandFrontier => BFSOneDirSingleStep(),
             Search.Phase.TracePath => MarkCriticalPathSingleStep(),
             _ => System.Array.Empty<Signpost>(),
         };
@@ -102,7 +105,7 @@ public class Wayfinder
     }
 
 
-    private IReadOnlyCollection<Signpost> BFSOneDirSingleStep(Erf[,] map)
+    private IReadOnlyCollection<Signpost> BFSOneDirSingleStep()
     {
         var list = new List<Signpost>();
 
@@ -124,8 +127,7 @@ public class Wayfinder
                 }
 
                 visited[c.X, c.Z] = true;
-                Erf erf = map[c.X, c.Z];
-                if (erf.HasWall)
+                if (wallMap[c.X, c.Z])
                 {
                     distances[c.X, c.Z] = -1;
                     continue;

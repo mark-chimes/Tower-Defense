@@ -3,7 +3,7 @@ using System.Collections.Generic;
 public class TreasureMap
 {
 
-    private Erf[,] map;
+    private bool[,] wallMap;
     public readonly int Width;
     public readonly int Height;
 
@@ -19,21 +19,8 @@ public class TreasureMap
         Height = height;
         SpawnPos = spawnPos;
         GoalPos = goalPos;
-        map = new Erf[width, height];
-        wayfinder = new Wayfinder(width, height, spawnPos, goalPos, Search.Dir.FromEnd, isStopOnPathFound);
-
-        for (int x = 0; x < width; x++)
-        {
-            for (int z = 0; z < height; z++)
-            {
-                Coord coord = new Coord(x, z);
-                Erf erf = new Erf(coord);
-
-                map[x, z] = erf;
-            }
-        }
-
-        wayfinder.ComputeFlow(map);
+        wallMap = new bool[width, height];
+        wayfinder = new Wayfinder(width, height, wallMap, spawnPos, goalPos, Search.Dir.FromEnd, isStopOnPathFound);
     }
 
     public IReadOnlyCollection<Coord> CurrentFrontier()
@@ -48,13 +35,13 @@ public class TreasureMap
 
     public Search.Delta SingleStep()
     {
-        return wayfinder.ComputeSingleStep(map);
+        return wayfinder.ComputeSingleStep();
     }
 
     public void Recompute()
     {
         wayfinder.ClearField();
-        wayfinder.ComputeFlow(map);
+        wayfinder.ComputeFlow();
     }
 
     // Just used to clear and not do anything - never a required external call
@@ -65,8 +52,7 @@ public class TreasureMap
 
     public ErfSnapshot At(Coord coord)
     {
-        Erf data = map[coord.X, coord.Z];
-        return new ErfSnapshot(coord, spawnGoalKind(coord), data.HasWall);
+        return new ErfSnapshot(coord, spawnGoalKind(coord), wallMap[coord.X, coord.Z]);
     }
 
     public Signpost SignpostAt(Coord coord)
@@ -81,10 +67,10 @@ public class TreasureMap
 
     public Signpost SignpostAt(int x, int z) => SignpostAt(new Coord(x, z));
 
-    public void SetWall(Coord c, bool hasWall) => map[c.X, c.Z].HasWall = hasWall;
+    public void SetWall(Coord c, bool hasWall) => this.wallMap[c.X, c.Z] = hasWall;
 
     public bool CanPlaceWall(Coord c) => spawnGoalKind(c) == SpawnGoalKind.Floor
-        && !map[c.X, c.Z].HasWall;
+        && !wallMap[c.X, c.Z];
 
     private SpawnGoalKind spawnGoalKind(Coord coord)
     {
