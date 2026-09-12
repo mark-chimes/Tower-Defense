@@ -52,7 +52,7 @@ public class TreasureMap
 
     public ErfSnapshot At(Coord coord)
     {
-        return new ErfSnapshot(coord, spawnGoalKind(coord), wallMap[coord.X, coord.Z]);
+        return new ErfSnapshot(coord, SpawnGoalKind(coord), wallMap[coord.X, coord.Z]);
     }
 
     public Signpost SignpostAt(Coord coord)
@@ -69,14 +69,14 @@ public class TreasureMap
 
     public void SetWall(Coord c, bool hasWall) => this.wallMap[c.X, c.Z] = hasWall;
 
-    public bool CanPlaceWall(Coord c) => spawnGoalKind(c) == SpawnGoalKind.Floor
+    public bool CanPlaceWall(Coord c) => SpawnGoalKind(c) == global::SpawnGoalKind.Floor
         && !wallMap[c.X, c.Z];
 
-    private SpawnGoalKind spawnGoalKind(Coord coord)
+    private SpawnGoalKind SpawnGoalKind(Coord coord)
     {
-        if (coord == SpawnPos) return SpawnGoalKind.Spawn;
-        else if (coord == GoalPos) return SpawnGoalKind.Goal;
-        return SpawnGoalKind.Floor;
+        if (coord == SpawnPos) return global::SpawnGoalKind.Spawn;
+        else if (coord == GoalPos) return global::SpawnGoalKind.Goal;
+        return global::SpawnGoalKind.Floor;
     }
 }
 
