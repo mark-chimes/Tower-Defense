@@ -30,15 +30,11 @@ public class GodClass : MonoBehaviour
 
 
     GridMouseHighlightIO gridIO;
-    GridPathfindingManager pathfindingManager;
-
-
-    // TODO this is almost surely not the way to do this
-    public GridPathfindingManager PathfindingManager => pathfindingManager;
+    GridPathfindingIOManager pathfindingManager;
 
     void Start()
     {
-        pathfindingManager = new GridPathfindingManager();
+        pathfindingManager = new GridPathfindingIOManager();
         GenerateGrid();
 
         // TODO don't forget to update camera method if main camera can change
@@ -71,6 +67,14 @@ public class GodClass : MonoBehaviour
         pathfindingManager.ClearField();
         gridWalls.Initialize(treasureMap, layout, pathfindingManager.UpdateDistances);
     }
+
+    public void OnRefreshPressed() => pathfindingManager.OnRefreshPressed();
+    public void OnClearFieldPressed() => pathfindingManager.OnClearFieldPressed();
+    public void OnSingleStepPressed() => pathfindingManager.OnSingleStepPressed();
+    public void OnVisualizePressed() => pathfindingManager.OnVisualizePressed();
+    public void OnFromStartModePressed() => pathfindingManager.OnFromStartModePressed();
+    public void OnFromEndModePressed() => pathfindingManager.OnFromEndModePressed();
+    public void SetAutoRefreshMode(bool isEnabled) => pathfindingManager.SetAutoRefreshMode(isEnabled);
 
 
 }

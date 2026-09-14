@@ -12,12 +12,6 @@ public class GridWalls : MonoBehaviour
 
     private Action onWallChange;
 
-    public interface IPathfindingCallback
-    {
-        void UpdateDistances();
-    }
-
-
     public void Initialize(TreasureMap treasureMap, GridLayout layout, Action onWallChange)
     {
         this.treasureMap = treasureMap;

@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [System.Serializable]
-public class GridPathfindingManager
+public class GridPathfindingIOManager
 {
     [SerializeField] private float visualizeFPS = 60f;
 
@@ -13,7 +13,7 @@ public class GridPathfindingManager
 
     private bool isAutoRefreshMode = false;
     private bool isVisualizeMode = false;
-    public GridPathfindingManager()
+    public GridPathfindingIOManager()
     {
         visualizeTime = 1f / visualizeFPS;
     }

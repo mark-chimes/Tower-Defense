@@ -15,43 +15,43 @@ public class DebugGUI : MonoBehaviour
         if(GUI.Button(new Rect(20,40,120,20), "Instant Refresh"))
         {
             Debug.Log("Refresh");
-            godClass.PathfindingManager.OnRefreshPressed();
+            godClass.OnRefreshPressed();
         }
 
         if(GUI.Button(new Rect(20,65,80,20), "Clear Field"))
         {
             Debug.Log("Clear Field");
-            godClass.PathfindingManager.OnClearFieldPressed();        
+            godClass.OnClearFieldPressed();        
         }
 
         if(GUI.Button(new Rect(20,90,80,20), "Single Step"))
         {
             Debug.Log("Single Step");
-            godClass.PathfindingManager.OnSingleStepPressed();        
+            godClass.OnSingleStepPressed();        
         }
 
         if(GUI.Button(new Rect(20,115,80,20), "VISUALIZE"))
         {
             Debug.Log("VISUALIZE");
-            godClass.PathfindingManager.OnVisualizePressed();        
+            godClass.OnVisualizePressed();        
         }
         
         autoRefreshEnabled = GUI.Toggle(new Rect(20,140,120,20), autoRefreshEnabled, "Auto-Refresh");
         if (wasEnabled != autoRefreshEnabled) { 
             wasEnabled = autoRefreshEnabled;
-            godClass.PathfindingManager.SetAutoRefreshMode(autoRefreshEnabled);
+            godClass.SetAutoRefreshMode(autoRefreshEnabled);
         }
 
         if(GUI.Button(new Rect(20,160,160,20), "From-Start Mode (clears)"))
         {
             Debug.Log("From-Start Mode");
-            godClass.PathfindingManager.OnFromStartModePressed();        
+            godClass.OnFromStartModePressed();        
         }
 
         if(GUI.Button(new Rect(20,180,160,20), "From-End Mode (clears)"))
         {
             Debug.Log("From-End Mode");
-            godClass.PathfindingManager.OnFromEndModePressed();        
+            godClass.OnFromEndModePressed();        
         }
     }
 }
