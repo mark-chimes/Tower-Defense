@@ -57,7 +57,7 @@ public class GridMouseHighlightIO
             Highlightable maybeWall = wallHandler.MaybeWall(c);
             target = (maybeWall != null ? maybeWall : hoveredErf.HighlightableTile());
         }
-        highlighted?.Unhighlight();
+        if (highlighted != null) highlighted.Unhighlight();
         target?.Highlight(highlightColor);
         highlighted = target;
     }
@@ -85,13 +85,4 @@ public class GridMouseHighlightIO
         if (hoveredErf == null) return;
         wallHandler.DespawnWall(hoveredErf.Coord);
     }
-
-    public void ClearHighlightIfMatching(Highlightable toMatch)
-    {
-        if (ReferenceEquals(highlighted, toMatch)) highlighted = null;
-    }
-
-    // TODO update camera method if camera can ever change
-
-
 }

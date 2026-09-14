@@ -43,7 +43,6 @@ public class GodClass : MonoBehaviour
 
         // TODO don't forget to update camera method if main camera can change
         gridIO = new GridMouseHighlightIO(gridWalls, treasureMap, Camera.main);
-        gridWalls.AttachHighlightIO(gridIO);
     }
 
     void Update()

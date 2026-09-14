@@ -11,12 +11,12 @@ public class GridWalls : MonoBehaviour
 
     private IPathfindingCallback pathfindingCallback;
 
+
     public interface IPathfindingCallback
     {
         void UpdateDistances();
     }
 
-    GridMouseHighlightIO gridIO;
 
     public void Initialize(TreasureMap treasureMap, GridLayout layout, IPathfindingCallback pathfindingCallback)
     {
@@ -24,11 +24,6 @@ public class GridWalls : MonoBehaviour
         this.layout = layout;
         this.pathfindingCallback = pathfindingCallback;
         walls = new Wall[treasureMap.Width, treasureMap.Height];
-    }
-
-    public void AttachHighlightIO(GridMouseHighlightIO gridIO)
-    {
-        this.gridIO = gridIO;
     }
 
     public Highlightable MaybeWall(Coord c)
@@ -59,9 +54,8 @@ public class GridWalls : MonoBehaviour
     }
 
     public void DespawnWall(Coord c)
-    {        
+    {
         Debug.Assert(treasureMap != null, "GridWalls.Initialize was never called");
-        Debug.Assert(gridIO != null, "GridWalls.AttachHighlightIO was never called");
 
         Wall wall = walls[c.X, c.Z];
         if (wall == null) return;
@@ -74,7 +68,6 @@ public class GridWalls : MonoBehaviour
             return;
         }
         walls[c.X, c.Z] = null;
-        gridIO.ClearHighlightIfMatching(wall);
         Destroy(wall.gameObject);
         treasureMap.SetWall(c, false);
         pathfindingCallback.UpdateDistances();
