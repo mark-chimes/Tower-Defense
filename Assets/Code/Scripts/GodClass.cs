@@ -41,9 +41,9 @@ public class GodClass : MonoBehaviour
         pathfindingManager = new GridPathfindingManager();
         GenerateGrid();
 
-        // gridWalls = new GridWalls();
         // TODO don't forget to update camera method if main camera can change
         gridIO = new GridMouseHighlightIO(gridWalls, treasureMap, Camera.main);
+        gridWalls.AttachHighlightIO(gridIO);
     }
 
     void Update()
@@ -70,7 +70,7 @@ public class GodClass : MonoBehaviour
         gridView.GenerateGridView(layout, spawnPos, goalPos);
         pathfindingManager.Initialize(treasureMap, gridView);
         pathfindingManager.ClearField();
-        gridWalls.Initialize(treasureMap, layout, pathfindingManager, gridIO);
+        gridWalls.Initialize(treasureMap, layout, pathfindingManager);
     }
 
 
