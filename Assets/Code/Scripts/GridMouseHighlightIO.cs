@@ -7,7 +7,7 @@ public class GridMouseHighlightIO
 
 
     private DirectionMarker hoveredErf;
-    private IHighlightable highlighted;
+    private Highlightable highlighted;
     private Camera cam;
 
 
@@ -18,18 +18,11 @@ public class GridMouseHighlightIO
 
     private const float maxRayDistance = 500f;
 
-    public interface IWallHandler
-    {
-        IHighlightable MaybeWall(Coord c);
-        void SpawnWall(Coord c);
-        void DespawnWall(Coord c);
-    }
-
     TreasureMap treasureMap;
 
-    private IWallHandler wallHandler;
+    private GridWalls wallHandler;
 
-    public GridMouseHighlightIO(IWallHandler wallHandler, TreasureMap treasureMap, Camera cam)
+    public GridMouseHighlightIO(GridWalls wallHandler, TreasureMap treasureMap, Camera cam)
     {
         this.wallHandler = wallHandler;
         this.treasureMap = treasureMap;
@@ -48,7 +41,7 @@ public class GridMouseHighlightIO
     private void HighlightAtHoveredErf()
     {
         hoveredErf = RaycastForErf();
-        IHighlightable target = null;
+        Highlightable target = null;
         Color highlightColor = Color.magenta; // something went wrong if this is the highlight color
         if (hoveredErf != null)
         {
@@ -61,7 +54,7 @@ public class GridMouseHighlightIO
             else
                 highlightColor = placeableColor;
 
-            IHighlightable maybeWall = wallHandler.MaybeWall(c);
+            Highlightable maybeWall = wallHandler.MaybeWall(c);
             target = (maybeWall != null ? maybeWall : hoveredErf.HighlightableTile());
         }
         highlighted?.Unhighlight();
@@ -93,7 +86,7 @@ public class GridMouseHighlightIO
         wallHandler.DespawnWall(hoveredErf.Coord);
     }
 
-    public void ClearHighlightIfMatching(IHighlightable toMatch)
+    public void ClearHighlightIfMatching(Highlightable toMatch)
     {
         if (ReferenceEquals(highlighted, toMatch)) highlighted = null;
     }

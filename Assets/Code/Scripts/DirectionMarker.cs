@@ -10,7 +10,7 @@ public class DirectionMarker : MonoBehaviour
     [SerializeField] private Color pathHighlightColor = Color.cyan;
     [SerializeField] private Color frontierHighlightColor = Color.red;
 
-    private IHighlightable highlightableTile;
+    private Highlightable highlightableTile;
 
     public Coord Coord { get; private set; }
 
@@ -42,7 +42,7 @@ public class DirectionMarker : MonoBehaviour
         arrow.TurnTo(dir);
     }
 
-    public IHighlightable HighlightableTile()
+    public Highlightable HighlightableTile()
     {
         return highlightableTile;
     }

@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [System.Serializable]
-public class GridPathfindingManager
+public class GridPathfindingManager: GridWalls.IPathfindingCallback
 {
     [SerializeField] private float visualizeFPS = 60f;
 

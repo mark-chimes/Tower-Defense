@@ -344,7 +344,7 @@ MonoBehaviour:
     spawnPosInitXZ: {x: 13, y: 13}
     goalPosInitXZ: {x: 10, y: 10}
   isStopOnPathFound: 1
-  gridWalls: {fileID: 0}
+  gridWalls: {fileID: 1885593513}
 --- !u!1 &783511479
 GameObject:
   m_ObjectHideFlags: 0
@@ -671,7 +671,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d56ba5d46dbc5af4aa7346fbf2f75093, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GridWalls
-  wallsParent: {fileID: 1885593512}
   wallPrefab: {fileID: 5586528569971646673, guid: 34992e6def475eb45b94617ae694c16b, type: 3}
 --- !u!1 &1943342539
 GameObject:

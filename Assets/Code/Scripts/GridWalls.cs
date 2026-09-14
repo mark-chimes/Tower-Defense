@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class GridWalls : MonoBehaviour, GridMouseHighlightIO.IWallHandler
+public class GridWalls : MonoBehaviour
 {
 
     [SerializeField] private Wall wallPrefab;
@@ -9,15 +9,20 @@ public class GridWalls : MonoBehaviour, GridMouseHighlightIO.IWallHandler
     private TreasureMap treasureMap;
     private GridLayout layout;
 
-    private GridPathfindingManager pathfindingManager;
+    private IPathfindingCallback pathfindingCallback;
+
+    public interface IPathfindingCallback
+    {
+        void UpdateDistances();
+    }
 
     GridMouseHighlightIO gridIO;
 
-    public void Initialize(TreasureMap treasureMap, GridLayout layout, GridPathfindingManager pathfindingManager)
+    public void Initialize(TreasureMap treasureMap, GridLayout layout, IPathfindingCallback pathfindingCallback)
     {
         this.treasureMap = treasureMap;
         this.layout = layout;
-        this.pathfindingManager = pathfindingManager;
+        this.pathfindingCallback = pathfindingCallback;
         walls = new Wall[treasureMap.Width, treasureMap.Height];
     }
 
@@ -26,7 +31,7 @@ public class GridWalls : MonoBehaviour, GridMouseHighlightIO.IWallHandler
         this.gridIO = gridIO;
     }
 
-    public IHighlightable MaybeWall(Coord c)
+    public Highlightable MaybeWall(Coord c)
     {
         return walls[c.X, c.Z];
     }
@@ -50,7 +55,7 @@ public class GridWalls : MonoBehaviour, GridMouseHighlightIO.IWallHandler
         wall.name = $"Wall_{c.X}_{c.Z}";
         walls[c.X, c.Z] = wall;
         treasureMap.SetWall(c, true);
-        pathfindingManager.UpdateDistances();
+        pathfindingCallback.UpdateDistances();
     }
 
     public void DespawnWall(Coord c)
@@ -72,6 +77,6 @@ public class GridWalls : MonoBehaviour, GridMouseHighlightIO.IWallHandler
         gridIO.ClearHighlightIfMatching(wall);
         Destroy(wall.gameObject);
         treasureMap.SetWall(c, false);
-        pathfindingManager.UpdateDistances();
+        pathfindingCallback.UpdateDistances();
     }
 }

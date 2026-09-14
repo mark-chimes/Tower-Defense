@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Highlightable : MonoBehaviour, IHighlightable
+public class Highlightable : MonoBehaviour
 {
     private MeshRenderer meshRenderer;
     protected MeshRenderer MeshRenderer =>
