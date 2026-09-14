@@ -30,11 +30,11 @@ public class GodClass : MonoBehaviour
 
 
     GridMouseHighlightIO gridIO;
-    GridPathfindingIOManager pathfindingManager;
+    GridPathfindingIOManager pathfindingIOManager;
 
     void Start()
     {
-        pathfindingManager = new GridPathfindingIOManager();
+        pathfindingIOManager = new GridPathfindingIOManager();
         GenerateGrid();
 
         // TODO don't forget to update camera method if main camera can change
@@ -44,7 +44,7 @@ public class GodClass : MonoBehaviour
     void Update()
     {
         gridIO.HandleMouse();
-        pathfindingManager.ContinuallySingleStep();
+        pathfindingIOManager.ContinuallySingleStep();
     }
 
     void OnDrawGizmos()
@@ -63,18 +63,22 @@ public class GodClass : MonoBehaviour
         treasureMap = new TreasureMap(width, height, spawnPos, goalPos, isStopOnPathFound);
 
         gridView.GenerateGridView(layout, spawnPos, goalPos);
-        pathfindingManager.Initialize(treasureMap, gridView);
-        pathfindingManager.ClearField();
-        gridWalls.Initialize(treasureMap, layout, pathfindingManager.UpdateDistances);
+        pathfindingIOManager.Initialize(treasureMap, gridView);
+        pathfindingIOManager.ClearField();
+        gridWalls.Initialize(treasureMap, layout, pathfindingIOManager.UpdateDistances);
     }
 
-    public void OnRefreshPressed() => pathfindingManager.OnRefreshPressed();
-    public void OnClearFieldPressed() => pathfindingManager.OnClearFieldPressed();
-    public void OnSingleStepPressed() => pathfindingManager.OnSingleStepPressed();
-    public void OnVisualizePressed() => pathfindingManager.OnVisualizePressed();
-    public void OnFromStartModePressed() => pathfindingManager.OnFromStartModePressed();
-    public void OnFromEndModePressed() => pathfindingManager.OnFromEndModePressed();
-    public void SetAutoRefreshMode(bool isEnabled) => pathfindingManager.SetAutoRefreshMode(isEnabled);
+    public void OnRefreshPressed() => pathfindingIOManager.OnRefreshPressed();
+    public void OnClearFieldPressed() => pathfindingIOManager.OnClearFieldPressed();
+    public void OnSingleStepPressed() => pathfindingIOManager.OnSingleStepPressed();
+    public void OnVisualizePressed() => pathfindingIOManager.OnVisualizePressed();
+    public void OnFromStartModePressed() => pathfindingIOManager.OnFromStartModePressed();
+    public void OnFromEndModePressed() => pathfindingIOManager.OnFromEndModePressed();
+    public void SetNumbersVisible(bool isEnabled) => pathfindingIOManager.OnSetNumbersVisible(isEnabled);
+
+    public void SetVisualizationVisible(bool isEnabled) => pathfindingIOManager.OnSetVisualizationVisible(isEnabled);
+
+    public void SetAutoRefreshMode(bool isEnabled) => pathfindingIOManager.SetAutoRefreshMode(isEnabled);
 
 
 }

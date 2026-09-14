@@ -70,5 +70,15 @@ public class DirectionMarker : MonoBehaviour
         }
     }
 
+    public void SetVisualizationVisible(bool isVisible)
+    {
+        arrow.gameObject.SetActive(isVisible);
+    }
+
+    public void SetNumbersVisible(bool isVisible)
+    {
+        numberLabel.gameObject.SetActive(isVisible);
+    }
+
 
 }

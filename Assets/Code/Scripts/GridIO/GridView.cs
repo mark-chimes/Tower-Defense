@@ -112,5 +112,27 @@ public class GridView : MonoBehaviour
         }
     }
 
+    public void SetVisualizationVisible(bool isVisible)
+    {
+        for (int x = 0; x < layout.Width; x++)
+        {
+            for (int z = 0; z < layout.Height; z++)
+            {
+                directionMarkers[x, z].SetVisualizationVisible(isVisible);
+            }
+        }
+    }
+
+    public void SetNumbersVisible(bool isVisible)
+    {
+        for (int x = 0; x < layout.Width; x++)
+        {
+            for (int z = 0; z < layout.Height; z++)
+            {
+                directionMarkers[x, z].SetNumbersVisible(isVisible);
+            }
+        }
+    }
+
 
 }

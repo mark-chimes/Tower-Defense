@@ -8,9 +8,17 @@ public class DebugGUI : MonoBehaviour
     bool autoRefreshEnabled = false;
     bool wasEnabled = false;
 
+    bool visualizeDistanceEnabled = true;
+
+    bool wasvisualizeDistanceEnabled = true;
+
+    bool visualizePathfindingEnabled = true;
+
+    bool wasvisualizePathfindingEnabled = true;
+
     void OnGUI ()
     {
-        GUI.Box(new Rect(10,10,210,200), "VISUALIZE");
+        GUI.Box(new Rect(10,10,210,280), "VISUALIZE");
     
         if(GUI.Button(new Rect(20,40,120,20), "Instant Refresh"))
         {
@@ -53,5 +61,19 @@ public class DebugGUI : MonoBehaviour
             Debug.Log("From-End Mode");
             godClass.OnFromEndModePressed();        
         }
+
+        visualizeDistanceEnabled = GUI.Toggle(new Rect(20,220,160,20), visualizeDistanceEnabled, "Distance Numbers");
+        if (wasvisualizeDistanceEnabled != visualizeDistanceEnabled) { 
+            wasvisualizeDistanceEnabled = visualizeDistanceEnabled;
+            godClass.SetNumbersVisible(visualizeDistanceEnabled);
+        }
+
+        visualizePathfindingEnabled = GUI.Toggle(new Rect(20,240,160,20), visualizePathfindingEnabled, "Pathfinding Arrows");
+        if (wasvisualizePathfindingEnabled != visualizePathfindingEnabled) { 
+            wasvisualizePathfindingEnabled = visualizePathfindingEnabled;
+            godClass.SetVisualizationVisible(visualizePathfindingEnabled);
+        }
+
+
     }
 }

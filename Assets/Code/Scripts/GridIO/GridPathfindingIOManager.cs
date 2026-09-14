@@ -13,6 +13,8 @@ public class GridPathfindingIOManager
 
     private bool isAutoRefreshMode = false;
     private bool isVisualizeMode = false;
+
+
     public GridPathfindingIOManager()
     {
         visualizeTime = 1f / visualizeFPS;
@@ -20,6 +22,8 @@ public class GridPathfindingIOManager
 
     private TreasureMap treasureMap;
     private GridView gridView;
+
+
 
     public void Initialize(TreasureMap treasureMap, GridView gridView)
     {
@@ -82,6 +86,15 @@ public class GridPathfindingIOManager
         SingleStep();
     }
 
+    public void OnSetVisualizationVisible(bool isEnabled)
+    {
+        gridView.SetVisualizationVisible(isEnabled);
+    }
+
+    public void OnSetNumbersVisible(bool isEnabled)
+    {
+        gridView.SetNumbersVisible(isEnabled);
+    }
 
 
     public void ContinuallySingleStep()
