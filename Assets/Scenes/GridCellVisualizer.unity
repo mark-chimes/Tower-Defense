@@ -291,37 +291,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DebugGUI
   godClass: {fileID: 742519895}
---- !u!1 &652559274
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 652559275}
-  m_Layer: 0
-  m_Name: Walls
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &652559275
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 652559274}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &742519893
 GameObject:
   m_ObjectHideFlags: 0
@@ -353,6 +322,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1943342540}
+  - {fileID: 1885593512}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &742519895
@@ -368,14 +338,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CellController
   gridView: {fileID: 1943342541}
-  wallsParent: {fileID: 652559275}
-  wallPrefab: {fileID: 5586528569971646673, guid: 34992e6def475eb45b94617ae694c16b, type: 3}
   gridAuthor:
     width: 15
     height: 15
     spawnPosInitXZ: {x: 13, y: 13}
     goalPosInitXZ: {x: 10, y: 10}
   isStopOnPathFound: 1
+  gridWalls: {fileID: 0}
 --- !u!1 &783511479
 GameObject:
   m_ObjectHideFlags: 0
@@ -658,6 +627,52 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 35.26, y: -45, z: 0}
+--- !u!1 &1885593511
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1885593512}
+  - component: {fileID: 1885593513}
+  m_Layer: 0
+  m_Name: GridWalls
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1885593512
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1885593511}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 742519894}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1885593513
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1885593511}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d56ba5d46dbc5af4aa7346fbf2f75093, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GridWalls
+  wallsParent: {fileID: 1885593512}
+  wallPrefab: {fileID: 5586528569971646673, guid: 34992e6def475eb45b94617ae694c16b, type: 3}
 --- !u!1 &1943342539
 GameObject:
   m_ObjectHideFlags: 0
@@ -713,5 +728,4 @@ SceneRoots:
   - {fileID: 203844589}
   - {fileID: 783511480}
   - {fileID: 742519894}
-  - {fileID: 652559275}
   - {fileID: 400977322}

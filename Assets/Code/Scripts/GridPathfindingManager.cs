@@ -6,7 +6,7 @@ public class GridPathfindingManager
     [SerializeField] private float visualizeFPS = 60f;
 
     // TODO this is an ugly way of doing this - temp debug only
-    [SerializeField] private bool shouldHighlight = false;
+    [SerializeField] private bool shouldHighlightFrontier = false;
 
     private float visualizeTime;
     private float tempTime;
@@ -69,9 +69,8 @@ public class GridPathfindingManager
         treasureMap.ClearField();
         gridView.RefreshDistanceLabels(treasureMap.Signposts());
     }
-
-    // TODO if isAutoRefreshMode is on, this clears the field but never recomputes/redraws it -
-    // auto-refresh should probably re-trigger after the clear. Deferred for now.
+    // TODO if isAutoRefreshMode is on, this clears the field but never redraws it
+    // autorefresh should retrigger after the clear.
     public void OnVisualizePressed()
     {
         ClearField();
@@ -128,7 +127,7 @@ public class GridPathfindingManager
         {
             case Search.Phase.ExpandFrontier:
                 {
-                    gridView.HighlightChangedOrFrontier(shouldHighlight, delta.Changed, treasureMap.CurrentFrontier());
+                    gridView.HighlightChangedOrFrontier(shouldHighlightFrontier, delta.Changed, treasureMap.CurrentFrontier());
                     break;
                 }
             case Search.Phase.TracePath:
