@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class GridWalls : MonoBehaviour
@@ -9,8 +10,7 @@ public class GridWalls : MonoBehaviour
     private TreasureMap treasureMap;
     private GridLayout layout;
 
-    private IPathfindingCallback pathfindingCallback;
-
+    private Action onWallChange;
 
     public interface IPathfindingCallback
     {
@@ -18,11 +18,11 @@ public class GridWalls : MonoBehaviour
     }
 
 
-    public void Initialize(TreasureMap treasureMap, GridLayout layout, IPathfindingCallback pathfindingCallback)
+    public void Initialize(TreasureMap treasureMap, GridLayout layout, Action onWallChange)
     {
         this.treasureMap = treasureMap;
         this.layout = layout;
-        this.pathfindingCallback = pathfindingCallback;
+        this.onWallChange = onWallChange;
         walls = new Wall[treasureMap.Width, treasureMap.Height];
     }
 
@@ -50,7 +50,7 @@ public class GridWalls : MonoBehaviour
         wall.name = $"Wall_{c.X}_{c.Z}";
         walls[c.X, c.Z] = wall;
         treasureMap.SetWall(c, true);
-        pathfindingCallback.UpdateDistances();
+        onWallChange.Invoke();
     }
 
     public void DespawnWall(Coord c)
@@ -70,6 +70,6 @@ public class GridWalls : MonoBehaviour
         walls[c.X, c.Z] = null;
         Destroy(wall.gameObject);
         treasureMap.SetWall(c, false);
-        pathfindingCallback.UpdateDistances();
+        onWallChange.Invoke();
     }
 }

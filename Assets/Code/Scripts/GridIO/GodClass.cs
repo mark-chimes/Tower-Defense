@@ -69,7 +69,7 @@ public class GodClass : MonoBehaviour
         gridView.GenerateGridView(layout, spawnPos, goalPos);
         pathfindingManager.Initialize(treasureMap, gridView);
         pathfindingManager.ClearField();
-        gridWalls.Initialize(treasureMap, layout, pathfindingManager);
+        gridWalls.Initialize(treasureMap, layout, pathfindingManager.UpdateDistances);
     }
 
 
