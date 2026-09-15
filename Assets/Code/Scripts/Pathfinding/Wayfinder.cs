@@ -126,7 +126,7 @@ public class Wayfinder
                     continue;
                 }
 
-                visited[c.X, c.Z] = true;
+                visited[c.X, c.Z] = true; 
                 if (wallMap[c.X, c.Z])
                 {
                     distances[c.X, c.Z] = -1;

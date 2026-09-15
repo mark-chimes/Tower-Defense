@@ -20,6 +20,9 @@ public class GridLayout
 
     public Quaternion CompassToQuaternion(Compass compassDir)
     {
-        return new Quaternion(30f, 30f, 30f, 30f); // TODO implement
+        // TODO implement
+        Quaternion targetRotation = Quaternion.identity;
+        return targetRotation; 
     }
+
 }
