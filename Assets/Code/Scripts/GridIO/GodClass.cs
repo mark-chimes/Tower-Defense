@@ -3,15 +3,7 @@ using UnityEngine.InputSystem;
 using static DirectionMarker;
 
 
-// May as well call it this until I figure out what it does 
-// In some way it is literally a God class; it lets you place 
-// walls and recomputes the map etc.
-// TODO separate concerns (some of these might still bundle / be split differently)
-// taking variables in editor
-// makes the view / physical unity objects
-// handles input from the player
-// manages walls
-// displays gizmos
+// TODO find better name for this class
 public class GodClass : MonoBehaviour
 {
     [SerializeField] private GridView gridView;
@@ -36,6 +28,7 @@ public class GodClass : MonoBehaviour
     {
         pathfindingIOManager = new GridPathfindingIOManager();
         GenerateGrid();
+        SpawnEnemy(layout, treasureMap.SpawnPos, treasureMap.GoalPos);
 
         // TODO don't forget to update camera method if main camera can change
         gridIO = new GridMouseHighlightIO(gridWalls, treasureMap, Camera.main);
@@ -66,8 +59,11 @@ public class GodClass : MonoBehaviour
         pathfindingIOManager.Initialize(treasureMap, gridView);
         pathfindingIOManager.ClearField();
         gridWalls.Initialize(treasureMap, layout, pathfindingIOManager.UpdateDistances);
+
     }
 
+
+    // TODO is this the best way to implement / group these methods? Feel like there must be a better way
     public void OnRefreshPressed() => pathfindingIOManager.OnRefreshPressed();
     public void OnClearFieldPressed() => pathfindingIOManager.OnClearFieldPressed();
     public void OnSingleStepPressed() => pathfindingIOManager.OnSingleStepPressed();
@@ -75,10 +71,25 @@ public class GodClass : MonoBehaviour
     public void OnFromStartModePressed() => pathfindingIOManager.OnFromStartModePressed();
     public void OnFromEndModePressed() => pathfindingIOManager.OnFromEndModePressed();
     public void SetNumbersVisible(bool isEnabled) => pathfindingIOManager.OnSetNumbersVisible(isEnabled);
-
     public void SetVisualizationVisible(bool isEnabled) => pathfindingIOManager.OnSetVisualizationVisible(isEnabled);
-
     public void SetAutoRefreshMode(bool isEnabled) => pathfindingIOManager.SetAutoRefreshMode(isEnabled);
 
+    // TODO enemy spawn logic below to get it going. Move out once a home is found. 
+    // Maybe some of it will form part of this
+
+    [SerializeField] private Boat boatPrefab;
+    [SerializeField] private EnemyController enemyController; // TODO move code herea and use this
+
+    // spawn a single enemy, just to test it out.
+    // passing in parameters in prep for moving this function out
+    void SpawnEnemy(GridLayout layout, Coord spawnPos, Coord goalPos)
+    {
+        Boat enemy = Instantiate(boatPrefab, transform);
+        Vector3 pos = layout.CoordsToWorld(spawnPos);
+        enemy.transform.localPosition = pos;
+        enemy.name = $"Boat";
+        enemy.Initialize(spawnPos, goalPos);
+        // TODO save enemies in a list
+    }
 
 }
