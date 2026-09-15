@@ -96,6 +96,9 @@ public class GridPathfindingIOManager
         gridView.SetNumbersVisible(isEnabled);
     }
 
+    public void OnSpawnBoatPressed() { }
+    public void OnDeleteBoatsPressed() { }
+
 
     public void ContinuallySingleStep()
     {

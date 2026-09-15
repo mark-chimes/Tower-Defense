@@ -21,7 +21,14 @@ public class DebugGUI : MonoBehaviour
 
     void OnGUI ()
     {
-        GUI.Box(new Rect(10,10,210,280), "VISUALIZE");
+        int guiVisY = 10;
+        int guiVisHeight = 280;
+        int guiVisEnd = guiVisY+guiVisHeight;
+
+        int guiBoatY = guiVisEnd+10;
+        int guiBoatHeight = 280;
+
+        GUI.Box(new Rect(10,guiVisY,210,guiVisHeight), "VISUALIZE");
     
         if(GUI.Button(new Rect(20,40,120,20), "Instant Refresh"))
         {
@@ -76,6 +83,42 @@ public class DebugGUI : MonoBehaviour
             wasvisualizePathfindingEnabled = visualizePathfindingEnabled;
             godClass.SetVisualizationVisible(visualizePathfindingEnabled);
         }
+
+        var yBetweenButtons = 20; 
+
+        GUI.Box(new Rect(10,guiBoatY,210,guiBoatHeight), "BOATS");
+        guiBoatY += yBetweenButtons;
+
+        if(GUI.Button(new Rect(20,guiBoatY,160,20), "Spawn Boat"))
+        {
+            Debug.Log("Spawn boats pressed");
+            godClass.OnSpawnBoatPressed();        
+        }
+
+        guiBoatY += yBetweenButtons;
+
+        if(GUI.Button(new Rect(20,guiBoatY,160,20), "Delete Boats"))
+        {
+            Debug.Log("Delete boats pressed");
+            godClass.OnDeleteBoatsPressed();        
+        }
+        
+        guiBoatY += yBetweenButtons;
+
+        if(GUI.Button(new Rect(20,guiBoatY,160,20), "Follow existing path"))
+        {
+            Debug.Log("Follow existing path pressed");
+            godClass.OnBoatsFollowExistingPathPressed();        
+        }
+
+        guiBoatY += yBetweenButtons;
+
+        if(GUI.Button(new Rect(20,guiBoatY,160,20), "Stop boats"))
+        {
+            Debug.Log("Stop boats pressed");
+            godClass.OnBoatsStopPressed();         
+        }
+
 
 
     }

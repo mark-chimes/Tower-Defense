@@ -47,7 +47,7 @@ public class GodClass : MonoBehaviour
     private const float cameraZoomSpeedBase = 100f;
     private const float cameraPanSpeedBase = 100f;
 
-    private const float minCameraY = 10f;   
+    private const float minCameraY = 10f;
 
     private float maxCameraY;
 
@@ -68,7 +68,7 @@ public class GodClass : MonoBehaviour
 
 
         if (Keyboard.current == null) return; // TODO log error?
-        
+
         var cameraTransform = Camera.main.transform;
 
         float cameraY = cameraTransform.position.y;
@@ -76,7 +76,7 @@ public class GodClass : MonoBehaviour
         float speedFactor = Mathf.Max(cameraZoomLevel, 0.15f);
         cameraZoomSpeed *= speedFactor;
         cameraPanSpeed *= speedFactor;
-        
+
         if (Keyboard.current.shiftKey.isPressed)
         {
             cameraZoomSpeed = cameraZoomSpeed * 2;
@@ -157,6 +157,28 @@ public class GodClass : MonoBehaviour
     public void SetVisualizationVisible(bool isEnabled) => pathfindingIOManager.OnSetVisualizationVisible(isEnabled);
     public void SetAutoRefreshMode(bool isEnabled) => pathfindingIOManager.SetAutoRefreshMode(isEnabled);
 
+    public void OnSpawnBoatPressed()
+    {
+        OnDeleteBoatsPressed(); // Delete it since we can only have one boat at the moment.
+        SpawnEnemy(layout, treasureMap.SpawnPos, treasureMap.GoalPos);
+    }
+    public void OnDeleteBoatsPressed()
+    {
+        Debug.Log($"Destroy enemy {enemy}");
+        if (enemy != null) Destroy(enemy.gameObject);
+        Debug.Log($"Enemy destroyed: {enemy}");
+    }
+
+    public void OnBoatsFollowExistingPathPressed()
+    {
+        PathfindingUpdate();
+    }
+
+    public void OnBoatsStopPressed()
+    {
+        PathfindingClear();
+    }
+
     // TODO enemy spawn logic below to get it going. Move out once a home is found. 
     // Maybe some of it will form part of this
 
@@ -174,7 +196,7 @@ public class GodClass : MonoBehaviour
         enemy.transform.localPosition = pos;
         enemy.name = $"Boat";
         enemy.Initialize(spawnPos, goalPos, layout);
-        // TODO save enemies in a list
+        // TODO save enemies in a list 
     }
 
     void PathfindingUpdate()
