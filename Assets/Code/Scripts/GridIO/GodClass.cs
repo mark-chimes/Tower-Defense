@@ -1,7 +1,5 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using static DirectionMarker;
-
 
 // TODO find better name for this class
 public class GodClass : MonoBehaviour
@@ -38,12 +36,98 @@ public class GodClass : MonoBehaviour
     {
         gridIO.HandleMouse();
         pathfindingIOManager.ContinuallySingleStep();
+        ControlCamera();
+    }
+
+
+    // TODO Camera controls should go to their own file eventually
+    private Vector3 cameraStartPosition;
+    private Quaternion cameraStartRotation;
+
+    private const float cameraZoomSpeedBase = 100f;
+    private const float cameraPanSpeedBase = 100f;
+
+    private const float minCameraY = 10f;   
+
+    private float maxCameraY;
+
+    void Awake()
+    {
+        cameraStartPosition = Camera.main.transform.position;
+        cameraStartRotation = Camera.main.transform.rotation;
+        maxCameraY = cameraStartPosition.y;
+    }
+
+    void ControlCamera()
+    {
+
+        float cameraZoomSpeed = cameraZoomSpeedBase;
+        float cameraPanSpeed = cameraPanSpeedBase;
+        // TODO adjust cameraZoomSpeed and cameraPanSpeed based off of zoom level.
+        // TODO adjust cameraZoomLevel based on how far camera is from max zoom somehow.
+
+
+        if (Keyboard.current == null) return; // TODO log error?
+        
+        var cameraTransform = Camera.main.transform;
+
+        float cameraY = cameraTransform.position.y;
+        float cameraZoomLevel = Mathf.InverseLerp(minCameraY, maxCameraY, cameraY);
+        float speedFactor = Mathf.Max(cameraZoomLevel, 0.15f);
+        cameraZoomSpeed *= speedFactor;
+        cameraPanSpeed *= speedFactor;
+        
+        if (Keyboard.current.shiftKey.isPressed)
+        {
+            cameraZoomSpeed = cameraZoomSpeed * 2;
+            cameraPanSpeed = cameraPanSpeed * 2;
+        }
+
+        if (Keyboard.current.eKey.isPressed)
+        {
+            cameraTransform.position += cameraTransform.forward * cameraZoomSpeed * Time.deltaTime;
+        }
+        if (Keyboard.current.qKey.isPressed)
+        {
+            cameraTransform.position -= cameraTransform.forward * cameraZoomSpeed * Time.deltaTime;
+        }
+
+
+        if (Keyboard.current.aKey.isPressed)
+        {
+            cameraTransform.position -= cameraTransform.right * cameraPanSpeed * Time.deltaTime;
+        }
+        if (Keyboard.current.dKey.isPressed)
+        {
+            cameraTransform.position += cameraTransform.right * cameraPanSpeed * Time.deltaTime;
+        }
+
+        Vector3 groundForward = new Vector3(cameraTransform.forward.x, 0f, cameraTransform.forward.z).normalized;
+        if (Keyboard.current.wKey.isPressed)
+        {
+            cameraTransform.position += groundForward * cameraPanSpeed * Time.deltaTime;
+        }
+        if (Keyboard.current.sKey.isPressed)
+        {
+            cameraTransform.position -= groundForward * cameraPanSpeed * Time.deltaTime;
+        }
+
+        if (Keyboard.current.spaceKey.wasPressedThisFrame)
+        {
+            Debug.Log($"Camera position WAS {cameraTransform.position}");
+            cameraTransform.position = cameraStartPosition;
+            // cameraTransform.rotation = cameraStartRotation; // revisit if anything affects rotation
+            // cameraZoomLevel = 1f;
+        }
+
     }
 
     void OnDrawGizmos()
     {
         GridGizmo.Draw(gridAuthor, transform);
     }
+
+
 
     void GenerateGrid()
     {
