@@ -11,13 +11,15 @@ public class TreasureMap
     public readonly Coord SpawnPos;
     public readonly Coord GoalPos;
 
-   private readonly Action onPathfindingUpdate;
+    private readonly Action onPathfindingUpdate;
+    private readonly Action onPathfindingClear;
 
 
 
     private Wayfinder wayfinder;
 
-    public TreasureMap(int width, int height, Coord spawnPos, Coord goalPos, bool isStopOnPathFound, Action onPathfindingUpdate)
+    public TreasureMap(int width, int height, Coord spawnPos, Coord goalPos, bool isStopOnPathFound,
+        Action onPathfindingUpdate, Action onPathfindingClear)
     {
         Width = width;
         Height = height;
@@ -26,6 +28,8 @@ public class TreasureMap
         wallMap = new bool[width, height];
         wayfinder = new Wayfinder(width, height, wallMap, spawnPos, goalPos, Search.Dir.FromEnd, isStopOnPathFound);
         this.onPathfindingUpdate = onPathfindingUpdate;
+        this.onPathfindingClear = onPathfindingClear;
+
     }
 
     public IReadOnlyCollection<Coord> CurrentFrontier()
@@ -54,8 +58,10 @@ public class TreasureMap
     public void ClearField()
     {
         wayfinder.ClearField();
+        onPathfindingClear.Invoke();
     }
 
+    // TODO check this works if pathfinding is not set
     public ErfSnapshot At(Coord coord)
     {
         return new ErfSnapshot(coord, SpawnGoalKindAt(coord), wallMap[coord.X, coord.Z]);
@@ -73,7 +79,7 @@ public class TreasureMap
 
     public Signpost SignpostAt(int x, int z) => SignpostAt(new Coord(x, z));
 
-    public void SetWall(Coord c, bool hasWall) => this.wallMap[c.X, c.Z] = hasWall;
+    public void SetWall(Coord c, bool hasWall) => wallMap[c.X, c.Z] = hasWall;
 
     public bool CanPlaceWall(Coord c) => SpawnGoalKindAt(c) == SpawnGoalKind.Floor
         && !wallMap[c.X, c.Z];

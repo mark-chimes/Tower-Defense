@@ -42,6 +42,7 @@ public readonly struct Coord : IEquatable<Coord>
         return Shifted(x_diff, z_diff);
     }
 
+    // TODO should this be a Coord? 
     public static Coord ForDirection(Compass dir) 
     {
         int x_diff = 0;
@@ -56,7 +57,7 @@ public readonly struct Coord : IEquatable<Coord>
             case Compass.None: break;  
         }
 
-        return Shifted(x_diff, z_diff);
+        return new Coord(x_diff, z_diff);
     }
 
     public Coord? InDirectionInBoundsNonSelf(Compass dir, int width, int height)

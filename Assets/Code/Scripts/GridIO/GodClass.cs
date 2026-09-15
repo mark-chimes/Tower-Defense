@@ -53,13 +53,12 @@ public class GodClass : MonoBehaviour
         Coord spawnPos = gridAuthor.SpawnPos;
         Coord goalPos = gridAuthor.GoalPos;
 
-        treasureMap = new TreasureMap(width, height, spawnPos, goalPos, isStopOnPathFound, PathfindingUpdate);
+        treasureMap = new TreasureMap(width, height, spawnPos, goalPos, isStopOnPathFound, PathfindingUpdate, PathfindingClear);
 
         gridView.GenerateGridView(layout, spawnPos, goalPos);
         pathfindingIOManager.Initialize(treasureMap, gridView);
         pathfindingIOManager.ClearField();
         gridWalls.Initialize(treasureMap, layout, pathfindingIOManager.UpdateDistances);
-
     }
 
 
@@ -99,8 +98,15 @@ public class GodClass : MonoBehaviour
         if (enemy == null) return;
 
         enemy.RecalculatePathing(treasureMap);
-        Debug.Log("Recalculate enemy pathing");
-         
+
+    }
+
+    void PathfindingClear()
+    {
+        if (enemy == null) return;
+
+        enemy.ClearPathing();
+
     }
 
 }
