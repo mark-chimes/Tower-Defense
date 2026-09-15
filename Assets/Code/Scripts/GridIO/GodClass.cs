@@ -53,7 +53,7 @@ public class GodClass : MonoBehaviour
         Coord spawnPos = gridAuthor.SpawnPos;
         Coord goalPos = gridAuthor.GoalPos;
 
-        treasureMap = new TreasureMap(width, height, spawnPos, goalPos, isStopOnPathFound);
+        treasureMap = new TreasureMap(width, height, spawnPos, goalPos, isStopOnPathFound, PathfindingUpdate);
 
         gridView.GenerateGridView(layout, spawnPos, goalPos);
         pathfindingIOManager.Initialize(treasureMap, gridView);
@@ -80,16 +80,27 @@ public class GodClass : MonoBehaviour
     [SerializeField] private Boat boatPrefab;
     [SerializeField] private EnemyController enemyController; // TODO move code herea and use this
 
+    Boat enemy = null;
+
     // spawn a single enemy, just to test it out.
     // passing in parameters in prep for moving this function out
     void SpawnEnemy(GridLayout layout, Coord spawnPos, Coord goalPos)
     {
-        Boat enemy = Instantiate(boatPrefab, transform);
+        enemy = Instantiate(boatPrefab, transform);
         Vector3 pos = layout.CoordsToWorld(spawnPos);
         enemy.transform.localPosition = pos;
         enemy.name = $"Boat";
-        enemy.Initialize(spawnPos, goalPos);
+        enemy.Initialize(spawnPos, goalPos, layout);
         // TODO save enemies in a list
+    }
+
+    void PathfindingUpdate()
+    {
+        if (enemy == null) return;
+
+        enemy.RecalculatePathing(treasureMap);
+        Debug.Log("Recalculate enemy pathing");
+         
     }
 
 }

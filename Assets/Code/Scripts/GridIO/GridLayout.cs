@@ -17,4 +17,9 @@ public class GridLayout
         float worldZ = (coord.Z - (Height - 1) / 2f) * CellSize;
         return new Vector3(worldX, 0f, worldZ);
     }
+
+    public Quaternion CompassToQuaternion(Compass compassDir)
+    {
+        return new Quaternion(30f, 30f, 30f, 30f); // TODO implement
+    }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 public class TreasureMap
@@ -10,10 +11,13 @@ public class TreasureMap
     public readonly Coord SpawnPos;
     public readonly Coord GoalPos;
 
+   private readonly Action onPathfindingUpdate;
+
+
 
     private Wayfinder wayfinder;
 
-    public TreasureMap(int width, int height, Coord spawnPos, Coord goalPos, bool isStopOnPathFound)
+    public TreasureMap(int width, int height, Coord spawnPos, Coord goalPos, bool isStopOnPathFound, Action onPathfindingUpdate)
     {
         Width = width;
         Height = height;
@@ -21,6 +25,7 @@ public class TreasureMap
         GoalPos = goalPos;
         wallMap = new bool[width, height];
         wayfinder = new Wayfinder(width, height, wallMap, spawnPos, goalPos, Search.Dir.FromEnd, isStopOnPathFound);
+        this.onPathfindingUpdate = onPathfindingUpdate;
     }
 
     public IReadOnlyCollection<Coord> CurrentFrontier()
@@ -42,6 +47,7 @@ public class TreasureMap
     {
         wayfinder.ClearField();
         wayfinder.ComputeFlow();
+        onPathfindingUpdate.Invoke();
     }
 
     // Just used to clear and not do anything - never a required external call
