@@ -3,12 +3,6 @@ using UnityEngine;
 // TODO should this enemy control its own movement or be controlled by central authority?
 public class Boat : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-
-    }
-
     bool hasPath = false;
     readonly float speed = 10f; // TODO improve how this is handled
 
@@ -28,7 +22,7 @@ public class Boat : MonoBehaviour
         {
             currentCoord = nextCoord;
             if (currentCoord == goalCoord) { hasPath = false; return; }
-            AimTowardsWaypoint();
+            FindNextWaypoint();
         }
 
     }
@@ -61,11 +55,10 @@ public class Boat : MonoBehaviour
         Debug.Log($"Recalculate enemy pathing for {name}.");
         this.treasureMap = treasureMap;
         hasPath = true;
-        AimTowardsWaypoint();
+        FindNextWaypoint();
     }
 
-    // TODO the code below and this structure can probably be simplified
-    private void AimTowardsWaypoint()
+    private void FindNextWaypoint()
     {
         Debug.Assert(hasPath);
         Debug.Log($"Recalculate pathing target for {name}.");
