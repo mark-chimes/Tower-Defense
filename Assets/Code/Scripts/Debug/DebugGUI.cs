@@ -37,7 +37,7 @@ public class DebugGUI : MonoBehaviour
         visualizePathfindingEnabled = visualization.ShowPathfinding;
         wasvisualizePathfindingEnabled = visualizePathfindingEnabled;
 
-        stopPathingEarly = godClass.IsStopOnPathFound;
+        stopPathingEarly = godClass.StartingIsStopOnPathFound;
     }
 
 
@@ -113,7 +113,7 @@ public class DebugGUI : MonoBehaviour
         if (wasStopPathingEarly != stopPathingEarly)
         {
             wasStopPathingEarly = stopPathingEarly;
-            godClass.SetFullFlowFieldPathfinding(stopPathingEarly);
+            godClass.SetPathfindingStopOnPathFound(stopPathingEarly);
         }
 
 

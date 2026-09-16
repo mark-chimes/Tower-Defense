@@ -12,11 +12,9 @@ public class GodClass : MonoBehaviour
 
     [SerializeField] private GridWalls gridWalls;
 
-    [SerializeField] private GridView.VisualizationSettings startingVisualization;
-
-    [SerializeField] public bool IsStopOnPathFound = true;
-    
-    public GridView.VisualizationSettings StartingVisualization => startingVisualization;
+    // These just exist so we can have serialized editor settings on this class
+    [SerializeField] public GridView.VisualizationSettings StartingVisualization;
+    [SerializeField] public bool StartingIsStopOnPathFound = true;
 
     private TreasureMap treasureMap;
 
@@ -139,9 +137,9 @@ public class GodClass : MonoBehaviour
         Coord spawnPos = gridAuthor.SpawnPos;
         Coord goalPos = gridAuthor.GoalPos;
 
-        treasureMap = new TreasureMap(width, height, spawnPos, goalPos, IsStopOnPathFound, PathfindingUpdate, PathfindingClear);
+        treasureMap = new TreasureMap(width, height, spawnPos, goalPos, StartingIsStopOnPathFound, PathfindingUpdate, PathfindingClear);
 
-        gridView.GenerateGridView(layout, spawnPos, goalPos, startingVisualization);
+        gridView.GenerateGridView(layout, spawnPos, goalPos, StartingVisualization);
         pathfindingIOManager.Initialize(treasureMap, gridView);
         pathfindingIOManager.ClearField();
         gridWalls.Initialize(treasureMap, layout, pathfindingIOManager.UpdateDistances);
@@ -158,7 +156,7 @@ public class GodClass : MonoBehaviour
     public void SetNumbersVisible(bool isEnabled) => pathfindingIOManager.OnSetNumbersVisible(isEnabled);
     public void SetVisualizationVisible(bool isEnabled) => pathfindingIOManager.OnSetVisualizationVisible(isEnabled);
 
-    public void SetFullFlowFieldPathfinding(bool isEnabled) => pathfindingIOManager.ToggleEarlySetPathfindingModeAndResetPathfinding(isEnabled);
+    public void SetPathfindingStopOnPathFound(bool isEnabled) => pathfindingIOManager.ResetPathfindingWithEarlyStoppingMode(isEnabled);
 
     public void SetAutoRefreshMode(bool isEnabled) => pathfindingIOManager.SetAutoRefreshMode(isEnabled);
 
