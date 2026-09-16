@@ -93,11 +93,8 @@ public class GridPathfindingIOManager
 
     public void OnSetNumbersVisible(bool isEnabled)
     {
-        gridView.SetNumbersVisible(isEnabled);
+        gridView.SetDistanceVisible(isEnabled);
     }
-
-    public void OnSpawnBoatPressed() { }
-    public void OnDeleteBoatsPressed() { }
 
 
     public void ContinuallySingleStep()

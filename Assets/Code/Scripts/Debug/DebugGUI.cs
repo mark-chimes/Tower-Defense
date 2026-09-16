@@ -19,104 +19,123 @@ public class DebugGUI : MonoBehaviour
 
     bool wasvisualizePathfindingEnabled = true;
 
-    void OnGUI ()
+    void Start()
+    {
+        ReadValuesFromGodClass();
+    }
+
+    void ReadValuesFromGodClass()
+    {
+        GridView.VisualizationSettings visualization = godClass.StartingVisualization;
+        visualizeDistanceEnabled = visualization.ShowDistance;
+        wasvisualizeDistanceEnabled = visualizeDistanceEnabled;
+
+        visualizePathfindingEnabled = visualization.ShowPathfinding;
+        wasvisualizePathfindingEnabled = visualizePathfindingEnabled;
+    }
+
+
+    void OnGUI()
     {
         int guiVisY = 10;
         int guiVisHeight = 280;
-        int guiVisEnd = guiVisY+guiVisHeight;
+        int guiVisEnd = guiVisY + guiVisHeight;
 
-        int guiBoatY = guiVisEnd+10;
+        int guiBoatY = guiVisEnd + 10;
         int guiBoatHeight = 280;
 
-        GUI.Box(new Rect(10,guiVisY,210,guiVisHeight), "VISUALIZE");
-    
-        if(GUI.Button(new Rect(20,40,120,20), "Instant Refresh"))
+        GUI.Box(new Rect(10, guiVisY, 210, guiVisHeight), "VISUALIZE");
+
+        if (GUI.Button(new Rect(20, 40, 120, 20), "Instant Refresh"))
         {
             Debug.Log("Refresh");
             godClass.OnRefreshPressed();
         }
 
-        if(GUI.Button(new Rect(20,65,80,20), "Clear Field"))
+        if (GUI.Button(new Rect(20, 65, 80, 20), "Clear Field"))
         {
             Debug.Log("Clear Field");
-            godClass.OnClearFieldPressed();        
+            godClass.OnClearFieldPressed();
         }
 
-        if(GUI.Button(new Rect(20,90,80,20), "Single Step"))
+        if (GUI.Button(new Rect(20, 90, 80, 20), "Single Step"))
         {
             Debug.Log("Single Step");
-            godClass.OnSingleStepPressed();        
+            godClass.OnSingleStepPressed();
         }
 
-        if(GUI.Button(new Rect(20,115,80,20), "VISUALIZE"))
+        if (GUI.Button(new Rect(20, 115, 80, 20), "VISUALIZE"))
         {
             Debug.Log("VISUALIZE");
-            godClass.OnVisualizePressed();        
+            godClass.OnVisualizePressed();
         }
-        
-        autoRefreshEnabled = GUI.Toggle(new Rect(20,140,120,20), autoRefreshEnabled, "Auto-Refresh");
-        if (wasEnabled != autoRefreshEnabled) { 
+
+        autoRefreshEnabled = GUI.Toggle(new Rect(20, 140, 120, 20), autoRefreshEnabled, "Auto-Refresh");
+        if (wasEnabled != autoRefreshEnabled)
+        {
             wasEnabled = autoRefreshEnabled;
             godClass.SetAutoRefreshMode(autoRefreshEnabled);
         }
 
-        if(GUI.Button(new Rect(20,160,160,20), "From-Start Mode (clears)"))
+        if (GUI.Button(new Rect(20, 160, 160, 20), "From-Start Mode (clears)"))
         {
             Debug.Log("From-Start Mode");
-            godClass.OnFromStartModePressed();        
+            godClass.OnFromStartModePressed();
         }
 
-        if(GUI.Button(new Rect(20,180,160,20), "From-End Mode (clears)"))
+        if (GUI.Button(new Rect(20, 180, 160, 20), "From-End Mode (clears)"))
         {
             Debug.Log("From-End Mode");
-            godClass.OnFromEndModePressed();        
+            godClass.OnFromEndModePressed();
         }
 
-        visualizeDistanceEnabled = GUI.Toggle(new Rect(20,220,160,20), visualizeDistanceEnabled, "Distance Numbers");
-        if (wasvisualizeDistanceEnabled != visualizeDistanceEnabled) { 
+        visualizeDistanceEnabled = GUI.Toggle(new Rect(20, 220, 160, 20), visualizeDistanceEnabled, "Distance Numbers");
+        if (wasvisualizeDistanceEnabled != visualizeDistanceEnabled)
+        {
             wasvisualizeDistanceEnabled = visualizeDistanceEnabled;
             godClass.SetNumbersVisible(visualizeDistanceEnabled);
         }
 
-        visualizePathfindingEnabled = GUI.Toggle(new Rect(20,240,160,20), visualizePathfindingEnabled, "Pathfinding Arrows");
-        if (wasvisualizePathfindingEnabled != visualizePathfindingEnabled) { 
+        visualizePathfindingEnabled = GUI.Toggle(new Rect(20, 240, 160, 20), visualizePathfindingEnabled, "Pathfinding Arrows");
+        if (wasvisualizePathfindingEnabled != visualizePathfindingEnabled)
+        {
             wasvisualizePathfindingEnabled = visualizePathfindingEnabled;
             godClass.SetVisualizationVisible(visualizePathfindingEnabled);
         }
 
-        var yBetweenButtons = 20; 
+        var yBetweenButtons = 20;
 
-        GUI.Box(new Rect(10,guiBoatY,210,guiBoatHeight), "BOATS");
+        GUI.Box(new Rect(10, guiBoatY, 210, guiBoatHeight), "BOATS");
         guiBoatY += yBetweenButtons;
 
-        if(GUI.Button(new Rect(20,guiBoatY,160,20), "Spawn Boat"))
+        if (GUI.Button(new Rect(20, guiBoatY, 160, 20), "Spawn Boat"))
         {
             Debug.Log("Spawn boats pressed");
-            godClass.OnSpawnBoatPressed();        
+            godClass.OnSpawnBoatPressed();
         }
 
         guiBoatY += yBetweenButtons;
 
-        if(GUI.Button(new Rect(20,guiBoatY,160,20), "Delete Boats"))
+        if (GUI.Button(new Rect(20, guiBoatY, 160, 20), "Delete Boats"))
         {
             Debug.Log("Delete boats pressed");
-            godClass.OnDeleteBoatsPressed();        
+            godClass.OnDeleteBoatsPressed();
         }
-        
+
         guiBoatY += yBetweenButtons;
 
-        if(GUI.Button(new Rect(20,guiBoatY,160,20), "Follow existing path"))
+        if (GUI.Button(new Rect(20, guiBoatY, 160, 20), "Follow existing path"))
         {
             Debug.Log("Follow existing path pressed");
-            godClass.OnBoatsFollowExistingPathPressed();        
+            godClass.OnBoatsFollowExistingPathPressed();
         }
 
         guiBoatY += yBetweenButtons;
 
-        if(GUI.Button(new Rect(20,guiBoatY,160,20), "Stop boats"))
+        if (GUI.Button(new Rect(20, guiBoatY, 160, 20), "Stop boats"))
         {
             Debug.Log("Stop boats pressed");
-            godClass.OnBoatsStopPressed();         
+            godClass.OnBoatsStopPressed();
         }
 
 

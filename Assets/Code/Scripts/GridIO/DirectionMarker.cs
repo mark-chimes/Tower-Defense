@@ -70,12 +70,12 @@ public class DirectionMarker : MonoBehaviour
         }
     }
 
-    public void SetVisualizationVisible(bool isVisible)
+    public void SetPathingVisible(bool isVisible)
     {
         arrow.gameObject.SetActive(isVisible);
     }
 
-    public void SetNumbersVisible(bool isVisible)
+    public void SetDistanceVisible(bool isVisible)
     {
         numberLabel.gameObject.SetActive(isVisible);
     }

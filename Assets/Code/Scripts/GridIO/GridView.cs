@@ -9,12 +9,22 @@ public class GridView : MonoBehaviour
     [SerializeField] private GameObject spawnPrefab;
     [SerializeField] private GameObject goalPrefab;
 
+    
+    [System.Serializable]
+    public class VisualizationSettings
+    {
+        [SerializeField] public bool ShowDistance = false;
+        [SerializeField] public bool ShowPathfinding = true;
+
+    }
+
 
     private GridLayout layout;
     private DirectionMarker[,] directionMarkers;
 
 
-    public void GenerateGridView(GridLayout layout, Coord spawnPos, Coord goalPos)
+    public void GenerateGridView(GridLayout layout, Coord spawnPos, Coord goalPos,
+        VisualizationSettings visualizationSettings)
     {
         this.layout = layout;
         directionMarkers = new DirectionMarker[layout.Width, layout.Height];
@@ -30,6 +40,8 @@ public class GridView : MonoBehaviour
                 directionMarker.transform.localPosition = pos;
                 directionMarker.name = $"DirectionMarker_{x}_{z}";
                 directionMarker.Initialize(coord);
+                directionMarker.SetPathingVisible(visualizationSettings.ShowPathfinding);
+                directionMarker.SetDistanceVisible(visualizationSettings.ShowDistance);
                 directionMarkers[x, z] = directionMarker;
 
                 if (coord == spawnPos)
@@ -118,18 +130,18 @@ public class GridView : MonoBehaviour
         {
             for (int z = 0; z < layout.Height; z++)
             {
-                directionMarkers[x, z].SetVisualizationVisible(isVisible);
+                directionMarkers[x, z].SetPathingVisible(isVisible);
             }
         }
     }
 
-    public void SetNumbersVisible(bool isVisible)
+    public void SetDistanceVisible(bool isVisible)
     {
         for (int x = 0; x < layout.Width; x++)
         {
             for (int z = 0; z < layout.Height; z++)
             {
-                directionMarkers[x, z].SetNumbersVisible(isVisible);
+                directionMarkers[x, z].SetDistanceVisible(isVisible);
             }
         }
     }

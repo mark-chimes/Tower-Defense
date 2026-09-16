@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -14,7 +15,8 @@ public class GodClass : MonoBehaviour
 
     [SerializeField] private GridWalls gridWalls;
 
-
+    [SerializeField] private GridView.VisualizationSettings startingVisualization;
+    public GridView.VisualizationSettings StartingVisualization => startingVisualization;
 
     private TreasureMap treasureMap;
 
@@ -139,7 +141,7 @@ public class GodClass : MonoBehaviour
 
         treasureMap = new TreasureMap(width, height, spawnPos, goalPos, isStopOnPathFound, PathfindingUpdate, PathfindingClear);
 
-        gridView.GenerateGridView(layout, spawnPos, goalPos);
+        gridView.GenerateGridView(layout, spawnPos, goalPos, startingVisualization);
         pathfindingIOManager.Initialize(treasureMap, gridView);
         pathfindingIOManager.ClearField();
         gridWalls.Initialize(treasureMap, layout, pathfindingIOManager.UpdateDistances);
