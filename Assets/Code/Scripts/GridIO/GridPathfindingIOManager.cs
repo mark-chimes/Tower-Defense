@@ -96,6 +96,14 @@ public class GridPathfindingIOManager
         gridView.SetDistanceVisible(isEnabled);
     }
 
+    // Whether this should continue pathfinding after shortest path found or continue to produce a full flow-field
+    // TODO later we should have a bunch of settings like the spawn point and goal point that can be moved around etc.
+    public void ToggleEarlySetPathfindingModeAndResetPathfinding(bool isStopOnPathFound)
+    {
+        treasureMap.RecreateWayfinder(isStopOnPathFound);
+        gridView.RefreshDistanceLabels(treasureMap.Signposts());
+    }
+
 
     public void ContinuallySingleStep()
     {

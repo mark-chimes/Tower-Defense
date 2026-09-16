@@ -1,4 +1,3 @@
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -11,11 +10,12 @@ public class GodClass : MonoBehaviour
     [SerializeField] private GridAuthor gridAuthor;
     private GridLayout layout;
 
-    [SerializeField] private bool isStopOnPathFound = true; // TODO this should be via debug buttons in-game
-
     [SerializeField] private GridWalls gridWalls;
 
     [SerializeField] private GridView.VisualizationSettings startingVisualization;
+
+    [SerializeField] public bool IsStopOnPathFound = true;
+    
     public GridView.VisualizationSettings StartingVisualization => startingVisualization;
 
     private TreasureMap treasureMap;
@@ -139,7 +139,7 @@ public class GodClass : MonoBehaviour
         Coord spawnPos = gridAuthor.SpawnPos;
         Coord goalPos = gridAuthor.GoalPos;
 
-        treasureMap = new TreasureMap(width, height, spawnPos, goalPos, isStopOnPathFound, PathfindingUpdate, PathfindingClear);
+        treasureMap = new TreasureMap(width, height, spawnPos, goalPos, IsStopOnPathFound, PathfindingUpdate, PathfindingClear);
 
         gridView.GenerateGridView(layout, spawnPos, goalPos, startingVisualization);
         pathfindingIOManager.Initialize(treasureMap, gridView);
@@ -157,6 +157,9 @@ public class GodClass : MonoBehaviour
     public void OnFromEndModePressed() => pathfindingIOManager.OnFromEndModePressed();
     public void SetNumbersVisible(bool isEnabled) => pathfindingIOManager.OnSetNumbersVisible(isEnabled);
     public void SetVisualizationVisible(bool isEnabled) => pathfindingIOManager.OnSetVisualizationVisible(isEnabled);
+
+    public void SetFullFlowFieldPathfinding(bool isEnabled) => pathfindingIOManager.ToggleEarlySetPathfindingModeAndResetPathfinding(isEnabled);
+
     public void SetAutoRefreshMode(bool isEnabled) => pathfindingIOManager.SetAutoRefreshMode(isEnabled);
 
     public void OnSpawnBoatPressed()

@@ -26,10 +26,19 @@ public class TreasureMap
         SpawnPos = spawnPos;
         GoalPos = goalPos;
         wallMap = new bool[width, height];
-        wayfinder = new Wayfinder(width, height, wallMap, spawnPos, goalPos, Search.Dir.FromEnd, isStopOnPathFound);
+        RecreateWayfinder(isStopOnPathFound);
         this.onPathfindingUpdate = onPathfindingUpdate;
         this.onPathfindingClear = onPathfindingClear;
 
+    }
+
+    /// <summary>
+    /// Make a wayfinder from scratch to completely re-do the pathfinding
+    /// </summary>
+    /// <param name="isStopOnPathFound"></param> stop pathfinding once shortest path found or continue completing the flow-field
+    public void RecreateWayfinder(bool isStopOnPathFound)
+    {
+        wayfinder = new Wayfinder(Width, Height, wallMap, SpawnPos, GoalPos, Search.Dir.FromEnd, isStopOnPathFound);
     }
 
     public IReadOnlyCollection<Coord> CurrentFrontier()
@@ -54,7 +63,7 @@ public class TreasureMap
         onPathfindingUpdate.Invoke();
     }
 
-    // Just used to clear and not do anything - never a required external call
+    // Just used to clear and not do anything - never a required _external_ call before calling other functions
     public void ClearField()
     {
         wayfinder.ClearField();
@@ -90,6 +99,8 @@ public class TreasureMap
         else if (coord == GoalPos) return SpawnGoalKind.Goal;
         return SpawnGoalKind.Floor;
     }
+
+
 }
 
 

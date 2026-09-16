@@ -19,6 +19,10 @@ public class DebugGUI : MonoBehaviour
 
     bool wasvisualizePathfindingEnabled = true;
 
+    bool stopPathingEarly = false;
+
+    bool wasStopPathingEarly = false;
+
     void Start()
     {
         ReadValuesFromGodClass();
@@ -32,13 +36,15 @@ public class DebugGUI : MonoBehaviour
 
         visualizePathfindingEnabled = visualization.ShowPathfinding;
         wasvisualizePathfindingEnabled = visualizePathfindingEnabled;
+
+        stopPathingEarly = godClass.IsStopOnPathFound;
     }
 
 
     void OnGUI()
     {
         int guiVisY = 10;
-        int guiVisHeight = 280;
+        int guiVisHeight = 300;
         int guiVisEnd = guiVisY + guiVisHeight;
 
         int guiBoatY = guiVisEnd + 10;
@@ -102,6 +108,14 @@ public class DebugGUI : MonoBehaviour
             wasvisualizePathfindingEnabled = visualizePathfindingEnabled;
             godClass.SetVisualizationVisible(visualizePathfindingEnabled);
         }
+
+        stopPathingEarly = GUI.Toggle(new Rect(20, 260, 160, 20), stopPathingEarly, "Stop pathfinding early");
+        if (wasStopPathingEarly != stopPathingEarly)
+        {
+            wasStopPathingEarly = stopPathingEarly;
+            godClass.SetFullFlowFieldPathfinding(stopPathingEarly);
+        }
+
 
         var yBetweenButtons = 20;
 

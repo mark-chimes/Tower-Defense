@@ -145,6 +145,4 @@ public class GridView : MonoBehaviour
             }
         }
     }
-
-
 }
