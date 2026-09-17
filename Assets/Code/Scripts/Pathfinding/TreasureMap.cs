@@ -100,7 +100,10 @@ public class TreasureMap
         return SpawnGoalKind.Floor;
     }
 
-
+    public SaveableLevel AsSaveableData()
+    {
+        return new SaveableLevel(Width, Height, wallMap);
+    }
 }
 
 

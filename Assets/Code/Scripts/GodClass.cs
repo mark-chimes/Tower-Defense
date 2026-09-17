@@ -43,6 +43,8 @@ public class GodClass : MonoBehaviour
 
         gui.Initialize(StartingVisualization, StartingIsStopOnPathFound,
             pathfindingIOManager, enemyController, saveLoadSystem, gridWalls);
+
+        saveLoadSystem.Initialize(treasureMap);
     }
 
     void Update()
