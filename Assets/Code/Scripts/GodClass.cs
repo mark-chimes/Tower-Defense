@@ -1,38 +1,31 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 // TODO find better name for this class
 public class GodClass : MonoBehaviour
 {
     [SerializeField] private DebugGUI gui;
     [SerializeField] private EnemyController enemyController;
-
-
     [SerializeField] private GridView gridView;
-
-
     [SerializeField] private GridAuthor gridAuthor;
-    private GridLayout layout;
-
     [SerializeField] private GridWalls gridWalls;
-
     // These just exist so we can have serialized editor settings on this class
     [SerializeField] public GridView.VisualizationSettings StartingVisualization;
     [SerializeField] public bool StartingIsStopOnPathFound = true;
 
     private TreasureMap treasureMap;
 
+    private GridLayout layout;
 
     GridMouseHighlightIO gridIO;
     GridPathfindingIOManager pathfindingIOManager;
-
     LevelSaveLoadSystem saveLoadSystem;
-
     CameraControl camControl;
 
     void Awake()
     {
         camControl = new CameraControl();
+        camControl.Initialize();
+
         pathfindingIOManager = new GridPathfindingIOManager();
         saveLoadSystem = new LevelSaveLoadSystem();
     }
@@ -50,7 +43,6 @@ public class GodClass : MonoBehaviour
         gui.Initialize(StartingVisualization, StartingIsStopOnPathFound,
             pathfindingIOManager, enemyController, saveLoadSystem);
 
-        camControl.Initialize();
 
     }
 
@@ -61,14 +53,10 @@ public class GodClass : MonoBehaviour
         camControl.ControlCamera();
     }
 
-
-
     void OnDrawGizmos()
     {
         GridGizmo.Draw(gridAuthor, transform);
     }
-
-
 
     void GenerateGrid()
     {
@@ -86,10 +74,4 @@ public class GodClass : MonoBehaviour
         pathfindingIOManager.ClearField();
         gridWalls.Initialize(treasureMap, layout, pathfindingIOManager.UpdateDistances);
     }
-
-    // TODO move this out? 
-    public void OnSave() => saveLoadSystem.OnSave();
-    public void OnLoad() => saveLoadSystem.OnLoad();
-
-
 }
