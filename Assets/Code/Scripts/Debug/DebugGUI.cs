@@ -43,86 +43,115 @@ public class DebugGUI : MonoBehaviour
 
     void OnGUI()
     {
-        int guiVisY = 10;
-        int guiVisHeight = 300;
+        int boxBuffer = 10;
+        int boxX = 10;
+        int boxWidth = 210;
+        int buttonX = boxX + boxBuffer;
+        int buttonWidth = boxWidth - 2*boxBuffer;
+        int buttonHeight = 20;
+
+        int yBetweenButtons = buttonHeight;
+
+        int numVisControls = 10;
+        int guiVisY = yBetweenButtons;
+        int guiVisHeight = (numVisControls+2) * yBetweenButtons  + boxBuffer;
         int guiVisEnd = guiVisY + guiVisHeight;
 
-        int guiBoatY = guiVisEnd + 10;
-        int guiBoatHeight = 280;
+        int numBoatControls = 4;
+        int guiBoatY = guiVisEnd + yBetweenButtons + boxBuffer;
+        int guiBoatHeight = (numBoatControls+2) * yBetweenButtons + boxBuffer;
+        int guiBoatEnd = guiBoatY + guiBoatHeight;
 
-        GUI.Box(new Rect(10, guiVisY, 210, guiVisHeight), "VISUALIZE");
+        int numSaveLoadControls = 2;
+        int guiSaveLoadY = guiBoatEnd + yBetweenButtons + boxBuffer;
+        int guiSaveLoadHeight = (numSaveLoadControls+2) * yBetweenButtons +  + boxBuffer;
 
-        if (GUI.Button(new Rect(20, 40, 120, 20), "Instant Refresh"))
+        GUI.Box(new Rect(boxX, guiVisY, boxWidth, guiVisHeight), "VISUALIZE");
+        guiVisY += yBetweenButtons + boxBuffer;
+
+        if (GUI.Button(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), "Instant Refresh"))
         {
             Debug.Log("Refresh");
             godClass.OnRefreshPressed();
         }
+        guiVisY += yBetweenButtons;
 
-        if (GUI.Button(new Rect(20, 65, 80, 20), "Clear Field"))
+        if (GUI.Button(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), "Clear Field"))
         {
             Debug.Log("Clear Field");
             godClass.OnClearFieldPressed();
         }
+        guiVisY += yBetweenButtons;
 
-        if (GUI.Button(new Rect(20, 90, 80, 20), "Single Step"))
+        if (GUI.Button(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), "Single Step"))
         {
             Debug.Log("Single Step");
             godClass.OnSingleStepPressed();
         }
+        guiVisY += yBetweenButtons;
 
-        if (GUI.Button(new Rect(20, 115, 80, 20), "VISUALIZE"))
+        if (GUI.Button(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), "VISUALIZE"))
         {
             Debug.Log("VISUALIZE");
             godClass.OnVisualizePressed();
         }
+        guiVisY += yBetweenButtons;
 
-        autoRefreshEnabled = GUI.Toggle(new Rect(20, 140, 120, 20), autoRefreshEnabled, "Auto-Refresh");
+
+        if (GUI.Button(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), "From-Start Mode (clears)"))
+        {
+            Debug.Log("From-Start Mode");
+            godClass.OnFromStartModePressed();
+        }
+        guiVisY += yBetweenButtons;
+
+        if (GUI.Button(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), "From-End Mode (clears)"))
+        {
+            Debug.Log("From-End Mode");
+            godClass.OnFromEndModePressed();
+        }
+        guiVisY += yBetweenButtons + boxBuffer;
+
+        autoRefreshEnabled = GUI.Toggle(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), autoRefreshEnabled, "Auto-Refresh");
         if (wasEnabled != autoRefreshEnabled)
         {
             wasEnabled = autoRefreshEnabled;
             godClass.SetAutoRefreshMode(autoRefreshEnabled);
         }
+        guiVisY += yBetweenButtons;
 
-        if (GUI.Button(new Rect(20, 160, 160, 20), "From-Start Mode (clears)"))
-        {
-            Debug.Log("From-Start Mode");
-            godClass.OnFromStartModePressed();
-        }
-
-        if (GUI.Button(new Rect(20, 180, 160, 20), "From-End Mode (clears)"))
-        {
-            Debug.Log("From-End Mode");
-            godClass.OnFromEndModePressed();
-        }
-
-        visualizeDistanceEnabled = GUI.Toggle(new Rect(20, 220, 160, 20), visualizeDistanceEnabled, "Distance Numbers");
+        visualizeDistanceEnabled = GUI.Toggle(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), visualizeDistanceEnabled, "Distance Numbers");
         if (wasvisualizeDistanceEnabled != visualizeDistanceEnabled)
         {
             wasvisualizeDistanceEnabled = visualizeDistanceEnabled;
             godClass.SetNumbersVisible(visualizeDistanceEnabled);
         }
+        guiVisY += yBetweenButtons;
 
-        visualizePathfindingEnabled = GUI.Toggle(new Rect(20, 240, 160, 20), visualizePathfindingEnabled, "Pathfinding Arrows");
+        visualizePathfindingEnabled = GUI.Toggle(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), visualizePathfindingEnabled, "Pathfinding Arrows");
         if (wasvisualizePathfindingEnabled != visualizePathfindingEnabled)
         {
             wasvisualizePathfindingEnabled = visualizePathfindingEnabled;
             godClass.SetVisualizationVisible(visualizePathfindingEnabled);
         }
+        guiVisY += yBetweenButtons;
 
-        stopPathingEarly = GUI.Toggle(new Rect(20, 260, 160, 20), stopPathingEarly, "Stop pathfinding early");
+        stopPathingEarly = GUI.Toggle(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), stopPathingEarly, "Stop pathfinding early");
         if (wasStopPathingEarly != stopPathingEarly)
         {
             wasStopPathingEarly = stopPathingEarly;
             godClass.SetPathfindingStopOnPathFound(stopPathingEarly);
         }
+        
+        
+        // === //
 
 
-        var yBetweenButtons = 20;
+        GUI.Box(new Rect(boxX, guiBoatY, boxWidth, guiBoatHeight), "BOATS");
 
-        GUI.Box(new Rect(10, guiBoatY, 210, guiBoatHeight), "BOATS");
-        guiBoatY += yBetweenButtons;
+        guiBoatY += yBetweenButtons + boxBuffer;
 
-        if (GUI.Button(new Rect(20, guiBoatY, 160, 20), "Spawn Boat"))
+        if (GUI.Button(new Rect(buttonX, guiBoatY, buttonWidth, buttonHeight), "Spawn Boat"))
         {
             Debug.Log("Spawn boats pressed");
             godClass.OnSpawnBoatPressed();
@@ -130,7 +159,7 @@ public class DebugGUI : MonoBehaviour
 
         guiBoatY += yBetweenButtons;
 
-        if (GUI.Button(new Rect(20, guiBoatY, 160, 20), "Delete Boats"))
+        if (GUI.Button(new Rect(buttonX, guiBoatY, buttonWidth, buttonHeight), "Delete Boats"))
         {
             Debug.Log("Delete boats pressed");
             godClass.OnDeleteBoatsPressed();
@@ -138,7 +167,7 @@ public class DebugGUI : MonoBehaviour
 
         guiBoatY += yBetweenButtons;
 
-        if (GUI.Button(new Rect(20, guiBoatY, 160, 20), "Follow existing path"))
+        if (GUI.Button(new Rect(buttonX, guiBoatY, buttonWidth, buttonHeight), "Follow existing path"))
         {
             Debug.Log("Follow existing path pressed");
             godClass.OnBoatsFollowExistingPathPressed();
@@ -146,13 +175,30 @@ public class DebugGUI : MonoBehaviour
 
         guiBoatY += yBetweenButtons;
 
-        if (GUI.Button(new Rect(20, guiBoatY, 160, 20), "Stop boats"))
+        if (GUI.Button(new Rect(buttonX, guiBoatY, buttonWidth, buttonHeight), "Stop boats"))
         {
             Debug.Log("Stop boats pressed");
             godClass.OnBoatsStopPressed();
         }
 
+        // === //
 
+        GUI.Box(new Rect(boxX, guiSaveLoadY, boxWidth, guiSaveLoadHeight), "SAVE/LOAD");
+        guiSaveLoadY += yBetweenButtons + boxBuffer;
+
+        if (GUI.Button(new Rect(buttonX, guiSaveLoadY, buttonWidth, buttonHeight), "Save"))
+        {
+            Debug.Log("Save pressed");
+            // TODO
+        }
+
+        guiSaveLoadY += yBetweenButtons;
+
+        if (GUI.Button(new Rect(buttonX, guiSaveLoadY, buttonWidth, buttonHeight), "Load"))
+        {
+            Debug.Log("Load pressed");
+            // TODO
+        }
 
     }
 }
