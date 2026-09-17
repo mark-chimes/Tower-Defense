@@ -10,24 +10,12 @@ public class DebugGUI : MonoBehaviour
     bool autoRefreshEnabled = false;
     bool wasEnabled = false;
 
-    // TODO how can I get the debug GUI to read these values from somewhere and 
-    // set up initial conditions easily so I don't have to unselect them every time? 
-
     bool visualizeDistanceEnabled = true;
-
     bool wasvisualizeDistanceEnabled = true;
-
     bool visualizePathfindingEnabled = true;
-
     bool wasvisualizePathfindingEnabled = true;
-
     bool stopPathingEarly = false;
-
     bool wasStopPathingEarly = false;
-
-    void Start()
-    {
-    }
 
     public void Initialize(GridView.VisualizationSettings visualization, 
         bool stopPathingEarly,

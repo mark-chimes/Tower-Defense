@@ -7,7 +7,8 @@ using UnityEngine;
 // - Control where they go
 public class EnemyController : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    [SerializeField] private Boat boatPrefab;
+
     private GridLayout layout;
     private TreasureMap treasureMap;
 
@@ -15,11 +16,6 @@ public class EnemyController : MonoBehaviour
     {
         this.layout = layout;
         this.treasureMap = treasureMap;
-    }
-
-    public void SpawnEnemy()
-    {
-        SpawnEnemy(layout, treasureMap.SpawnPos, treasureMap.GoalPos);
     }
 
     public void OnSpawnBoatPressed()
@@ -45,19 +41,16 @@ public class EnemyController : MonoBehaviour
     }
 
 
-    [SerializeField] private Boat boatPrefab;
-
     Boat enemy = null;
 
     // spawn a single enemy, just to test it out.
-    // passing in parameters in prep for moving this function out
-    void SpawnEnemy(GridLayout layout, Coord spawnPos, Coord goalPos)
+    public void SpawnEnemy()
     {
         enemy = Instantiate(boatPrefab, transform);
-        Vector3 pos = layout.CoordsToWorld(spawnPos);
+        Vector3 pos = layout.CoordsToWorld(treasureMap.SpawnPos);
         enemy.transform.localPosition = pos;
         enemy.name = $"Boat";
-        enemy.Initialize(spawnPos, goalPos, layout);
+        enemy.Initialize(treasureMap.SpawnPos, treasureMap.GoalPos, layout);
         // TODO save enemies in a list 
     }
 
