@@ -6,6 +6,7 @@ public class DebugGUI : MonoBehaviour
     private GridPathfindingIOManager pathfindingIOManager;
     private EnemyController enemyController;    // TODO Cross-coupling - move all relevant methods to own class
     private LevelSaveLoadSystem saveLoadSystem;
+    private GridWalls gridWalls;
 
     bool autoRefreshEnabled = false;
     bool wasEnabled = false;
@@ -21,7 +22,8 @@ public class DebugGUI : MonoBehaviour
         bool stopPathingEarly,
         GridPathfindingIOManager pathfindingIOManager, 
         EnemyController enemyController, // TODO remove reference
-        LevelSaveLoadSystem saveLoadSystem)
+        LevelSaveLoadSystem saveLoadSystem,
+        GridWalls gridWalls)
     {
         visualizeDistanceEnabled = visualization.ShowDistance;
         wasvisualizeDistanceEnabled = visualizeDistanceEnabled;
@@ -34,7 +36,9 @@ public class DebugGUI : MonoBehaviour
         this.pathfindingIOManager = pathfindingIOManager;
         this.enemyController = enemyController;
         this.saveLoadSystem = saveLoadSystem;
+        this.gridWalls = gridWalls;
     }
+
 
 
 
@@ -62,6 +66,12 @@ public class DebugGUI : MonoBehaviour
         int numSaveLoadControls = 2;
         int guiSaveLoadY = guiBoatEnd + yBetweenButtons + boxBuffer;
         int guiSaveLoadHeight = (numSaveLoadControls + 2) * yBetweenButtons + boxBuffer;
+        int guiSaveLoadEnd = guiSaveLoadY + guiSaveLoadHeight;
+
+        int numBuildingControls = 2;
+        int guiBuildingY = guiSaveLoadEnd + yBetweenButtons + boxBuffer;
+        int guiBuildingHeight = (numBuildingControls + 2) * yBetweenButtons + boxBuffer;
+        int guiBuildingEnd = guiBuildingY + guiBuildingHeight;
 
         GUI.Box(new Rect(boxX, guiVisY, boxWidth, guiVisHeight), "VISUALIZE");
         guiVisY += yBetweenButtons + boxBuffer;
@@ -195,6 +205,25 @@ public class DebugGUI : MonoBehaviour
         {
             Debug.Log("Load pressed");
             saveLoadSystem.OnLoad();
+        }
+
+        // === //
+
+        GUI.Box(new Rect(boxX, guiBuildingY, boxWidth, guiBuildingHeight), "Building");
+        guiBuildingY += yBetweenButtons + boxBuffer;
+
+        if (GUI.Button(new Rect(buttonX, guiBuildingY, buttonWidth, buttonHeight), "Wall"))
+        {
+            Debug.Log("Build wall pressed");
+            gridWalls.OnBuildWallsMode();
+        }
+
+        guiBuildingY += yBetweenButtons;
+
+        if (GUI.Button(new Rect(buttonX, guiBuildingY, buttonWidth, buttonHeight), "Tower"))
+        {
+            Debug.Log("Build tower pressed");
+            gridWalls.OnBuildTowersMode();
         }
 
     }

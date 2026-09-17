@@ -9,19 +9,15 @@ public class GridView : MonoBehaviour
     [SerializeField] private GameObject spawnPrefab;
     [SerializeField] private GameObject goalPrefab;
 
-    
     [System.Serializable]
     public class VisualizationSettings
     {
         [SerializeField] public bool ShowDistance = false;
         [SerializeField] public bool ShowPathfinding = true;
-
     }
-
 
     private GridLayout layout;
     private DirectionMarker[,] directionMarkers;
-
 
     public void GenerateGridView(GridLayout layout, Coord spawnPos, Coord goalPos,
         VisualizationSettings visualizationSettings)
@@ -89,7 +85,7 @@ public class GridView : MonoBehaviour
         }
     }
 
-    // TODO the methods below probably don't cut at the right seams
+    // TODO the methods below maybe don't cut at the right seams
 
     public void HighlightChangedOrFrontier(
         bool shouldHighlight,

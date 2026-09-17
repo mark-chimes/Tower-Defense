@@ -6,8 +6,10 @@ public class GodClass : MonoBehaviour
     [SerializeField] private DebugGUI gui;
     [SerializeField] private EnemyController enemyController;
     [SerializeField] private GridView gridView;
-    [SerializeField] private GridAuthor gridAuthor;
     [SerializeField] private GridWalls gridWalls;
+
+    [SerializeField] private GridAuthor gridAuthor;
+
     // These just exist so we can have serialized editor settings on this class
     [SerializeField] public GridView.VisualizationSettings StartingVisualization;
     [SerializeField] public bool StartingIsStopOnPathFound = true;
@@ -34,16 +36,13 @@ public class GodClass : MonoBehaviour
     {
         GenerateGrid();
 
-        // TODO should gridIO and camControl be coupled? 
         gridIO = new GridMouseHighlightIO(gridWalls, treasureMap, Camera.main);
 
         enemyController.Initialize(layout, treasureMap);
         enemyController.SpawnEnemy();
 
         gui.Initialize(StartingVisualization, StartingIsStopOnPathFound,
-            pathfindingIOManager, enemyController, saveLoadSystem);
-
-
+            pathfindingIOManager, enemyController, saveLoadSystem, gridWalls);
     }
 
     void Update()

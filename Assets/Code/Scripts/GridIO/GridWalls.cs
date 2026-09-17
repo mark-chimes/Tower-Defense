@@ -66,4 +66,20 @@ public class GridWalls : MonoBehaviour
         treasureMap.SetWall(c, false);
         onWallChange.Invoke();
     }
+
+    // The below are temporary and should be reconsidered with the proper feature 
+    public void OnBuildWallsMode()
+    {
+        // TODO switch mode
+
+    }
+
+    public void OnBuildTowersMode()
+    {
+
+        // TODO switch mode
+
+    }
+
+
 }
