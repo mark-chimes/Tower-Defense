@@ -4,7 +4,7 @@ public class DebugGUI : MonoBehaviour
 {
 
     private GridPathfindingIOManager pathfindingIOManager;
-    private GodClass godClass;    // TODO Cross-coupling - move all relevant methods to own class
+    private EnemyController enemyController;    // TODO Cross-coupling - move all relevant methods to own class
     private LevelSaveLoadSystem saveLoadSystem;
 
     bool autoRefreshEnabled = false;
@@ -32,7 +32,7 @@ public class DebugGUI : MonoBehaviour
     public void Initialize(GridView.VisualizationSettings visualization, 
         bool stopPathingEarly,
         GridPathfindingIOManager pathfindingIOManager, 
-        GodClass godClass, // TODO remove reference
+        EnemyController enemyController, // TODO remove reference
         LevelSaveLoadSystem saveLoadSystem)
     {
         visualizeDistanceEnabled = visualization.ShowDistance;
@@ -44,7 +44,7 @@ public class DebugGUI : MonoBehaviour
         this.stopPathingEarly = stopPathingEarly;
         
         this.pathfindingIOManager = pathfindingIOManager;
-        this.godClass = godClass;
+        this.enemyController = enemyController;
         this.saveLoadSystem = saveLoadSystem;
     }
 
@@ -163,7 +163,7 @@ public class DebugGUI : MonoBehaviour
         if (GUI.Button(new Rect(buttonX, guiBoatY, buttonWidth, buttonHeight), "Spawn Boat"))
         {
             Debug.Log("Spawn boats pressed");
-            godClass.OnSpawnBoatPressed();
+            enemyController.OnSpawnBoatPressed();
         }
 
         guiBoatY += yBetweenButtons;
@@ -171,7 +171,7 @@ public class DebugGUI : MonoBehaviour
         if (GUI.Button(new Rect(buttonX, guiBoatY, buttonWidth, buttonHeight), "Delete Boats"))
         {
             Debug.Log("Delete boats pressed");
-            godClass.OnDeleteBoatsPressed();
+            enemyController.OnDeleteBoatsPressed();
         }
 
         guiBoatY += yBetweenButtons;
@@ -179,7 +179,7 @@ public class DebugGUI : MonoBehaviour
         if (GUI.Button(new Rect(buttonX, guiBoatY, buttonWidth, buttonHeight), "Follow existing path"))
         {
             Debug.Log("Follow existing path pressed");
-            godClass.OnBoatsFollowExistingPathPressed();
+            enemyController.OnBoatsFollowExistingPathPressed();
         }
 
         guiBoatY += yBetweenButtons;
@@ -187,7 +187,7 @@ public class DebugGUI : MonoBehaviour
         if (GUI.Button(new Rect(buttonX, guiBoatY, buttonWidth, buttonHeight), "Stop boats"))
         {
             Debug.Log("Stop boats pressed");
-            godClass.OnBoatsStopPressed();
+            enemyController.OnBoatsStopPressed();
         }
 
         // === //

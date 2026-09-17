@@ -5,6 +5,8 @@ using UnityEngine.InputSystem;
 public class GodClass : MonoBehaviour
 {
     [SerializeField] private DebugGUI gui;
+    [SerializeField] private EnemyController enemyController;
+
 
     [SerializeField] private GridView gridView;
 
@@ -32,12 +34,15 @@ public class GodClass : MonoBehaviour
         saveLoadSystem = new LevelSaveLoadSystem();
 
         GenerateGrid();
-        SpawnEnemy(layout, treasureMap.SpawnPos, treasureMap.GoalPos);
 
         // TODO don't forget to update camera method if main camera can change
         gridIO = new GridMouseHighlightIO(gridWalls, treasureMap, Camera.main);
 
-        gui.Initialize(StartingVisualization, StartingIsStopOnPathFound, pathfindingIOManager, this, saveLoadSystem);
+        enemyController.Initialize(layout, treasureMap);
+        enemyController.SpawnEnemy();
+
+        gui.Initialize(StartingVisualization, StartingIsStopOnPathFound, 
+            pathfindingIOManager, enemyController, saveLoadSystem);
 
     }
 
@@ -72,8 +77,6 @@ public class GodClass : MonoBehaviour
 
         float cameraZoomSpeed = cameraZoomSpeedBase;
         float cameraPanSpeed = cameraPanSpeedBase;
-        // TODO adjust cameraZoomSpeed and cameraPanSpeed based off of zoom level.
-        // TODO adjust cameraZoomLevel based on how far camera is from max zoom somehow.
 
 
         if (Keyboard.current == null) return; // TODO log error?
@@ -126,8 +129,6 @@ public class GodClass : MonoBehaviour
         {
             Debug.Log($"Camera position WAS {cameraTransform.position}");
             cameraTransform.position = cameraStartPosition;
-            // cameraTransform.rotation = cameraStartRotation; // revisit if anything affects rotation
-            // cameraZoomLevel = 1f;
         }
 
     }
@@ -147,7 +148,8 @@ public class GodClass : MonoBehaviour
         Coord spawnPos = gridAuthor.SpawnPos;
         Coord goalPos = gridAuthor.GoalPos;
 
-        treasureMap = new TreasureMap(width, height, spawnPos, goalPos, StartingIsStopOnPathFound, PathfindingUpdate, PathfindingClear);
+        treasureMap = new TreasureMap(width, height, spawnPos, goalPos, StartingIsStopOnPathFound,
+            enemyController.PathfindingUpdate, enemyController.PathfindingClear);
 
         gridView.GenerateGridView(layout, spawnPos, goalPos, StartingVisualization);
         pathfindingIOManager.Initialize(treasureMap, gridView);
@@ -159,63 +161,5 @@ public class GodClass : MonoBehaviour
     public void OnSave() => saveLoadSystem.OnSave();
     public void OnLoad() => saveLoadSystem.OnLoad();
 
-    // TODO Move this to its own class
-    public void OnSpawnBoatPressed()
-    {
-        OnDeleteBoatsPressed(); // Delete it since we can only have one boat at the moment.
-        SpawnEnemy(layout, treasureMap.SpawnPos, treasureMap.GoalPos);
-    }
-    public void OnDeleteBoatsPressed()
-    {
-        Debug.Log($"Destroy enemy {enemy}");
-        if (enemy != null) Destroy(enemy.gameObject);
-        Debug.Log($"Enemy destroyed: {enemy}");
-    }
-
-    public void OnBoatsFollowExistingPathPressed()
-    {
-        PathfindingUpdate();
-    }
-
-    public void OnBoatsStopPressed()
-    {
-        PathfindingClear();
-    }
-
-    // TODO enemy spawn logic below to get it going. Move out once a home is found. 
-    // Maybe some of it will form part of this
-
-    [SerializeField] private Boat boatPrefab;
-    [SerializeField] private EnemyController enemyController; // TODO move code herea and use this
-
-    Boat enemy = null;
-
-    // spawn a single enemy, just to test it out.
-    // passing in parameters in prep for moving this function out
-    void SpawnEnemy(GridLayout layout, Coord spawnPos, Coord goalPos)
-    {
-        enemy = Instantiate(boatPrefab, transform);
-        Vector3 pos = layout.CoordsToWorld(spawnPos);
-        enemy.transform.localPosition = pos;
-        enemy.name = $"Boat";
-        enemy.Initialize(spawnPos, goalPos, layout);
-        // TODO save enemies in a list 
-    }
-
-    void PathfindingUpdate()
-    {
-        if (enemy == null) return;
-
-        enemy.RecalculatePathing(treasureMap);
-
-    }
-
-    void PathfindingClear()
-    {
-        if (enemy == null) return;
-
-        enemy.ClearPathing();
-
-    }
 
 }
