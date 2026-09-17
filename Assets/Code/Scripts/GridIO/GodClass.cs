@@ -22,14 +22,19 @@ public class GodClass : MonoBehaviour
     GridMouseHighlightIO gridIO;
     GridPathfindingIOManager pathfindingIOManager;
 
+    LevelSaveLoadSystem saveLoadSystem;
+
     void Start()
     {
         pathfindingIOManager = new GridPathfindingIOManager();
+        saveLoadSystem = new LevelSaveLoadSystem();
+
         GenerateGrid();
         SpawnEnemy(layout, treasureMap.SpawnPos, treasureMap.GoalPos);
 
         // TODO don't forget to update camera method if main camera can change
         gridIO = new GridMouseHighlightIO(gridWalls, treasureMap, Camera.main);
+
     }
 
     void Update()
@@ -83,8 +88,8 @@ public class GodClass : MonoBehaviour
             cameraPanSpeed = cameraPanSpeed * 4;
         }
 
-        
-        if (cameraY  > minCameraY && Keyboard.current.eKey.isPressed)
+
+        if (cameraY > minCameraY && Keyboard.current.eKey.isPressed)
         {
             cameraTransform.position += cameraTransform.forward * cameraZoomSpeed * Time.deltaTime;
         }
@@ -156,10 +161,12 @@ public class GodClass : MonoBehaviour
     public void OnFromEndModePressed() => pathfindingIOManager.OnFromEndModePressed();
     public void SetNumbersVisible(bool isEnabled) => pathfindingIOManager.OnSetNumbersVisible(isEnabled);
     public void SetVisualizationVisible(bool isEnabled) => pathfindingIOManager.OnSetVisualizationVisible(isEnabled);
-
     public void SetPathfindingStopOnPathFound(bool isEnabled) => pathfindingIOManager.ResetPathfindingWithEarlyStoppingMode(isEnabled);
-
     public void SetAutoRefreshMode(bool isEnabled) => pathfindingIOManager.SetAutoRefreshMode(isEnabled);
+
+    // TODO move this out? 
+    public void OnSave() => saveLoadSystem.OnSave();
+    public void OnLoad() => saveLoadSystem.OnLoad();
 
     public void OnSpawnBoatPressed()
     {

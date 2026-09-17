@@ -64,7 +64,7 @@ public class DebugGUI : MonoBehaviour
 
         int numSaveLoadControls = 2;
         int guiSaveLoadY = guiBoatEnd + yBetweenButtons + boxBuffer;
-        int guiSaveLoadHeight = (numSaveLoadControls+2) * yBetweenButtons +  + boxBuffer;
+        int guiSaveLoadHeight = (numSaveLoadControls+2) * yBetweenButtons + boxBuffer;
 
         GUI.Box(new Rect(boxX, guiVisY, boxWidth, guiVisHeight), "VISUALIZE");
         guiVisY += yBetweenButtons + boxBuffer;
@@ -189,7 +189,7 @@ public class DebugGUI : MonoBehaviour
         if (GUI.Button(new Rect(buttonX, guiSaveLoadY, buttonWidth, buttonHeight), "Save"))
         {
             Debug.Log("Save pressed");
-            // TODO
+            godClass.OnSave();
         }
 
         guiSaveLoadY += yBetweenButtons;
@@ -197,7 +197,7 @@ public class DebugGUI : MonoBehaviour
         if (GUI.Button(new Rect(buttonX, guiSaveLoadY, buttonWidth, buttonHeight), "Load"))
         {
             Debug.Log("Load pressed");
-            // TODO
+            godClass.OnLoad();
         }
 
     }
