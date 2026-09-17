@@ -4,6 +4,8 @@ using UnityEngine.InputSystem;
 // TODO find better name for this class
 public class GodClass : MonoBehaviour
 {
+    [SerializeField] private DebugGUI gui;
+
     [SerializeField] private GridView gridView;
 
 
@@ -34,6 +36,8 @@ public class GodClass : MonoBehaviour
 
         // TODO don't forget to update camera method if main camera can change
         gridIO = new GridMouseHighlightIO(gridWalls, treasureMap, Camera.main);
+
+        gui.Initialize(StartingVisualization, StartingIsStopOnPathFound, pathfindingIOManager, this, saveLoadSystem);
 
     }
 
@@ -151,23 +155,11 @@ public class GodClass : MonoBehaviour
         gridWalls.Initialize(treasureMap, layout, pathfindingIOManager.UpdateDistances);
     }
 
-
-    // TODO is this the best way to implement / group these methods? Feel like there must be a better way
-    public void OnRefreshPressed() => pathfindingIOManager.OnRefreshPressed();
-    public void OnClearFieldPressed() => pathfindingIOManager.OnClearFieldPressed();
-    public void OnSingleStepPressed() => pathfindingIOManager.OnSingleStepPressed();
-    public void OnVisualizePressed() => pathfindingIOManager.OnVisualizePressed();
-    public void OnFromStartModePressed() => pathfindingIOManager.OnFromStartModePressed();
-    public void OnFromEndModePressed() => pathfindingIOManager.OnFromEndModePressed();
-    public void SetNumbersVisible(bool isEnabled) => pathfindingIOManager.OnSetNumbersVisible(isEnabled);
-    public void SetVisualizationVisible(bool isEnabled) => pathfindingIOManager.OnSetVisualizationVisible(isEnabled);
-    public void SetPathfindingStopOnPathFound(bool isEnabled) => pathfindingIOManager.ResetPathfindingWithEarlyStoppingMode(isEnabled);
-    public void SetAutoRefreshMode(bool isEnabled) => pathfindingIOManager.SetAutoRefreshMode(isEnabled);
-
     // TODO move this out? 
     public void OnSave() => saveLoadSystem.OnSave();
     public void OnLoad() => saveLoadSystem.OnLoad();
 
+    // TODO Move this to its own class
     public void OnSpawnBoatPressed()
     {
         OnDeleteBoatsPressed(); // Delete it since we can only have one boat at the moment.

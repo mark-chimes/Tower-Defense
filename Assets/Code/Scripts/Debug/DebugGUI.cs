@@ -3,7 +3,9 @@ using UnityEngine;
 public class DebugGUI : MonoBehaviour
 {
 
-    [SerializeField] private GodClass godClass; // TODO improve this data flow
+    private GridPathfindingIOManager pathfindingIOManager;
+    private GodClass godClass;    // TODO Cross-coupling - move all relevant methods to own class
+    private LevelSaveLoadSystem saveLoadSystem;
 
     bool autoRefreshEnabled = false;
     bool wasEnabled = false;
@@ -25,23 +27,27 @@ public class DebugGUI : MonoBehaviour
 
     void Start()
     {
-        ReadValuesFromGodClass();
     }
 
-    void ReadValuesFromGodClass()
+    public void Initialize(GridView.VisualizationSettings visualization, 
+        bool stopPathingEarly,
+        GridPathfindingIOManager pathfindingIOManager, 
+        GodClass godClass, // TODO remove reference
+        LevelSaveLoadSystem saveLoadSystem)
     {
-        GridView.VisualizationSettings visualization = godClass.StartingVisualization;
         visualizeDistanceEnabled = visualization.ShowDistance;
         wasvisualizeDistanceEnabled = visualizeDistanceEnabled;
 
         visualizePathfindingEnabled = visualization.ShowPathfinding;
         wasvisualizePathfindingEnabled = visualizePathfindingEnabled;
 
-        stopPathingEarly = godClass.StartingIsStopOnPathFound;
+        this.stopPathingEarly = stopPathingEarly;
+        
+        this.pathfindingIOManager = pathfindingIOManager;
+        this.godClass = godClass;
+        this.saveLoadSystem = saveLoadSystem;
     }
 
-    void Initialize() {
-    }
 
 
     void OnGUI()
@@ -50,24 +56,24 @@ public class DebugGUI : MonoBehaviour
         int boxX = 10;
         int boxWidth = 210;
         int buttonX = boxX + boxBuffer;
-        int buttonWidth = boxWidth - 2*boxBuffer;
+        int buttonWidth = boxWidth - 2 * boxBuffer;
         int buttonHeight = 20;
 
         int yBetweenButtons = buttonHeight;
 
         int numVisControls = 10;
         int guiVisY = yBetweenButtons;
-        int guiVisHeight = (numVisControls+2) * yBetweenButtons  + boxBuffer;
+        int guiVisHeight = (numVisControls + 2) * yBetweenButtons + boxBuffer;
         int guiVisEnd = guiVisY + guiVisHeight;
 
         int numBoatControls = 4;
         int guiBoatY = guiVisEnd + yBetweenButtons + boxBuffer;
-        int guiBoatHeight = (numBoatControls+2) * yBetweenButtons + boxBuffer;
+        int guiBoatHeight = (numBoatControls + 2) * yBetweenButtons + boxBuffer;
         int guiBoatEnd = guiBoatY + guiBoatHeight;
 
         int numSaveLoadControls = 2;
         int guiSaveLoadY = guiBoatEnd + yBetweenButtons + boxBuffer;
-        int guiSaveLoadHeight = (numSaveLoadControls+2) * yBetweenButtons + boxBuffer;
+        int guiSaveLoadHeight = (numSaveLoadControls + 2) * yBetweenButtons + boxBuffer;
 
         GUI.Box(new Rect(boxX, guiVisY, boxWidth, guiVisHeight), "VISUALIZE");
         guiVisY += yBetweenButtons + boxBuffer;
@@ -75,28 +81,28 @@ public class DebugGUI : MonoBehaviour
         if (GUI.Button(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), "Instant Refresh"))
         {
             Debug.Log("Refresh");
-            godClass.OnRefreshPressed();
+            pathfindingIOManager.OnRefreshPressed();
         }
         guiVisY += yBetweenButtons;
 
         if (GUI.Button(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), "Clear Field"))
         {
             Debug.Log("Clear Field");
-            godClass.OnClearFieldPressed();
+            pathfindingIOManager.OnClearFieldPressed();
         }
         guiVisY += yBetweenButtons;
 
         if (GUI.Button(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), "Single Step"))
         {
             Debug.Log("Single Step");
-            godClass.OnSingleStepPressed();
+            pathfindingIOManager.OnSingleStepPressed();
         }
         guiVisY += yBetweenButtons;
 
         if (GUI.Button(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), "VISUALIZE"))
         {
             Debug.Log("VISUALIZE");
-            godClass.OnVisualizePressed();
+            pathfindingIOManager.OnVisualizePressed();
         }
         guiVisY += yBetweenButtons;
 
@@ -104,14 +110,14 @@ public class DebugGUI : MonoBehaviour
         if (GUI.Button(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), "From-Start Mode (clears)"))
         {
             Debug.Log("From-Start Mode");
-            godClass.OnFromStartModePressed();
+            pathfindingIOManager.OnFromStartModePressed();
         }
         guiVisY += yBetweenButtons;
 
         if (GUI.Button(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), "From-End Mode (clears)"))
         {
             Debug.Log("From-End Mode");
-            godClass.OnFromEndModePressed();
+            pathfindingIOManager.OnFromEndModePressed();
         }
         guiVisY += yBetweenButtons + boxBuffer;
 
@@ -119,7 +125,7 @@ public class DebugGUI : MonoBehaviour
         if (wasEnabled != autoRefreshEnabled)
         {
             wasEnabled = autoRefreshEnabled;
-            godClass.SetAutoRefreshMode(autoRefreshEnabled);
+            pathfindingIOManager.SetAutoRefreshMode(autoRefreshEnabled);
         }
         guiVisY += yBetweenButtons;
 
@@ -127,7 +133,7 @@ public class DebugGUI : MonoBehaviour
         if (wasvisualizeDistanceEnabled != visualizeDistanceEnabled)
         {
             wasvisualizeDistanceEnabled = visualizeDistanceEnabled;
-            godClass.SetNumbersVisible(visualizeDistanceEnabled);
+            pathfindingIOManager.OnSetNumbersVisible(visualizeDistanceEnabled);
         }
         guiVisY += yBetweenButtons;
 
@@ -135,7 +141,7 @@ public class DebugGUI : MonoBehaviour
         if (wasvisualizePathfindingEnabled != visualizePathfindingEnabled)
         {
             wasvisualizePathfindingEnabled = visualizePathfindingEnabled;
-            godClass.SetVisualizationVisible(visualizePathfindingEnabled);
+            pathfindingIOManager.OnSetVisualizationVisible(visualizePathfindingEnabled);
         }
         guiVisY += yBetweenButtons;
 
@@ -143,10 +149,10 @@ public class DebugGUI : MonoBehaviour
         if (wasStopPathingEarly != stopPathingEarly)
         {
             wasStopPathingEarly = stopPathingEarly;
-            godClass.SetPathfindingStopOnPathFound(stopPathingEarly);
+            pathfindingIOManager.ResetPathfindingWithEarlyStoppingMode(stopPathingEarly);
         }
-        
-        
+
+
         // === //
 
 
@@ -192,7 +198,7 @@ public class DebugGUI : MonoBehaviour
         if (GUI.Button(new Rect(buttonX, guiSaveLoadY, buttonWidth, buttonHeight), "Save"))
         {
             Debug.Log("Save pressed");
-            godClass.OnSave();
+            saveLoadSystem.OnSave();
         }
 
         guiSaveLoadY += yBetweenButtons;
@@ -200,7 +206,7 @@ public class DebugGUI : MonoBehaviour
         if (GUI.Button(new Rect(buttonX, guiSaveLoadY, buttonWidth, buttonHeight), "Load"))
         {
             Debug.Log("Load pressed");
-            godClass.OnLoad();
+            saveLoadSystem.OnLoad();
         }
 
     }
