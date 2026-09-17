@@ -44,8 +44,8 @@ public class GodClass : MonoBehaviour
     private Vector3 cameraStartPosition;
     private Quaternion cameraStartRotation;
 
-    private const float cameraZoomSpeedBase = 100f;
-    private const float cameraPanSpeedBase = 100f;
+    private const float cameraZoomSpeedBase = 300f;
+    private const float cameraPanSpeedBase = 200f;
 
     private const float minCameraY = 10f;
 
@@ -55,7 +55,7 @@ public class GodClass : MonoBehaviour
     {
         cameraStartPosition = Camera.main.transform.position;
         cameraStartRotation = Camera.main.transform.rotation;
-        maxCameraY = cameraStartPosition.y;
+        maxCameraY = cameraStartPosition.y * 2;
     }
 
     void ControlCamera()
@@ -79,15 +79,16 @@ public class GodClass : MonoBehaviour
 
         if (Keyboard.current.shiftKey.isPressed)
         {
-            cameraZoomSpeed = cameraZoomSpeed * 2;
-            cameraPanSpeed = cameraPanSpeed * 2;
+            cameraZoomSpeed = cameraZoomSpeed * 4;
+            cameraPanSpeed = cameraPanSpeed * 4;
         }
 
-        if (Keyboard.current.eKey.isPressed)
+        
+        if (cameraY  > minCameraY && Keyboard.current.eKey.isPressed)
         {
             cameraTransform.position += cameraTransform.forward * cameraZoomSpeed * Time.deltaTime;
         }
-        if (Keyboard.current.qKey.isPressed)
+        if (cameraY < maxCameraY && Keyboard.current.qKey.isPressed)
         {
             cameraTransform.position -= cameraTransform.forward * cameraZoomSpeed * Time.deltaTime;
         }
