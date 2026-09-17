@@ -40,6 +40,9 @@ public class DebugGUI : MonoBehaviour
         stopPathingEarly = godClass.StartingIsStopOnPathFound;
     }
 
+    void Initialize() {
+    }
+
 
     void OnGUI()
     {
