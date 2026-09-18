@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public class TreasureMap
 {
 
-    private bool[,] wallMap;
+    private bool[,] wallMap; // TODO I'm starting to think TreasureMap should not hold the wall map
     public readonly int Width;
     public readonly int Height;
 
@@ -18,18 +18,17 @@ public class TreasureMap
 
     private Wayfinder wayfinder;
 
-    public TreasureMap(int width, int height, Coord spawnPos, Coord goalPos, bool isStopOnPathFound,
-        Action onPathfindingUpdate, Action onPathfindingClear)
+    public TreasureMap(int width, int height, bool[,] wallMap, Coord spawnPos, Coord goalPos, bool isStopOnPathFound,
+    Action onPathfindingUpdate, Action onPathfindingClear)
     {
         Width = width;
         Height = height;
+        this.wallMap = wallMap;
         SpawnPos = spawnPos;
         GoalPos = goalPos;
-        wallMap = new bool[width, height];
         RecreateWayfinder(isStopOnPathFound);
         this.onPathfindingUpdate = onPathfindingUpdate;
         this.onPathfindingClear = onPathfindingClear;
-
     }
 
     /// <summary>
@@ -63,7 +62,7 @@ public class TreasureMap
         onPathfindingUpdate.Invoke();
     }
 
-    // Just used to clear and not do anything - never a required _external_ call before calling other functions
+    // External functions can assume internal functions will call this if they have to
     public void ClearField()
     {
         wayfinder.ClearField();
@@ -89,6 +88,11 @@ public class TreasureMap
     public Signpost SignpostAt(int x, int z) => SignpostAt(new Coord(x, z));
 
     public void SetWall(Coord c, bool hasWall) => wallMap[c.X, c.Z] = hasWall;
+
+    public bool[,] Walls()
+    {
+        return wallMap;
+    }
 
     public bool CanPlaceWall(Coord c) => SpawnGoalKindAt(c) == SpawnGoalKind.Floor
         && !wallMap[c.X, c.Z];

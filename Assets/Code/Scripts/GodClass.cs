@@ -16,8 +16,6 @@ public class GodClass : MonoBehaviour
 
     private TreasureMap treasureMap;
 
-    private GridLayout layout;
-
     GridMouseHighlightIO gridIO;
     GridPathfindingIOManager pathfindingIOManager;
     LevelSaveLoadSystem saveLoadSystem;
@@ -34,17 +32,7 @@ public class GodClass : MonoBehaviour
 
     void Start()
     {
-        GenerateGrid();
-
-        gridIO = new GridMouseHighlightIO(gridWalls, treasureMap, Camera.main);
-
-        enemyController.Initialize(layout, treasureMap);
-        enemyController.SpawnEnemy();
-
-        gui.Initialize(StartingVisualization, StartingIsStopOnPathFound,
-            pathfindingIOManager, enemyController, saveLoadSystem, gridWalls);
-
-        saveLoadSystem.Initialize(treasureMap);
+        CreateMapFromNothing();
     }
 
     void Update()
@@ -59,20 +47,61 @@ public class GodClass : MonoBehaviour
         GridGizmo.Draw(gridAuthor, transform);
     }
 
-    void GenerateGrid()
+    public void OnSave()
     {
-        layout = gridAuthor.Layout;
-        int width = layout.Width;
-        int height = layout.Height;
+        saveLoadSystem.SaveMap(treasureMap);
+    }
+
+    public void OnLoad()
+    {
+        SaveableLevel loaded = saveLoadSystem.OnLoad();
+
+        gridView.ClearData();
+        gridWalls.ClearData();
+        enemyController.ClearData();
+
+        CreateMapFromData(loaded);
+    }
+
+    void CreateMapFromNothing()
+    {
+        int width = gridAuthor.Layout.Width;
+        int height = gridAuthor.Layout.Height;
+        bool[,] wallMap = new bool[width, height];
         Coord spawnPos = gridAuthor.SpawnPos;
         Coord goalPos = gridAuthor.GoalPos;
 
-        treasureMap = new TreasureMap(width, height, spawnPos, goalPos, StartingIsStopOnPathFound,
+        treasureMap = new TreasureMap(width, height, wallMap, spawnPos, goalPos, StartingIsStopOnPathFound,
             enemyController.PathfindingUpdate, enemyController.PathfindingClear);
 
-        gridView.GenerateGridView(layout, spawnPos, goalPos, StartingVisualization);
+        CreateMapFromTreasureMap(treasureMap);
+    }
+
+    void CreateMapFromData(SaveableLevel loaded)
+    {
+        treasureMap = new TreasureMap(loaded.Width, loaded.Height, loaded.WallMap(), treasureMap.SpawnPos, treasureMap.GoalPos,
+            StartingIsStopOnPathFound,
+            enemyController.PathfindingUpdate,
+            enemyController.PathfindingClear);
+        CreateMapFromTreasureMap(treasureMap);
+    }
+
+    void CreateMapFromTreasureMap(TreasureMap treasureMap)
+    {
+        GridLayout layout = new GridLayout(treasureMap.Width, treasureMap.Height);
+        gridView.Initialize(layout, treasureMap.SpawnPos, treasureMap.GoalPos, StartingVisualization);
         pathfindingIOManager.Initialize(treasureMap, gridView);
         pathfindingIOManager.ClearField();
         gridWalls.Initialize(treasureMap, layout, pathfindingIOManager.UpdateDistances);
+
+        gridIO = new GridMouseHighlightIO(gridWalls, treasureMap, Camera.main);
+
+        enemyController.Initialize(layout, treasureMap);
+        enemyController.SpawnEnemy();
+
+        gui.Initialize(StartingVisualization, StartingIsStopOnPathFound,
+            pathfindingIOManager, enemyController, this, gridWalls); // TODO cross-dependency code-smell
     }
+
+
 }

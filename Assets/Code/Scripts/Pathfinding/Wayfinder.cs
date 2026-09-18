@@ -17,7 +17,6 @@ public class Wayfinder
 
     private Search.Phase phase = Search.Phase.ExpandFrontier;
 
-    // TODO should pass this in as a parameter
     private bool isStopOnPathFound = false;
 
 

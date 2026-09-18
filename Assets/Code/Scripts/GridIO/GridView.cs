@@ -19,9 +19,14 @@ public class GridView : MonoBehaviour
     private GridLayout layout;
     private DirectionMarker[,] directionMarkers;
 
-    public void GenerateGridView(GridLayout layout, Coord spawnPos, Coord goalPos,
+    private bool isInitialized;
+
+    public void Initialize(GridLayout layout, Coord spawnPos, Coord goalPos,
         VisualizationSettings visualizationSettings)
     {
+        Debug.Assert(!isInitialized);
+        isInitialized = true;
+
         this.layout = layout;
         directionMarkers = new DirectionMarker[layout.Width, layout.Height];
 
@@ -52,15 +57,37 @@ public class GridView : MonoBehaviour
         }
     }
 
-    private void InstantiateMarker(GameObject prefab, Coord coord)
+    public void ClearData()
+    {
+        Debug.Assert(isInitialized);
+        isInitialized = false;
+
+        foreach (Transform child in transform) Destroy(child.gameObject);
+        layout = null;
+        directionMarkers = null;
+    }
+
+
+    public void Reinitialize(GridLayout layout, Coord spawnPos, Coord goalPos,
+        VisualizationSettings visualizationSettings)
+    {
+        ClearData();
+        Initialize(layout, spawnPos, goalPos, visualizationSettings);
+    }
+
+
+    private GameObject InstantiateMarker(GameObject prefab, Coord coord)
     {
         GameObject obj = Instantiate(prefab, transform);
         obj.transform.localPosition = layout.CoordsToWorld(coord);
+        return obj;
     }
 
 
     private void UnhighlightAllArrows()
     {
+        Debug.Assert(isInitialized);
+
         for (int x = 0; x < layout.Width; x++)
         {
             for (int z = 0; z < layout.Height; z++)
@@ -74,7 +101,10 @@ public class GridView : MonoBehaviour
 
     public void RefreshDistanceLabels(IReadOnlyCollection<Signpost> signposts)
     {
+        Debug.Assert(isInitialized);
+
         Debug.Log("RefreshDistanceLabels");
+
 
         foreach (Signpost sign in signposts)
         {
@@ -92,6 +122,8 @@ public class GridView : MonoBehaviour
         IReadOnlyCollection<Signpost> changed,
         IReadOnlyCollection<Coord> frontier)
     {
+        Debug.Assert(isInitialized);
+
         UnhighlightAllArrows();
         foreach (Signpost sign in changed)
         {
@@ -112,6 +144,8 @@ public class GridView : MonoBehaviour
 
     public void HighlightPath(IReadOnlyCollection<Signpost> changed)
     {
+        Debug.Assert(isInitialized);
+
         foreach (Signpost sign in changed)
         {
             Coord c = sign.Coord;
@@ -122,6 +156,8 @@ public class GridView : MonoBehaviour
 
     public void SetVisualizationVisible(bool isVisible)
     {
+        Debug.Assert(isInitialized);
+
         for (int x = 0; x < layout.Width; x++)
         {
             for (int z = 0; z < layout.Height; z++)
@@ -133,6 +169,8 @@ public class GridView : MonoBehaviour
 
     public void SetDistanceVisible(bool isVisible)
     {
+        Debug.Assert(isInitialized);
+
         for (int x = 0; x < layout.Width; x++)
         {
             for (int z = 0; z < layout.Height; z++)

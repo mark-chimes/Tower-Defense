@@ -1,39 +1,26 @@
-using System;
+
 using System.IO;
 using UnityEngine;
 
+// TODO this class should be reworked when I figure it out.
 public class LevelSaveLoadSystem
 {
-    int testValue = 1;
-
-    // TODO later we'll initialize this with treasureMap so it can use it
-    private TreasureMap treasureMap;
-
-    public void Initialize(TreasureMap treasureMap) // TODO
-    {
-        this.treasureMap = treasureMap;
-    }
-
-    public void OnSave()
+    // TODO should I save the map, or something else?
+    public void SaveMap(TreasureMap map)
     {
         Debug.Log("saving...");
-        SaveableLevel saveable = treasureMap.AsSaveableData();
+        SaveableLevel saveable = map.AsSaveableData();
         WriteToFile(saveable.ToJson());
-        testValue++;
     }
 
-    public void OnLoad()
+    public SaveableLevel OnLoad()
     {
         Debug.Log("loading...");
         string json = ReadJson();
         SaveableLevel saveable = SaveableLevel.FromJson(json);
-        // TODO what to do with this loaded data? 
-        Debug.Log($"Loaded value {json}");
-        Debug.Log($"Loaded value {saveable}");
+        return saveable;
 
     }
-
-    // TODO everything below should probably move to file IO class.
 
     private readonly string filePath = Path.Combine(Application.persistentDataPath, "walls_save.json");
 

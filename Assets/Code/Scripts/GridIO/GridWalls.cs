@@ -12,12 +12,49 @@ public class GridWalls : MonoBehaviour
 
     private Action onWallChange;
 
+    private bool isInitialized;
+
     public void Initialize(TreasureMap treasureMap, GridLayout layout, Action onWallChange)
     {
+        Debug.Assert(!isInitialized);
+        isInitialized = true;
+
         this.treasureMap = treasureMap;
         this.layout = layout;
         this.onWallChange = onWallChange;
         walls = new Wall[treasureMap.Width, treasureMap.Height];
+
+        bool[,] wallBool = treasureMap.Walls(); // feels weird, yes? 
+
+        for (int x = 0; x < treasureMap.Width; x++)
+        {
+            for (int z = 0; z < treasureMap.Height; z++)
+            {
+                if (wallBool[x, z])
+                {
+                    MakeWallAt(new Coord(x, z));
+                }
+            }
+
+        }
+    }
+
+    public void ClearData()
+    {
+        Debug.Assert(isInitialized);
+        isInitialized = false;
+
+        this.treasureMap = null;
+        this.layout = null;
+        this.onWallChange = null;
+        foreach (Transform child in transform) Destroy(child.gameObject);
+        this.walls = null;
+    }
+
+    public void Reinitialize(TreasureMap treasureMap, GridLayout layout, Action onWallChange)
+    {
+        ClearData();
+        Initialize(treasureMap, layout, onWallChange);
     }
 
     public Highlightable MaybeWall(Coord c)
@@ -39,12 +76,17 @@ public class GridWalls : MonoBehaviour
             return;
         }
 
+        treasureMap.SetWall(c, true);
+        MakeWallAt(c);
+        onWallChange.Invoke();
+    }
+
+    private void MakeWallAt(Coord c)
+    {
         Wall wall = Instantiate(wallPrefab, transform);
         wall.transform.localPosition = layout.CoordsToWorld(c);
         wall.name = $"Wall_{c.X}_{c.Z}";
         walls[c.X, c.Z] = wall;
-        treasureMap.SetWall(c, true);
-        onWallChange.Invoke();
     }
 
     public void DespawnWall(Coord c)

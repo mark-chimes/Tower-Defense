@@ -11,11 +11,36 @@ public class EnemyController : MonoBehaviour
 
     private GridLayout layout;
     private TreasureMap treasureMap;
+    private Boat enemy = null;
+
+
+    private bool isInitialized;
 
     public void Initialize(GridLayout layout, TreasureMap treasureMap)
     {
+        Debug.Assert(!isInitialized);
+        isInitialized = true;
+
         this.layout = layout;
         this.treasureMap = treasureMap;
+    }
+
+    public void ClearData()
+    {
+        Debug.Assert(isInitialized);
+        isInitialized = false;
+
+        foreach (Transform child in transform) Destroy(child.gameObject);
+        layout = null;
+        treasureMap = null;
+        enemy = null;
+    }
+
+
+    public void Reinitialize(GridLayout layout, TreasureMap treasureMap)
+    {
+        ClearData();
+        Initialize(layout, treasureMap);
     }
 
     public void OnSpawnBoatPressed()
@@ -41,7 +66,6 @@ public class EnemyController : MonoBehaviour
     }
 
 
-    Boat enemy = null;
 
     // spawn a single enemy, just to test it out.
     public void SpawnEnemy()

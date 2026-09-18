@@ -4,8 +4,11 @@ public class DebugGUI : MonoBehaviour
 {
 
     private GridPathfindingIOManager pathfindingIOManager;
-    private EnemyController enemyController;    // TODO Cross-coupling - move all relevant methods to own class
-    private LevelSaveLoadSystem saveLoadSystem;
+    private EnemyController enemyController;    
+    
+    private GodClass godClass; // // TODO Cross-dependency code smell not ideal, but I'll fix this later
+
+
     private GridWalls gridWalls;
 
     bool autoRefreshEnabled = false;
@@ -22,7 +25,7 @@ public class DebugGUI : MonoBehaviour
         bool stopPathingEarly,
         GridPathfindingIOManager pathfindingIOManager, 
         EnemyController enemyController, // TODO remove reference
-        LevelSaveLoadSystem saveLoadSystem,
+        GodClass godClass,
         GridWalls gridWalls)
     {
         visualizeDistanceEnabled = visualization.ShowDistance;
@@ -35,7 +38,7 @@ public class DebugGUI : MonoBehaviour
         
         this.pathfindingIOManager = pathfindingIOManager;
         this.enemyController = enemyController;
-        this.saveLoadSystem = saveLoadSystem;
+        this.godClass = godClass; // TODO Cross-dependency code smell 
         this.gridWalls = gridWalls;
     }
 
@@ -196,7 +199,7 @@ public class DebugGUI : MonoBehaviour
         if (GUI.Button(new Rect(buttonX, guiSaveLoadY, buttonWidth, buttonHeight), "Save"))
         {
             Debug.Log("Save pressed");
-            saveLoadSystem.OnSave();
+            godClass.OnSave();
         }
 
         guiSaveLoadY += yBetweenButtons;
@@ -204,7 +207,7 @@ public class DebugGUI : MonoBehaviour
         if (GUI.Button(new Rect(buttonX, guiSaveLoadY, buttonWidth, buttonHeight), "Load"))
         {
             Debug.Log("Load pressed");
-            saveLoadSystem.OnLoad();
+            godClass.OnLoad();
         }
 
         // === //
