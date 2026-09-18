@@ -19,6 +19,8 @@ public class GridView : MonoBehaviour
     private GridLayout layout;
     private DirectionMarker[,] directionMarkers;
 
+    private GameObject spawnObj;
+
     private bool isInitialized;
 
     public void Initialize(GridLayout layout, Coord spawnPos, Coord goalPos,
@@ -47,7 +49,7 @@ public class GridView : MonoBehaviour
 
                 if (coord == spawnPos)
                 {
-                    InstantiateMarker(spawnPrefab, coord);
+                    spawnObj = InstantiateMarker(spawnPrefab, coord);
                 }
                 else if (coord == goalPos)
                 {
@@ -157,6 +159,8 @@ public class GridView : MonoBehaviour
     public void SetVisualizationVisible(bool isVisible)
     {
         Debug.Assert(isInitialized);
+
+        spawnObj.SetActive(isVisible);
 
         for (int x = 0; x < layout.Width; x++)
         {

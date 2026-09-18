@@ -17,7 +17,7 @@ public class CameraControl
     public void Initialize()
     {
         cameraStartPosition = Camera.main.transform.position;
-        maxCameraY = cameraStartPosition.y * 2;
+        maxCameraY = cameraStartPosition.y * 4;
     }
 
     public void ControlCamera()
