@@ -89,13 +89,10 @@ public class TreasureMap
 
     public void SetWall(Coord c, bool hasWall) => wallMap[c.X, c.Z] = hasWall;
 
-    public bool[,] Walls()
-    {
-        return wallMap;
-    }
+    public bool HasWall(Coord c) => wallMap[c.X, c.Z];
 
-    public bool CanPlaceWall(Coord c) => SpawnGoalKindAt(c) == SpawnGoalKind.Floor
-        && !wallMap[c.X, c.Z];
+
+    public bool CanPlaceWall(Coord c) => SpawnGoalKindAt(c) == SpawnGoalKind.Floor && !HasWall(c);
 
     private SpawnGoalKind SpawnGoalKindAt(Coord coord)
     {

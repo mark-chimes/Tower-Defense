@@ -24,15 +24,14 @@ public class GridWalls : MonoBehaviour
         this.onWallChange = onWallChange;
         walls = new Wall[treasureMap.Width, treasureMap.Height];
 
-        bool[,] wallBool = treasureMap.Walls(); // feels weird, yes? 
-
         for (int x = 0; x < treasureMap.Width; x++)
         {
             for (int z = 0; z < treasureMap.Height; z++)
             {
-                if (wallBool[x, z])
+                Coord c = new Coord(x,z);
+                if (treasureMap.HasWall(c))
                 {
-                    MakeWallAt(new Coord(x, z));
+                    MakeWallAt(c);
                 }
             }
 

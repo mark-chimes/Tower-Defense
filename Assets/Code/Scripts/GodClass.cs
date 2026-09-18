@@ -79,7 +79,9 @@ public class GodClass : MonoBehaviour
 
     void CreateMapFromData(SaveableLevel loaded)
     {
-        treasureMap = new TreasureMap(loaded.Width, loaded.Height, loaded.WallMap(), treasureMap.SpawnPos, treasureMap.GoalPos,
+        treasureMap = new TreasureMap(loaded.Width, loaded.Height, loaded.WallMap(), 
+            treasureMap.SpawnPos, 
+            treasureMap.GoalPos,
             StartingIsStopOnPathFound,
             enemyController.PathfindingUpdate,
             enemyController.PathfindingClear);
