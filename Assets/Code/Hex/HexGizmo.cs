@@ -12,7 +12,7 @@ public static class HexGizmo
         int height = layout.Height;
 
         Gizmos.matrix = transform.localToWorldMatrix;
-        Vector3 size = new Vector3(GridLayout.CellSize, 1f, GridLayout.CellSize);
+        Vector3 size = new Vector3(HexLayout.CellSize, 1f, HexLayout.CellSize);
 
         HexCoord spawnPos = gridAuthor.SpawnPos;
         HexCoord goalPos = gridAuthor.GoalPos;

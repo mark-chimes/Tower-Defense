@@ -1,6 +1,6 @@
 using System;
 
-public readonly struct HexCoord : IEquatable<Coord>
+public readonly struct HexCoord : IEquatable<HexCoord>
 {
     public int X { get; }
     public int Z { get; }
@@ -19,50 +19,50 @@ public readonly struct HexCoord : IEquatable<Coord>
     public override int GetHashCode() => HashCode.Combine(X, Z);
     public override string ToString() => $"({X}, {Z})";
 
-    public bool Equals(Coord other) => X == other.X && Z == other.Z;
-    public override bool Equals(object obj) => obj is Coord c && Equals(c);
+    public bool Equals(HexCoord other) => X == other.X && Z == other.Z;
+    public override bool Equals(object obj) => obj is HexCoord c && Equals(c);
 
     public static bool operator ==(HexCoord a, HexCoord b) => a.Equals(b);
     public static bool operator !=(HexCoord a, HexCoord b) => !a.Equals(b);
 
-    public HexCoord InDirection(Compass dir) 
+    public HexCoord InDirection(HexCompass dir) 
     {
         int x_diff = 0;
         int z_diff = 0;
 
         switch (dir) 
         {
-            case Compass.North: z_diff = 1; break;
-            case Compass.East: x_diff = 1;  break;
-            case Compass.South: z_diff = -1; break;
-            case Compass.West: x_diff = -1;  break;
-            case Compass.None: break;  
+            case HexCompass.North: z_diff = 1; break;
+            case HexCompass.East: x_diff = 1;  break;
+            case HexCompass.South: z_diff = -1; break;
+            case HexCompass.West: x_diff = -1;  break;
+            case HexCompass.None: break;  
         }
 
         return Shifted(x_diff, z_diff);
     }
 
     // TODO should this be a Coord? 
-    public static HexCoord ForDirection(Compass dir) 
+    public static HexCoord ForDirection(HexCompass dir) 
     {
         int x_diff = 0;
         int z_diff = 0;
 
         switch (dir) 
         {
-            case Compass.North: z_diff = 1; break;
-            case Compass.East: x_diff = 1;  break;
-            case Compass.South: z_diff = -1; break;
-            case Compass.West: x_diff = -1;  break;
-            case Compass.None: break;  
+            case HexCompass.North: z_diff = 1; break;
+            case HexCompass.East: x_diff = 1;  break;
+            case HexCompass.South: z_diff = -1; break;
+            case HexCompass.West: x_diff = -1;  break;
+            case HexCompass.None: break;  
         }
 
         return new HexCoord(x_diff, z_diff);
     }
 
-    public HexCoord? InDirectionInBoundsNonSelf(Compass dir, int width, int height)
+    public HexCoord? InDirectionInBoundsNonSelf(HexCompass dir, int width, int height)
     {
-        if (dir == Compass.None) {
+        if (dir == HexCompass.None) {
             return null;
         }
 
