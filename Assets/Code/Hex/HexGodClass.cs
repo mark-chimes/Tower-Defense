@@ -5,6 +5,11 @@ public class HexGodClass : MonoBehaviour
 {
     [SerializeField] private HexAuthor gridAuthor;
 
+    [SerializeField] private Mesh hexMesh;
+
+    [SerializeField] private bool isWire;
+
+
     CameraControl camControl;
 
     void Awake()
@@ -24,6 +29,6 @@ public class HexGodClass : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        HexGizmo.Draw(gridAuthor, transform);
+        HexGizmo.Draw(gridAuthor, hexMesh, transform,isWire);
     }
 }

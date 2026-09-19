@@ -2,35 +2,40 @@ using UnityEngine;
 
 public class HexLayout
 {
-    public readonly int Width;
-    public readonly int Height;
-    public const float CellSize = 10f;
+    public readonly int NumRings;
+
+    public const float CellWidth = 10f; // center of one cell to center of another - the small diameter
+    public static readonly float CellHeight = CellWidth * 2f / Mathf.Sqrt(3f); 
+    // large diamater / diagonal 
+
+    public  float cellWidth = CellHeight * Mathf.Sqrt(3f) / 2f ; 
+
+
     public const float SqrClose = 0.01f; // TODO what's a good value here? 
 
-    public HexLayout(int width, int height)
+    public HexLayout(int numRings)
     {
-        Width = width;
-        Height = height;
+        NumRings = numRings;
     }
 
-    public Vector3 CoordsToWorld(HexCoord coord)
+    public static Vector3 CoordsToWorld(HexCoord coord)
     {
-        float worldX = (coord.X - (Width - 1) / 2f) * CellSize;
-        float worldZ = (coord.Z - (Height - 1) / 2f) * CellSize;
-        return new Vector3(worldX, 0f, worldZ);
+        float posX = CellWidth * coord.Q + CellWidth / 2f * coord.R; // Horizontal spacing W
+        float posZ = 3f/4f * CellHeight  * coord.R; // Vertical spacing: 3/4 * H
+        return new Vector3 (posX, 0f, posZ);
     }
 
-    public Vector3 CompassToVector3(Compass compassDir)
-    {
-        HexCoord dir = HexCoord.ForDirection(compassDir);
-        return new Vector3(dir.X, 0f, dir.Z);
-    }
+    // public Vector3 CompassToVector3(HexCompass compassDir)
+    // {
+    //     HexCoord dir = HexCoord.ForDirection(compassDir);
+    //     return new Vector3(dir.X, 0f, dir.Z);
+    // }
 
-    public Quaternion CompassToQuaternion(Compass compassDir)
-    {
-        Quaternion targetRotation = Quaternion.LookRotation(CompassToVector3(compassDir));
-        return targetRotation;
-    }
+    // public Quaternion CompassToQuaternion(HexCompass compassDir)
+    // {
+    //     Quaternion targetRotation = Quaternion.LookRotation(CompassToVector3(compassDir));
+    //     return targetRotation;
+    // }
 
     public bool AreVector3Close(Vector3 first, Vector3 second)
     {
