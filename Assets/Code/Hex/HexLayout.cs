@@ -8,8 +8,6 @@ public class HexLayout
     public static readonly float CellHeight = CellWidth * 2f / Mathf.Sqrt(3f); 
     // large diamater / diagonal 
 
-    public  float cellWidth = CellHeight * Mathf.Sqrt(3f) / 2f ; 
-
 
     public const float SqrClose = 0.01f; // TODO what's a good value here? 
 
@@ -18,7 +16,7 @@ public class HexLayout
         NumRings = numRings;
     }
 
-    public static Vector3 CoordsToWorld(HexCoord coord)
+    public Vector3 CoordsToWorld(HexCoord coord)
     {
         float posX = CellWidth * coord.Q + CellWidth / 2f * coord.R; // Horizontal spacing W
         float posZ = 3f/4f * CellHeight  * coord.R; // Vertical spacing: 3/4 * H

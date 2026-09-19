@@ -11,11 +11,27 @@ public readonly struct HexCoord : IEquatable<HexCoord>
     {
         Q = q;
         R = r;
-        S = -q-r;
+        S = -q - r;
     }
 
-    // public HexCoord Shifted(int x, int z) => new HexCoord(X + x, Z + z);
-    // public HexCoord Shifted(HexCoord shift) => new HexCoord(X + shift.X, Z + shift.Z);
+    public HexCoord ShiftedAxial(int q, int r) => new HexCoord(Q + q, R + r);
+    public HexCoord Shifted(HexCoord shift) => new HexCoord(Q + shift.Q, R + shift.R);
+
+    public HexCoord[] Neighbours()
+    {
+        HexCoord[] neighbors = new HexCoord[6];
+        for (int i = 0; i < 6; i++)
+        {
+            neighbors[i] = Shifted(HexCompassExtension.AllDirs[i].Offset());
+        }
+        return neighbors;
+    }
+
+    // Mirrored across the origin
+    public HexCoord Negative()
+    {
+        return new HexCoord(-Q, -R);
+    }
 
     // public bool InBounds(int width, int height) => X >= 0 && Z >= 0 && X < width && Z < height;
 

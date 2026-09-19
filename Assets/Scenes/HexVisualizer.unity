@@ -328,7 +328,7 @@ MonoBehaviour:
     spawnPosInitXZ: {x: 0, y: 0}
     goalPosInitXZ: {x: 1, y: 1}
   hexMesh: {fileID: -6145683337337129500, guid: 91be09977fa273e48a2a9b3b7ad4ff6b, type: 3}
-  isWire: 0
+  isWire: 1
 --- !u!1 &961739749
 GameObject:
   m_ObjectHideFlags: 0
