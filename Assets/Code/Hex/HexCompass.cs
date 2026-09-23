@@ -2,49 +2,49 @@ using System;
 
 public enum HexCompass
 {
-    R,
-    UR,
-    UL,
-    L,
-    DL,
-    DR,
     NONE,
+    E,
+    NE,
+    NW,
+    W,
+    SW,
+    SE,
 }
 
 public static class HexCompassExtension
 {
     private static readonly HexCompass[] allDirs =
     {
-        HexCompass.R,
-        HexCompass.UR,
-        HexCompass.UL,
-        HexCompass.L,
-        HexCompass.DL,
-        HexCompass.DR,
+        HexCompass.E,
+        HexCompass.NE,
+        HexCompass.NW,
+        HexCompass.W,
+        HexCompass.SW,
+        HexCompass.SE,
     };
 
-    
+
     public static ReadOnlySpan<HexCompass> AllDirs => allDirs;
-    
+
     public static HexCoord Offset(this HexCompass dir) => dir switch
     {
-        HexCompass.R => new HexCoord(+1, 0),
-        HexCompass.UR => new HexCoord(0, +1),
-        HexCompass.UL => new HexCoord(-1, +1),
-        HexCompass.L => new HexCoord(-1, 0),
-        HexCompass.DL => new HexCoord(0, -1),
-        HexCompass.DR => new HexCoord(+1, -1),
+        HexCompass.E => new HexCoord(+1, 0),
+        HexCompass.NE => new HexCoord(0, +1),
+        HexCompass.NW => new HexCoord(-1, +1),
+        HexCompass.W => new HexCoord(-1, 0),
+        HexCompass.SW => new HexCoord(0, -1),
+        HexCompass.SE => new HexCoord(+1, -1),
         _ => throw new ArgumentOutOfRangeException(nameof(dir)),
     };
 
     public static HexCompass Opposite(this HexCompass dir) => dir switch
     {
-        HexCompass.R => HexCompass.L,
-        HexCompass.UR => HexCompass.DL,
-        HexCompass.UL => HexCompass.DR,
-        HexCompass.L => HexCompass.R,
-        HexCompass.DL => HexCompass.UR,
-        HexCompass.DR => HexCompass.UL,
+        HexCompass.E => HexCompass.W,
+        HexCompass.NE => HexCompass.SW,
+        HexCompass.NW => HexCompass.SE,
+        HexCompass.W => HexCompass.E,
+        HexCompass.SW => HexCompass.NE,
+        HexCompass.SE => HexCompass.NW,
         _ => throw new ArgumentOutOfRangeException(nameof(dir)),
     };
 
