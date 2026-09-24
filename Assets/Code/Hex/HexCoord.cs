@@ -50,6 +50,6 @@ public readonly struct HexCoord : IEquatable<HexCoord>
         return Math.Max(Math.Abs(Q), Math.Max(Math.Abs(R), Math.Abs(S)));
     }
 
-    public HexCoord InDirection(HexCompass dir) => dir.Offset();
+    public HexCoord InDirection(HexCompass dir) => Shifted(dir.Offset());
 }
 
