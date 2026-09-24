@@ -6,9 +6,7 @@ public class FlowField
     public readonly int Width;
     public readonly int Height;
 
-    public readonly int[,] distance;
-    public readonly Compass[,] dirToGoal;
-    public readonly bool[,] onCriticalPath;
+    private readonly Tile[,] tiles;
 
     public FlowField(
         int width, int height)
@@ -16,19 +14,8 @@ public class FlowField
         Width = width;
         Height = height;
 
-        distance = new int[Width, Height];
-        dirToGoal = new Compass[Width, Height];
-        onCriticalPath = new bool[Width, Height];
-
-        for (int x = 0; x < Width; x++)
-        {
-            for (int z = 0; z < Height; z++)
-            {
-                distance[x, z] = -1;
-                dirToGoal[x, z] = Compass.None;
-                onCriticalPath[x, z] = false;
-            }
-        }
+        tiles = new Tile[Width, Height];
+        ClearTiles();
     }
 
     public IReadOnlyCollection<Signpost> Signposts()
@@ -45,9 +32,42 @@ public class FlowField
         return list;
     }
 
-    public int DistanceAt(Coord c) => distance[c.X, c.Z];
-    public Compass DirectionAt(Coord c) => dirToGoal[c.X, c.Z];
-    public bool OnCriticalPath(Coord c) => onCriticalPath[c.X, c.Z];
-    public bool Reachable(Coord c) => distance[c.X, c.Z] >= 0;
+    public Tile TileAt(Coord c) => tiles[c.X, c.Z];
+
+    public void SetTile(Coord c, Tile t) => tiles[c.X, c.Z] = t;
+
+    public int DistanceAt(Coord c) => TileAt(c).Distance;
+    public Compass DirectionAt(Coord c) => TileAt(c).DirToGoal;
+    public bool OnCriticalPath(Coord c) => TileAt(c).OnCriticalPath;
+    public bool Reachable(Coord c) => TileAt(c).Distance >= 0;
+
+
+    public struct Tile
+
+    {
+        public readonly int Distance;
+        public readonly Compass DirToGoal;
+        public readonly bool OnCriticalPath;
+
+        public Tile(int distance, Compass dirToGoal, bool onCriticalPath)
+        {
+            Distance = distance;
+            DirToGoal = dirToGoal;
+            OnCriticalPath = onCriticalPath;
+        }
+    }
+
+    public static readonly Tile UnreachedTile = new Tile(-1, Compass.None, false);
+
+    private void ClearTiles()
+    {
+        for (int x = 0; x < Width; x++)
+        {
+            for (int z = 0; z < Height; z++)
+            {
+                tiles[x,z] = UnreachedTile;
+            }
+        }
+    }
 
 }

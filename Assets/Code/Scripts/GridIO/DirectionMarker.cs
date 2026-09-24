@@ -16,7 +16,7 @@ public class DirectionMarker : MonoBehaviour
 
     public void Awake()
     {
-        highlightableTile = GetComponentInChildren<Tile>();
+        highlightableTile = GetComponentInChildren<Flagstone>();
 
     }
 

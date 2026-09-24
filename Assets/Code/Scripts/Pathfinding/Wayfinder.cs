@@ -72,7 +72,7 @@ public class Wayfinder
         }
 
         visited[c.X, c.Z] = true;
-        currentFlow.distance[c.X, c.Z] = 0;
+        currentFlow.SetTile(c, new FlowField.Tile(0, Compass.None, false));
         erfQueue.Enqueue(c);
     }
 
@@ -108,12 +108,9 @@ public class Wayfinder
 
         if (phase != Search.Phase.ExpandFrontier) return list;
 
-        int[,] distances = currentFlow.distance;
-        Compass[,] dirsToGoal = currentFlow.dirToGoal;
-
         if (erfQueue.TryDequeue(out var coord))
         {
-            int dist = distances[coord.X, coord.Z];
+            int prevDist = currentFlow.TileAt(coord).Distance;
 
             foreach (Compass dir in CompassExtension.AllDirs)
             {
@@ -126,39 +123,38 @@ public class Wayfinder
                 visited[c.X, c.Z] = true;
                 if (wallMap.HasWall(c))
                 {
-                    distances[c.X, c.Z] = -1;
                     continue;
                 }
 
-                distances[c.X, c.Z] = dist + 1;
+                Compass newDir;
+                Coord target;
                 switch (SearchDirection)
                 {
                     case Search.Dir.FromStart:
                         {
-                            dirsToGoal[c.X, c.Z] = dir;
-                            list.Add(new Signpost(c, currentFlow));
-
-                            if (isStopOnPathFound && c == GoalPos)
-                            {
-                                phase = Search.Phase.TracePath;
-                                return list;
-                            }
+                            newDir = dir;
+                            target = GoalPos;
                             break;
                         }
                     case Search.Dir.FromEnd:
                         {
-                            dirsToGoal[c.X, c.Z] = dir.Opposite();
-                            list.Add(new Signpost(c, currentFlow));
-
-                            if (isStopOnPathFound && c == SpawnPos)
-                            {
-                                phase = Search.Phase.TracePath;
-                                return list;
-                            }
+                            newDir = dir.Opposite();
+                            target = SpawnPos;
                             break;
                         }
                     default: { phase = Search.Phase.Done; return list; } // TODO
                 }
+
+                FlowField.Tile newTile = new FlowField.Tile(prevDist + 1, newDir, false);
+                currentFlow.SetTile(c, newTile);
+                list.Add(new Signpost(c, currentFlow));
+
+                if (isStopOnPathFound && c == target)
+                {
+                    phase = Search.Phase.TracePath;
+                    return list;
+                }
+
                 erfQueue.Enqueue(c);
             }
         }
@@ -174,20 +170,20 @@ public class Wayfinder
         IReadOnlyCollection<Signpost> empty = System.Array.Empty<Signpost>();
         if (phase != Search.Phase.TracePath) { phase = Search.Phase.Done; return empty; }
 
-        bool[,] onCriticalPath = currentFlow.onCriticalPath;
-        Compass[,] dirsToGoal = currentFlow.dirToGoal;
-
         if (SearchDirection == Search.Dir.Dual) { phase = Search.Phase.Done; return empty; } // TODO
 
         if (pathC == null) { phase = Search.Phase.Done; return empty; }
 
         Coord coord = (Coord)pathC;
-        onCriticalPath[coord.X, coord.Z] = true;
+        FlowField.Tile oldTile = currentFlow.TileAt(coord);
+        FlowField.Tile newTile = new FlowField.Tile(oldTile.Distance, oldTile.DirToGoal, true);
+        currentFlow.SetTile(coord, newTile);
+
         Compass dir;
         switch (SearchDirection)
         {
-            case Search.Dir.FromStart: dir = dirsToGoal[coord.X, coord.Z].Opposite(); break;
-            case Search.Dir.FromEnd: dir = dirsToGoal[coord.X, coord.Z]; break;
+            case Search.Dir.FromStart: dir = oldTile.DirToGoal.Opposite(); break;
+            case Search.Dir.FromEnd: dir = oldTile.DirToGoal; break;
             default: dir = Compass.None; break; // TODO
         }
         pathC = coord.InDirectionInBoundsNonSelf(dir, Width, Height);
