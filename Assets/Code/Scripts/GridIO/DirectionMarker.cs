@@ -10,13 +10,13 @@ public class DirectionMarker : MonoBehaviour
     [SerializeField] private Color pathHighlightColor = Color.cyan;
     [SerializeField] private Color frontierHighlightColor = Color.red;
 
-    private Highlightable highlightableTile;
+    private Highlightable highlightableFlagstone;
 
     public Coord Coord { get; private set; }
 
     public void Awake()
     {
-        highlightableTile = GetComponentInChildren<Flagstone>();
+        highlightableFlagstone = GetComponentInChildren<Flagstone>();
 
     }
 
@@ -44,7 +44,7 @@ public class DirectionMarker : MonoBehaviour
 
     public Highlightable HighlightableTile()
     {
-        return highlightableTile;
+        return highlightableFlagstone;
     }
 
     public enum ArrowAccent

@@ -65,7 +65,7 @@ public class FlowField
         {
             for (int z = 0; z < Height; z++)
             {
-                tiles[x,z] = UnreachedTile;
+                tiles[x, z] = UnreachedTile;
             }
         }
     }
