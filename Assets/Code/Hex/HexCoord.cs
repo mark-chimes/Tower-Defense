@@ -1,5 +1,8 @@
 using System;
 
+// Check https://www.redblobgames.com/grids/hexagons for more info
+// We use an axial coordinate system which provides a cubic interface
+
 public readonly struct HexCoord : IEquatable<HexCoord>
 {
     public readonly int Q;
@@ -33,8 +36,6 @@ public readonly struct HexCoord : IEquatable<HexCoord>
         return new HexCoord(-Q, -R);
     }
 
-    // public bool InBounds(int width, int height) => X >= 0 && Z >= 0 && X < width && Z < height;
-
     public override int GetHashCode() => HashCode.Combine(Q, R);
     public override string ToString() => $"({Q}, {R}, {S})";
 
@@ -44,53 +45,11 @@ public readonly struct HexCoord : IEquatable<HexCoord>
     public static bool operator ==(HexCoord a, HexCoord b) => a.Equals(b);
     public static bool operator !=(HexCoord a, HexCoord b) => !a.Equals(b);
 
-    // public HexCoord InDirection(HexCompass dir) 
-    // {
-    //     int x_diff = 0;
-    //     int z_diff = 0;
+    public int Length()
+    {
+        return Math.Max(Math.Abs(Q), Math.Max(Math.Abs(R), Math.Abs(S)));
+    }
 
-    //     switch (dir) 
-    //     {
-    //         case HexCompass.North: z_diff = 1; break;
-    //         case HexCompass.East: x_diff = 1;  break;
-    //         case HexCompass.South: z_diff = -1; break;
-    //         case HexCompass.West: x_diff = -1;  break;
-    //         case HexCompass.None: break;  
-    //     }
-
-    //     return Shifted(x_diff, z_diff);
-    // }
-
-    // TODO should this be a Coord? 
-    // public static HexCoord ForDirection(HexCompass dir) 
-    // {
-    //     int x_diff = 0;
-    //     int z_diff = 0;
-
-    //     switch (dir) 
-    //     {
-    //         case HexCompass.North: z_diff = 1; break;
-    //         case HexCompass.East: x_diff = 1;  break;
-    //         case HexCompass.South: z_diff = -1; break;
-    //         case HexCompass.West: x_diff = -1;  break;
-    //         case HexCompass.None: break;  
-    //     }
-
-    //     return new HexCoord(x_diff, z_diff);
-    // }
-
-    // public HexCoord? InDirectionInBoundsNonSelf(HexCompass dir, int width, int height)
-    // {
-    //     if (dir == HexCompass.None) {
-    //         return null;
-    //     }
-
-    //     HexCoord shifted = InDirection(dir);
-    //     if (!shifted.InBounds(width, height))
-    //     {
-    //         return null;
-    //     }
-    //     return shifted;
-    // }
+    public HexCoord InDirection(HexCompass dir) => dir.Offset();
 }
 
