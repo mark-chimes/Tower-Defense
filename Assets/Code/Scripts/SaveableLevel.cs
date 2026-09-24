@@ -8,11 +8,11 @@ public class SaveableLevel
     public int Height;
     public bool[] IsWall; // 1D flattening of 2D array
 
-    public SaveableLevel(int width, int height, WallMap wallMap)
+    public SaveableLevel(int width, int height, RectMap<bool> wallMap)
     {
         Width = width;
         Height = height;
-        IsWall = wallMap.FlattenedWallMap();
+        IsWall = wallMap.MapAsFlatArray();
     }
 
     public string ToJson()
@@ -25,9 +25,9 @@ public class SaveableLevel
         return JsonUtility.FromJson<SaveableLevel>(json);
     }
 
-    public WallMap LoadMap()
+    public RectMap<bool> LoadMap()
     {
-        return WallMap.FromFlatMap(IsWall, Width, Height);
+        return RectMap<bool>.MapFromArray(IsWall, Width, Height);
     }
 
     public override string ToString()

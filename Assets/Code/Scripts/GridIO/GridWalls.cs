@@ -6,7 +6,7 @@ public class GridWalls : MonoBehaviour
 
     [SerializeField] private Wall wallPrefab;
 
-    private Wall[,] walls;
+    private RectMap<Wall> walls;
     private TreasureMap treasureMap;
     private GridLayout layout;
 
@@ -22,13 +22,13 @@ public class GridWalls : MonoBehaviour
         this.treasureMap = treasureMap;
         this.layout = layout;
         this.onWallChange = onWallChange;
-        walls = new Wall[treasureMap.Width, treasureMap.Height];
+        walls = new RectMap<Wall>(treasureMap.Width, treasureMap.Height);
 
         for (int x = 0; x < treasureMap.Width; x++)
         {
             for (int z = 0; z < treasureMap.Height; z++)
             {
-                Coord c = new Coord(x,z);
+                Coord c = new Coord(x, z);
                 if (treasureMap.HasWall(c))
                 {
                     MakeWallAt(c);
@@ -58,14 +58,14 @@ public class GridWalls : MonoBehaviour
 
     public Highlightable MaybeWall(Coord c)
     {
-        return walls[c.X, c.Z];
+        return walls.At(c);
     }
 
 
     public void SpawnWall(Coord c)
     {
         Debug.Assert(treasureMap != null, "GridWalls.Initialize was never called");
-        if (walls[c.X, c.Z] != null) return;
+        if (walls.At(c) != null) return;
 
         ErfSnapshot erf = treasureMap.At(c);
 
@@ -85,14 +85,14 @@ public class GridWalls : MonoBehaviour
         Wall wall = Instantiate(wallPrefab, transform);
         wall.transform.localPosition = layout.CoordsToWorld(c);
         wall.name = $"Wall_{c.X}_{c.Z}";
-        walls[c.X, c.Z] = wall;
+        walls.SetAt(c, wall);
     }
 
     public void DespawnWall(Coord c)
     {
         Debug.Assert(treasureMap != null, "GridWalls.Initialize was never called");
 
-        Wall wall = walls[c.X, c.Z];
+        Wall wall = walls.At(c);
         if (wall == null) return;
 
         ErfSnapshot erf = treasureMap.At(c);
@@ -102,7 +102,7 @@ public class GridWalls : MonoBehaviour
             Debug.LogError($"DespawnWall: {c} Kind was {erf.Kind}", wall);
             return;
         }
-        walls[c.X, c.Z] = null;
+        walls.SetAt(c, null);
         Destroy(wall.gameObject);
         treasureMap.SetWall(c, false);
         onWallChange.Invoke();

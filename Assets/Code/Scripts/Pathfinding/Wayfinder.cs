@@ -5,7 +5,7 @@ public class Wayfinder
     public readonly Coord SpawnPos;
     public readonly Coord GoalPos;
 
-    private WallMap wallMap; // Do not modify
+    private RectMap<bool> wallMap; // Do not modify
 
     public int Width => wallMap.Width;
     public int Height => wallMap.Height;
@@ -21,12 +21,12 @@ public class Wayfinder
 
 
 
-    bool[,] visited;
+    bool[,] visited; // TODO RectMap<bool>
     Queue<Coord> erfQueue;
     Coord? pathC;
 
 
-    public Wayfinder(WallMap wallMap, Coord spawnPos, Coord goalPos, Search.Dir searchDirection, bool isStopOnPathFound)
+    public Wayfinder(RectMap<bool> wallMap, Coord spawnPos, Coord goalPos, Search.Dir searchDirection, bool isStopOnPathFound)
     {
         this.wallMap = wallMap;
         currentFlow = new FlowField(Width, Height);
@@ -121,7 +121,7 @@ public class Wayfinder
                 }
 
                 visited[c.X, c.Z] = true;
-                if (wallMap.HasWall(c))
+                if (wallMap.At(c))
                 {
                     continue;
                 }

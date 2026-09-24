@@ -55,7 +55,7 @@ public class GodClass : MonoBehaviour
     public void OnLoad()
     {
         SaveableLevel loaded = saveLoadSystem.OnLoad();
-
+ 
         gridView.ClearData();
         gridWalls.ClearData();
         enemyController.ClearData();
@@ -67,7 +67,7 @@ public class GodClass : MonoBehaviour
     {
         int width = gridAuthor.Layout.Width;
         int height = gridAuthor.Layout.Height;
-        WallMap wallMap = new WallMap(width, height);
+        RectMap<bool>  wallMap = new RectMap<bool>(width, height);
         Coord spawnPos = gridAuthor.SpawnPos;
         Coord goalPos = gridAuthor.GoalPos;
 
@@ -79,7 +79,7 @@ public class GodClass : MonoBehaviour
 
     void CreateMapFromData(SaveableLevel loaded)
     {
-        WallMap loadedMap = loaded.LoadMap();
+        RectMap<bool> loadedMap = loaded.LoadMap();
 
         treasureMap = new TreasureMap(loadedMap, 
             treasureMap.SpawnPos, 

@@ -68,8 +68,6 @@ public class RectMap<T>
         return $"RectMap<{typeof(T).Name}> with Width: {Width}, Height: {Height}";
     }
 
-
-
     private RectMap(T[,] map)
     {
         this.map = map;

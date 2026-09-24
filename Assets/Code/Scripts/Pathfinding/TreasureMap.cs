@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public class TreasureMap
 {
 
-    private WallMap wallMap;
+    private RectMap<bool> wallMap;
     public int Width => wallMap.Width;
     public int Height => wallMap.Height;
 
@@ -18,7 +18,7 @@ public class TreasureMap
 
     private Wayfinder wayfinder;
 
-    public TreasureMap(WallMap wallMap, Coord spawnPos, Coord goalPos, bool isStopOnPathFound,
+    public TreasureMap(RectMap<bool> wallMap, Coord spawnPos, Coord goalPos, bool isStopOnPathFound,
     Action onPathfindingUpdate, Action onPathfindingClear)
     {
         this.wallMap = wallMap;
@@ -70,7 +70,7 @@ public class TreasureMap
     // TODO check this works if pathfinding is not set
     public ErfSnapshot At(Coord coord)
     {
-        return new ErfSnapshot(coord, SpawnGoalKindAt(coord), wallMap.HasWall(coord));
+        return new ErfSnapshot(coord, SpawnGoalKindAt(coord), wallMap.At(coord));
     }
 
     public Signpost SignpostAt(Coord coord)
@@ -85,9 +85,9 @@ public class TreasureMap
 
     public Signpost SignpostAt(int x, int z) => SignpostAt(new Coord(x, z));
 
-    public void SetWall(Coord c, bool hasWall) => wallMap.SetWall(c, hasWall);
+    public void SetWall(Coord c, bool hasWall) => wallMap.SetAt(c, hasWall);
 
-    public bool HasWall(Coord c) => wallMap.HasWall(c);
+    public bool HasWall(Coord c) => wallMap.At(c);
 
 
     public bool CanPlaceWall(Coord c) => SpawnGoalKindAt(c) == SpawnGoalKind.Floor && !HasWall(c);
