@@ -3,14 +3,14 @@ public class WallMap
 {
 
     private bool[,] map;
-    private int width;
-    private int height;
+    public readonly int Width;
+    public readonly int Height;
 
-    public WallMap(int Width, int Height)
+    public WallMap(int width, int height)
     {
-        map = new bool[Width, Height];
-        width = Width;
-        height = Height;
+        map = new bool[width, height];
+        Width = width;
+        Height = height;
     }
 
     public bool HasWall(Coord c)
@@ -25,12 +25,12 @@ public class WallMap
 
     public bool[] FlattenedWallMap()
     {
-        bool[] flatMap = new bool[width * height];
-        for (int x = 0; x < width; x++)
+        bool[] flatMap = new bool[Width * Height];
+        for (int x = 0; x < Width; x++)
         {
-            for (int z = 0; z < height; z++)
+            for (int z = 0; z < Height; z++)
             {
-                flatMap[z * width + x] = map[x, z];
+                flatMap[z * Width + x] = map[x, z];
             }
         }
         return flatMap;
@@ -49,15 +49,15 @@ public class WallMap
         return new WallMap(wallMap, Width, Height);
     }
 
-    private WallMap(bool[,] map, int Width, int Height)
+    private WallMap(bool[,] map, int width, int height)
     {
         this.map = map;
-        width = Width;
-        height = Height;
+        Width = width;
+        Height = height;
     }
 
     public override string ToString()
     {
-        return $"WallMap Width: {width}, Height: {height}, Flat Array: ({map[0, 0]})";
+        return $"WallMap Width: {Width}, Height: {Height}";
     }
 }

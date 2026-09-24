@@ -5,8 +5,8 @@ public class TreasureMap
 {
 
     private WallMap wallMap;
-    public readonly int Width;
-    public readonly int Height;
+    public int Width => wallMap.Width;
+    public int Height => wallMap.Height;
 
     public readonly Coord SpawnPos;
     public readonly Coord GoalPos;
@@ -18,11 +18,9 @@ public class TreasureMap
 
     private Wayfinder wayfinder;
 
-    public TreasureMap(int width, int height, WallMap wallMap, Coord spawnPos, Coord goalPos, bool isStopOnPathFound,
+    public TreasureMap(WallMap wallMap, Coord spawnPos, Coord goalPos, bool isStopOnPathFound,
     Action onPathfindingUpdate, Action onPathfindingClear)
     {
-        Width = width;
-        Height = height;
         this.wallMap = wallMap;
         SpawnPos = spawnPos;
         GoalPos = goalPos;
@@ -37,7 +35,7 @@ public class TreasureMap
     /// <param name="isStopOnPathFound"></param> stop pathfinding once shortest path found or continue completing the flow-field
     public void RecreateWayfinder(bool isStopOnPathFound)
     {
-        wayfinder = new Wayfinder(Width, Height, wallMap, SpawnPos, GoalPos, Search.Dir.FromEnd, isStopOnPathFound);
+        wayfinder = new Wayfinder(wallMap, SpawnPos, GoalPos, Search.Dir.FromEnd, isStopOnPathFound);
     }
 
     public IReadOnlyCollection<Coord> CurrentFrontier()

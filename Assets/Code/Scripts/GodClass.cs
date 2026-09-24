@@ -71,7 +71,7 @@ public class GodClass : MonoBehaviour
         Coord spawnPos = gridAuthor.SpawnPos;
         Coord goalPos = gridAuthor.GoalPos;
 
-        treasureMap = new TreasureMap(width, height, wallMap, spawnPos, goalPos, StartingIsStopOnPathFound,
+        treasureMap = new TreasureMap(wallMap, spawnPos, goalPos, StartingIsStopOnPathFound,
             enemyController.PathfindingUpdate, enemyController.PathfindingClear);
 
         CreateMapFromTreasureMap(treasureMap);
@@ -81,7 +81,7 @@ public class GodClass : MonoBehaviour
     {
         WallMap loadedMap = loaded.LoadMap();
 
-        treasureMap = new TreasureMap(loaded.Width, loaded.Height, loadedMap, 
+        treasureMap = new TreasureMap(loadedMap, 
             treasureMap.SpawnPos, 
             treasureMap.GoalPos,
             StartingIsStopOnPathFound,

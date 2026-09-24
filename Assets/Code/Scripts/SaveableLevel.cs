@@ -2,7 +2,6 @@ using UnityEngine;
 
 [System.Serializable]
 
-// TODO should this live on the WallMap class?
 public class SaveableLevel
 {
     public int Width;
@@ -33,7 +32,7 @@ public class SaveableLevel
 
     public override string ToString()
     {
-        return $"SaveableLevel Width: {Width}, Height: {Height}, Flat Array: {IsWall})";
+        return $"SaveableLevel Width: {Width}, Height: {Height}";
     }
 
 }

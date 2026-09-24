@@ -7,8 +7,8 @@ public class Wayfinder
 
     private WallMap wallMap; // Do not modify
 
-    public readonly int Width;
-    public readonly int Height;
+    public int Width => wallMap.Width;
+    public int Height => wallMap.Width;
 
     private readonly Search.Dir SearchDirection;
 
@@ -26,14 +26,12 @@ public class Wayfinder
     Coord? pathC;
 
 
-    public Wayfinder(int width, int height, WallMap wallMap, Coord spawnPos, Coord goalPos, Search.Dir searchDirection, bool isStopOnPathFound)
+    public Wayfinder(WallMap wallMap, Coord spawnPos, Coord goalPos, Search.Dir searchDirection, bool isStopOnPathFound)
     {
-        currentFlow = new FlowField(width, height);
+        this.wallMap = wallMap;
+        currentFlow = new FlowField(Width, Height);
         SpawnPos = spawnPos;
         GoalPos = goalPos;
-        Width = width;
-        Height = height;
-        this.wallMap = wallMap;
         SearchDirection = searchDirection;
         this.isStopOnPathFound = isStopOnPathFound;
         ClearField();
@@ -41,7 +39,7 @@ public class Wayfinder
 
     public Wayfinder WithNewSearchDir(Search.Dir searchDirection)
     {
-        return new Wayfinder(Width, Height, wallMap, SpawnPos, GoalPos, searchDirection, isStopOnPathFound);
+        return new Wayfinder(wallMap, SpawnPos, GoalPos, searchDirection, isStopOnPathFound);
     }
 
     public void ClearField()
@@ -125,7 +123,7 @@ public class Wayfinder
                     continue;
                 }
 
-                visited[c.X, c.Z] = true; 
+                visited[c.X, c.Z] = true;
                 if (wallMap.HasWall(c))
                 {
                     distances[c.X, c.Z] = -1;
