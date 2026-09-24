@@ -115,7 +115,7 @@ public class Wayfinder
             foreach (Compass dir in CompassExtension.AllDirs)
             {
                 Coord c = coord.InDirection(dir);
-                if (!c.InBounds(Width, Height) || visited.At(c))
+                if (!visited.IsCoordOnMap(c) || visited.At(c))
                 {
                     continue;
                 }
@@ -186,7 +186,15 @@ public class Wayfinder
             case Search.Dir.FromEnd: dir = oldTile.DirToGoal; break;
             default: dir = Compass.None; break; // TODO
         }
-        pathC = coord.InDirectionInBoundsNonSelf(dir, Width, Height);
+        if (dir == Compass.None)
+        {
+            pathC = null;
+        }
+        else
+        {
+            Coord next = coord.InDirection(dir);
+            pathC = wallMap.IsCoordOnMap(next) ? next : null;
+        }
         return new[] { new Signpost(coord, newTile) };
     }
 

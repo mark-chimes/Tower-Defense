@@ -14,7 +14,7 @@ public readonly struct Coord : IEquatable<Coord>
     public Coord Shifted(int x, int z) => new Coord(X + x, Z + z);
     public Coord Shifted(Coord shift) => new Coord(X + shift.X, Z + shift.Z);
 
-    public bool InBounds(int width, int height) => X >= 0 && Z >= 0 && X < width && Z < height;
+    private bool inBounds(int width, int height) => X >= 0 && Z >= 0 && X < width && Z < height;
 
     public override int GetHashCode() => HashCode.Combine(X, Z);
     public override string ToString() => $"({X}, {Z})";
@@ -60,6 +60,7 @@ public readonly struct Coord : IEquatable<Coord>
         return new Coord(x_diff, z_diff);
     }
 
+    // TODO maybe this should move?
     public Coord? InDirectionInBoundsNonSelf(Compass dir, int width, int height)
     {
         if (dir == Compass.None) {
@@ -67,7 +68,7 @@ public readonly struct Coord : IEquatable<Coord>
         }
 
         Coord shifted = InDirection(dir);
-        if (!shifted.InBounds(width, height))
+        if (!shifted.inBounds(width, height))
         {
             return null;
         }

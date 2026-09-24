@@ -3,18 +3,11 @@ using System.Collections.Generic;
 public class FlowField
 {
 
-    public readonly int Width;
-    public readonly int Height;
-
     private readonly RectMap<Tile> tiles;
 
-    public FlowField(
-        int width, int height)
+    public FlowField(int width, int height)
     {
-        Width = width;
-        Height = height;
-
-        tiles = new RectMap<Tile>(Width, Height);
+        tiles = new RectMap<Tile>(width, height);
         ClearTiles();
     }
 
