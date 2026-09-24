@@ -21,7 +21,7 @@ public class Wayfinder
 
 
 
-    bool[,] visited; // TODO RectMap<bool>
+    RectMap<bool> visited;
     Queue<Coord> erfQueue;
     Coord? pathC;
 
@@ -44,7 +44,7 @@ public class Wayfinder
 
     public void ClearField()
     {
-        visited = new bool[Width, Height];
+        visited = new RectMap<bool>(Width, Height);
         erfQueue = new Queue<Coord>();
         currentFlow = new FlowField(Width, Height);
         phase = Search.Phase.ExpandFrontier;
@@ -71,7 +71,7 @@ public class Wayfinder
                 }
         }
 
-        visited[c.X, c.Z] = true;
+        visited.SetAt(c, true);
         currentFlow.SetTile(c, new FlowField.Tile(0, Compass.None, false));
         erfQueue.Enqueue(c);
     }
@@ -115,12 +115,12 @@ public class Wayfinder
             foreach (Compass dir in CompassExtension.AllDirs)
             {
                 Coord c = coord.InDirection(dir);
-                if (!c.InBounds(Width, Height) || visited[c.X, c.Z])
+                if (!c.InBounds(Width, Height) || visited.At(c))
                 {
                     continue;
                 }
 
-                visited[c.X, c.Z] = true;
+                visited.SetAt(c, true);
                 if (wallMap.At(c))
                 {
                     continue;
@@ -147,7 +147,7 @@ public class Wayfinder
 
                 FlowField.Tile newTile = new FlowField.Tile(prevDist + 1, newDir, false);
                 currentFlow.SetTile(c, newTile);
-                list.Add(new Signpost(c, currentFlow));
+                list.Add(new Signpost(c, newTile));
 
                 if (isStopOnPathFound && c == target)
                 {
@@ -187,12 +187,12 @@ public class Wayfinder
             default: dir = Compass.None; break; // TODO
         }
         pathC = coord.InDirectionInBoundsNonSelf(dir, Width, Height);
-        return new[] { new Signpost(coord, currentFlow) };
+        return new[] { new Signpost(coord, newTile) };
     }
 
     public Signpost SignpostAt(Coord coord)
     {
-        return new Signpost(coord, currentFlow);
+        return new Signpost(coord, currentFlow.TileAt(coord));
     }
 
     public IReadOnlyCollection<Signpost> Signposts()

@@ -6,7 +6,7 @@ public class FlowField
     public readonly int Width;
     public readonly int Height;
 
-    private readonly Tile[,] tiles;
+    private readonly RectMap<Tile> tiles;
 
     public FlowField(
         int width, int height)
@@ -14,27 +14,21 @@ public class FlowField
         Width = width;
         Height = height;
 
-        tiles = new Tile[Width, Height];
+        tiles = new RectMap<Tile>(Width, Height);
         ClearTiles();
     }
 
     public IReadOnlyCollection<Signpost> Signposts()
     {
         var list = new List<Signpost>();
-
-        for (int x = 0; x < Width; x++)
-        {
-            for (int z = 0; z < Height; z++)
-            {
-                list.Add(new Signpost(new Coord(x, z), this));
-            }
-        }
+        foreach (Coord c in tiles.AllCoords())
+            list.Add(new Signpost(c, tiles.At(c)));
         return list;
     }
 
-    public Tile TileAt(Coord c) => tiles[c.X, c.Z];
+    public Tile TileAt(Coord c) => tiles.At(c);
 
-    public void SetTile(Coord c, Tile t) => tiles[c.X, c.Z] = t;
+    public void SetTile(Coord c, Tile t) => tiles.SetAt(c, t);
 
     public int DistanceAt(Coord c) => TileAt(c).Distance;
     public Compass DirectionAt(Coord c) => TileAt(c).DirToGoal;
@@ -59,15 +53,6 @@ public class FlowField
 
     public static readonly Tile UnreachedTile = new Tile(-1, Compass.None, false);
 
-    private void ClearTiles()
-    {
-        for (int x = 0; x < Width; x++)
-        {
-            for (int z = 0; z < Height; z++)
-            {
-                tiles[x, z] = UnreachedTile;
-            }
-        }
-    }
+    private void ClearTiles() => tiles.Fill(UnreachedTile);
 
 }

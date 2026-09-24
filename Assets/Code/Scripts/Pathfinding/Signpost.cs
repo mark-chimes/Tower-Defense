@@ -10,17 +10,6 @@ public readonly struct Signpost
 
     public bool OnCriticalPath => Tile.OnCriticalPath;
 
-
-
-
-    // Signpost should never return the FlowField or any of its components directly.
-    public Signpost(Coord coord, FlowField flow)
-    {
-        Coord = coord;
-        Tile = flow.TileAt(coord);
-    }
-
-
     public Signpost(Coord coord, FlowField.Tile tile)
     {
         Coord = coord;
