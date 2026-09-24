@@ -36,17 +36,17 @@ public class WallMap
         return flatMap;
     }
 
-    public static WallMap FromFlatMap(bool[] flatMap, int Width, int Height)
+    public static WallMap FromFlatMap(bool[] flatMap, int width, int height)
     {
-        bool[,] wallMap = new bool[Width, Height];
-        for (int x = 0; x < Width; x++)
+        bool[,] wallMap = new bool[width, height];
+        for (int x = 0; x < width; x++)
         {
-            for (int z = 0; z < Height; z++)
+            for (int z = 0; z < height; z++)
             {
-                wallMap[x, z] = flatMap[z * Width + x];
+                wallMap[x, z] = flatMap[z * width + x];
             }
         }
-        return new WallMap(wallMap, Width, Height);
+        return new WallMap(wallMap, width, height);
     }
 
     private WallMap(bool[,] map, int width, int height)

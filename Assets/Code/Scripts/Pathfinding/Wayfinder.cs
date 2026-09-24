@@ -8,7 +8,7 @@ public class Wayfinder
     private WallMap wallMap; // Do not modify
 
     public int Width => wallMap.Width;
-    public int Height => wallMap.Width;
+    public int Height => wallMap.Height;
 
     private readonly Search.Dir SearchDirection;
 
