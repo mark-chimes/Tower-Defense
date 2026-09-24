@@ -67,7 +67,7 @@ public class GodClass : MonoBehaviour
     {
         int width = gridAuthor.Layout.Width;
         int height = gridAuthor.Layout.Height;
-        bool[,] wallMap = new bool[width, height];
+        WallMap wallMap = new WallMap(width, height);
         Coord spawnPos = gridAuthor.SpawnPos;
         Coord goalPos = gridAuthor.GoalPos;
 
@@ -79,7 +79,9 @@ public class GodClass : MonoBehaviour
 
     void CreateMapFromData(SaveableLevel loaded)
     {
-        treasureMap = new TreasureMap(loaded.Width, loaded.Height, loaded.WallMap(), 
+        WallMap loadedMap = loaded.LoadMap();
+
+        treasureMap = new TreasureMap(loaded.Width, loaded.Height, loadedMap, 
             treasureMap.SpawnPos, 
             treasureMap.GoalPos,
             StartingIsStopOnPathFound,

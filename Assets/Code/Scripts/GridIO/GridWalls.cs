@@ -24,6 +24,8 @@ public class GridWalls : MonoBehaviour
         this.onWallChange = onWallChange;
         walls = new Wall[treasureMap.Width, treasureMap.Height];
 
+        Debug.Log($"Got treasure map with walls at 0,0? {treasureMap.HasWall(new Coord(0,0))}");
+
         for (int x = 0; x < treasureMap.Width; x++)
         {
             for (int z = 0; z < treasureMap.Height; z++)

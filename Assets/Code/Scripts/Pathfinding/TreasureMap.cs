@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public class TreasureMap
 {
 
-    private bool[,] wallMap; // TODO I'm starting to think TreasureMap should not hold the wall map
+    private WallMap wallMap;
     public readonly int Width;
     public readonly int Height;
 
@@ -18,7 +18,7 @@ public class TreasureMap
 
     private Wayfinder wayfinder;
 
-    public TreasureMap(int width, int height, bool[,] wallMap, Coord spawnPos, Coord goalPos, bool isStopOnPathFound,
+    public TreasureMap(int width, int height, WallMap wallMap, Coord spawnPos, Coord goalPos, bool isStopOnPathFound,
     Action onPathfindingUpdate, Action onPathfindingClear)
     {
         Width = width;
@@ -72,7 +72,7 @@ public class TreasureMap
     // TODO check this works if pathfinding is not set
     public ErfSnapshot At(Coord coord)
     {
-        return new ErfSnapshot(coord, SpawnGoalKindAt(coord), wallMap[coord.X, coord.Z]);
+        return new ErfSnapshot(coord, SpawnGoalKindAt(coord), wallMap.HasWall(coord));
     }
 
     public Signpost SignpostAt(Coord coord)
@@ -87,9 +87,9 @@ public class TreasureMap
 
     public Signpost SignpostAt(int x, int z) => SignpostAt(new Coord(x, z));
 
-    public void SetWall(Coord c, bool hasWall) => wallMap[c.X, c.Z] = hasWall;
+    public void SetWall(Coord c, bool hasWall) => wallMap.SetWall(c, hasWall);
 
-    public bool HasWall(Coord c) => wallMap[c.X, c.Z];
+    public bool HasWall(Coord c) => wallMap.HasWall(c);
 
 
     public bool CanPlaceWall(Coord c) => SpawnGoalKindAt(c) == SpawnGoalKind.Floor && !HasWall(c);

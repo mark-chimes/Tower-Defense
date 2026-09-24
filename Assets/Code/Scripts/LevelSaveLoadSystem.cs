@@ -10,6 +10,8 @@ public class LevelSaveLoadSystem
     {
         Debug.Log("saving...");
         SaveableLevel saveable = map.AsSaveableData();
+        Debug.Log($"Saving: {saveable}");
+
         WriteToFile(saveable.ToJson());
     }
 
@@ -18,6 +20,8 @@ public class LevelSaveLoadSystem
         Debug.Log("loading...");
         string json = ReadJson();
         SaveableLevel saveable = SaveableLevel.FromJson(json);
+        Debug.Log($"Loaded: {saveable}");
+
         return saveable;
 
     }
