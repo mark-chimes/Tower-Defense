@@ -42,7 +42,7 @@ public class DirectionMarker : MonoBehaviour
         arrow.TurnTo(dir);
     }
 
-    public Highlightable HighlightableTile()
+    public Highlightable HighlightableFlagstone()
     {
         return highlightableFlagstone;
     }

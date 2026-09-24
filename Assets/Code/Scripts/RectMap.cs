@@ -25,9 +25,9 @@ public class RectMap<T>
         map[c.X, c.Z] = t;
     }
 
-    public bool IsInBounds(Coord c)
+    public bool IsCoordOnMap(Coord c)
     {
-        return (0 <= c.X) && (c.X <= Width) && (0 <= c.Z) && (c.Z <= Height);
+        return (0 <= c.X) && (c.X < Width) && (0 <= c.Z) && (c.Z < Height);
     }
 
     // fills the entire map with the value t 
@@ -65,7 +65,7 @@ public class RectMap<T>
 
     public override string ToString()
     {
-        return $"RectMap<{typeof(T).Name}> with Width: {Width}, Height: {Height}"; // TODO can we print type of T?
+        return $"RectMap<{typeof(T).Name}> with Width: {Width}, Height: {Height}";
     }
 
 

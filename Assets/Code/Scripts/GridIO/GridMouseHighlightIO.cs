@@ -55,7 +55,7 @@ public class GridMouseHighlightIO
                 highlightColor = placeableColor;
 
             Highlightable maybeWall = wallHandler.MaybeWall(c);
-            target = (maybeWall != null ? maybeWall : hoveredErf.HighlightableTile());
+            target = maybeWall != null ? maybeWall : hoveredErf.HighlightableFlagstone();
         }
         if (highlighted != null) highlighted.Unhighlight();
         target?.Highlight(highlightColor);
