@@ -1,9 +1,7 @@
 using UnityEngine;
 
-public class HexLayout
+public static class HexLayout
 {
-    public readonly int NumRings;
-
     public const float CellWidth = 10f; // center of one cell to center of another - the small diameter
     public static readonly float CellHeight = CellWidth * 2f / Mathf.Sqrt(3f); 
     // large diamater / diagonal 
@@ -11,12 +9,7 @@ public class HexLayout
 
     public const float SqrClose = 0.01f; // TODO what's a good value here? 
 
-    public HexLayout(int numRings)
-    {
-        NumRings = numRings;
-    }
-
-    public Vector3 CoordsToWorld(HexCoord coord)
+    public static Vector3 CoordsToWorld(HexCoord coord)
     {
         float posX = CellWidth * coord.Q + CellWidth / 2f * coord.R; // Horizontal spacing W
         float posZ = 3f/4f * CellHeight  * coord.R; // Vertical spacing: 3/4 * H
@@ -35,7 +28,7 @@ public class HexLayout
     //     return targetRotation;
     // }
 
-    public bool AreVector3Close(Vector3 first, Vector3 second)
+    public static bool AreVector3Close(Vector3 first, Vector3 second)
     {
         return (first - second).sqrMagnitude <= SqrClose;
 

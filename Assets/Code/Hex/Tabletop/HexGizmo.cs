@@ -7,19 +7,19 @@ public static class HexGizmo
         Matrix4x4 originalMatrix = Gizmos.matrix;
         Color originalColor = Gizmos.color;
         Gizmos.matrix = transform.localToWorldMatrix;
-
-        HexLayout layout = hexAuthor.Layout;
         
         HexCoord coord0 = new HexCoord(0,0);
-        Vector3 pos0 = layout.CoordsToWorld(coord0);
+        Vector3 pos0 = HexLayout.CoordsToWorld(coord0);
 
         HexCoord[] neighbors = coord0.Neighbours();
+
+        // TODO draw num rings depending on hexAuthor
 
         if (isWire)
         {
             Gizmos.DrawWireMesh(hexMesh, pos0);
             foreach (HexCoord neighbor in neighbors) {
-                Vector3 pos = layout.CoordsToWorld(neighbor);
+                Vector3 pos = HexLayout.CoordsToWorld(neighbor);
                 Gizmos.DrawWireMesh(hexMesh, pos);
             }
         }
@@ -27,7 +27,7 @@ public static class HexGizmo
         {
             Gizmos.DrawMesh(hexMesh, pos0);
             foreach (HexCoord neighbor in neighbors) {
-                Vector3 pos = layout.CoordsToWorld(neighbor);
+                Vector3 pos = HexLayout.CoordsToWorld(neighbor);
                 Gizmos.DrawMesh(hexMesh, pos);
             }
         }
