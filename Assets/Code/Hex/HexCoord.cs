@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 // Check https://www.redblobgames.com/grids/hexagons for more info
 // We use an axial coordinate system which provides a cubic interface
@@ -51,5 +52,16 @@ public readonly struct HexCoord : IEquatable<HexCoord>
     }
 
     public HexCoord InDirection(HexCompass dir) => Shifted(dir.Offset());
+
+    
+    // See https://www.redblobgames.com/grids/hexagons/#range
+    public static IEnumerable<HexCoord> AllWithinRings(int numRings)
+    {
+        for (int q = -numRings; q <= numRings; q++)
+            for (int r = Math.Max(-numRings, -q - numRings); r <= Math.Min(numRings, -q + numRings); r++)
+                yield return new HexCoord(q, r);
+    }
+
+    // TODO can use something similar to above method for RANGE later
 }
 

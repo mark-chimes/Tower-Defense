@@ -13,21 +13,23 @@ public static class HexGizmo
 
         HexCoord[] neighbors = coord0.Neighbours();
 
+
+
         // TODO draw num rings depending on hexAuthor
 
         if (isWire)
         {
             Gizmos.DrawWireMesh(hexMesh, pos0);
-            foreach (HexCoord neighbor in neighbors) {
-                Vector3 pos = HexLayout.CoordsToWorld(neighbor);
+            foreach (HexCoord coord in HexCoord.AllWithinRings(hexAuthor.NumRings)) {
+                Vector3 pos = HexLayout.CoordsToWorld(coord);
                 Gizmos.DrawWireMesh(hexMesh, pos);
             }
         }
         else
         {
             Gizmos.DrawMesh(hexMesh, pos0);
-            foreach (HexCoord neighbor in neighbors) {
-                Vector3 pos = HexLayout.CoordsToWorld(neighbor);
+            foreach (HexCoord coord in HexCoord.AllWithinRings(hexAuthor.NumRings)) {
+                Vector3 pos = HexLayout.CoordsToWorld(coord);
                 Gizmos.DrawMesh(hexMesh, pos);
             }
         }

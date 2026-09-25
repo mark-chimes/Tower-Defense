@@ -46,12 +46,9 @@ public class HexMap<T>
     }
 
 
-    // See https://www.redblobgames.com/grids/hexagons/#range
     public IEnumerable<HexCoord> AllCoords()
     {
-        for (int q = -NumRings; q <= NumRings; q++)
-            for (int r = Math.Max(-NumRings, -q - NumRings); r <= Math.Min(NumRings, -q + NumRings); r++)
-                yield return new HexCoord(q, r);
+        return HexCoord.AllWithinRings(NumRings);
     }
 
     // Implementation assumes a square map
