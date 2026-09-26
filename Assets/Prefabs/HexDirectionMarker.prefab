@@ -48,8 +48,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HexDirectionMarker
   numberLabel: {fileID: 8380223068467426430}
   arrow: {fileID: 2152118906964014776}
-  pathHighlightColor: {r: 0, g: 1, b: 1, a: 1}
-  frontierHighlightColor: {r: 1, g: 0, b: 0, a: 1}
+  pathHighlightColor: {r: 0, g: 1, b: 1, a: 0.4117647}
+  frontierHighlightColor: {r: 1, g: 0, b: 0, a: 0.31764707}
 --- !u!1 &249131890987507807
 GameObject:
   m_ObjectHideFlags: 0

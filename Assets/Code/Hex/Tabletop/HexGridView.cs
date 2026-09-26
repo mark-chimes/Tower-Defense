@@ -11,8 +11,8 @@ public class HexGridView : MonoBehaviour
     [SerializeField] private GameObject signpostPrefab;
 
 
-    // [SerializeField] private GameObject spawnPrefab;
-    // [SerializeField] private GameObject goalPrefab;
+    [SerializeField] private GameObject spawnPrefab;
+    [SerializeField] private GameObject goalPrefab;
 
     [System.Serializable]
     public class VisualizationSettings
@@ -26,11 +26,13 @@ public class HexGridView : MonoBehaviour
     private HexMap<HexDirectionMarker> directionMarkers;
 
     private GameObject spawnObj;
+    private GameObject goalObj;
+
 
     private bool isInitialized;
 
     // TODO reconsider if this should handle "floors" and "walls" together or not? 
-    public void Initialize(HexMap<bool> walls)
+    public void Initialize(HexMap<bool> walls, HexCoord spawnCoord, HexCoord goalCoord)
     // , HexCoord spawnPos, HexCoord goalPos, VisualizationSettings visualizationSettings) // Later
     {
         Debug.Assert(!isInitialized);
@@ -62,6 +64,10 @@ public class HexGridView : MonoBehaviour
 
             // TODO spawn and goal pos
         }
+
+        spawnObj = InstantiateAtCoord(spawnPrefab, spawnCoord);
+        goalObj = InstantiateAtCoord(goalPrefab, goalCoord);
+
     }
 
     public void ClearData()
@@ -74,11 +80,11 @@ public class HexGridView : MonoBehaviour
     }
 
 
-    public void Reinitialize(HexMap<bool> walls)
+    public void Reinitialize(HexMap<bool> walls, HexCoord spawnCoord, HexCoord goalCoord)
     // HexCoord spawnPos, HexCoord goalPos, VisualizationSettings visualizationSettings)
     {
         ClearData();
-        Initialize(walls); // spawnPos, goalPos, visualizationSettings);
+        Initialize(walls, spawnCoord, goalCoord); // visualizationSettings);
     }
 
 

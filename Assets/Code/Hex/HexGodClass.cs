@@ -85,14 +85,14 @@ public class HexGodClass : MonoBehaviour
             Debug.Log($"wayfinder at {coord} : {wayfinder.SignpostAt(coord)}");
         }
 
-        CreateMapFromWallMap(wallMap);
+        CreateMapFromWallMap(wallMap, spawnCoord, goalCoord);
         gridView.ExhibitSignposts(wayfinder.Signposts());
 
 
     }
 
-    void CreateMapFromWallMap(HexMap<bool> wallMap)
+    void CreateMapFromWallMap(HexMap<bool> wallMap, HexCoord spawnCoord, HexCoord goalCoord)
     {
-        gridView.Initialize(wallMap);
+        gridView.Initialize(wallMap, spawnCoord, goalCoord);
     }
 }
