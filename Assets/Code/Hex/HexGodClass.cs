@@ -10,8 +10,9 @@ public class HexGodClass : MonoBehaviour
     [SerializeField] private Mesh hexMesh;
 
     [SerializeField] private bool isWire = false;
-    [SerializeField] private bool isDrawingColors = true; 
+    [SerializeField] private bool isDrawingColors = true;
 
+    [SerializeField] private HexGizmo.ColorMode colorMode; 
 
     CameraControl camControl;
 
@@ -33,10 +34,10 @@ public class HexGodClass : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        HexGizmo.Draw(gridAuthor, hexMesh, transform, isWire, isDrawingColors);
+        HexGizmo.Draw(gridAuthor, hexMesh, transform, isWire, colorMode);
     }
 
-    
+
     void CreateMapFromNothing()
     {
         HexMap<bool> wallMap = new HexMap<bool>(gridAuthor.NumRings);
@@ -49,9 +50,9 @@ public class HexGodClass : MonoBehaviour
         // CreateMapFromTreasureMap(treasureMap);
 
         //** TEST wall positions **//
-        HexCoord wallPos1 = new HexCoord(0,1);
+        HexCoord wallPos1 = new HexCoord(0, 1);
         wallMap.SetAt(wallPos1, true);
-        HexCoord wallPos2 = new HexCoord(1,0);
+        HexCoord wallPos2 = new HexCoord(1, 0);
         wallMap.SetAt(wallPos2, true);
         //** TEST wall positions **//
 
