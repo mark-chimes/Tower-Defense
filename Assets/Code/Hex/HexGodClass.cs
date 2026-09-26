@@ -10,7 +10,9 @@ public class HexGodClass : MonoBehaviour
     [SerializeField] private Mesh hexMesh;
 
     [SerializeField] private bool isWire = false;
-    [SerializeField] private HexGizmo.ColorMode colorMode; 
+    [SerializeField] private HexGizmo.DiagonalColorMode diagonalColorMode = HexGizmo.DiagonalColorMode.POSITIVE; 
+    [SerializeField] private bool colorZeros = true;
+    [SerializeField] private bool colorRGB = false;
 
     CameraControl camControl;
 
@@ -32,7 +34,7 @@ public class HexGodClass : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        HexGizmo.Draw(gridAuthor, hexMesh, transform, isWire, colorMode);
+        HexGizmo.Draw(gridAuthor, hexMesh, transform, isWire, diagonalColorMode, colorZeros, colorRGB);
     }
 
 

@@ -325,63 +325,6 @@ Transform:
   - {fileID: 203844589}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &578283465
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -3910990755373119420, guid: 9b8bf937a48af0846a744fad07367eb2, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 1.4
-      objectReference: {fileID: 0}
-    - target: {fileID: -3910990755373119420, guid: 9b8bf937a48af0846a744fad07367eb2, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -0.0000015993173
-      objectReference: {fileID: 0}
-    - target: {fileID: -3910990755373119420, guid: 9b8bf937a48af0846a744fad07367eb2, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 2.5
-      objectReference: {fileID: 0}
-    - target: {fileID: -3910990755373119420, guid: 9b8bf937a48af0846a744fad07367eb2, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -3910990755373119420, guid: 9b8bf937a48af0846a744fad07367eb2, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -3910990755373119420, guid: 9b8bf937a48af0846a744fad07367eb2, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -3910990755373119420, guid: 9b8bf937a48af0846a744fad07367eb2, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -3910990755373119420, guid: 9b8bf937a48af0846a744fad07367eb2, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -3910990755373119420, guid: 9b8bf937a48af0846a744fad07367eb2, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -3910990755373119420, guid: 9b8bf937a48af0846a744fad07367eb2, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8771091787928289351, guid: 9b8bf937a48af0846a744fad07367eb2, type: 3}
-      propertyPath: m_Name
-      value: Hextower
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: -4161369568681901532, guid: 9b8bf937a48af0846a744fad07367eb2, type: 3}
 --- !u!1 &742519893
 GameObject:
   m_ObjectHideFlags: 0
@@ -427,13 +370,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HexGodClass
   gridAuthor:
-    numRings: 4
+    numRings: 8
     spawnPosInitXZ: {x: 0, y: 0}
     goalPosInitXZ: {x: 1, y: 1}
   gridView: {fileID: 341370300}
   hexMesh: {fileID: -6145683337337129500, guid: 01dbacd4caa73f44ea66d5317d46c061, type: 3}
   isWire: 0
-  isDrawingColors: 1
+  colorMode: 4
 --- !u!1 &961739749
 GameObject:
   m_ObjectHideFlags: 0
@@ -578,4 +521,3 @@ SceneRoots:
   - {fileID: 346855380}
   - {fileID: 742519894}
   - {fileID: 341370301}
-  - {fileID: 578283465}

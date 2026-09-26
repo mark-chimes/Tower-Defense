@@ -2,19 +2,16 @@ using UnityEngine;
 
 public static class HexGizmo
 {
-
-    public enum ColorMode
+    public enum DiagonalColorMode
     {
         NONE,
-        COLOR_ZEROES,
-        COLOR_RGB,
-        COLOR_DIAGONALS,
-        COLOR_RGB_AND_DIAGONALS,
+        POSITIVE,
+        ALL
     }
 
 
     public static void Draw(HexAuthor hexAuthor, Mesh hexMesh, Transform transform,
-        bool isWire, ColorMode colorMode)
+        bool isWire, DiagonalColorMode diagonalMode, bool colorZeros, bool colorRGB)
     {
         Matrix4x4 originalMatrix = Gizmos.matrix;
         Color originalColor = Gizmos.color;
@@ -23,7 +20,7 @@ public static class HexGizmo
         foreach (HexCoord coord in HexCoord.AllWithinRings(hexAuthor.NumRings))
         {
             Vector3 pos = HexLayout.CoordsToWorld(coord);
-            Gizmos.color = ColorFor(coord, hexAuthor.NumRings, colorMode);
+            Gizmos.color = ColorFor(coord, hexAuthor.NumRings, diagonalMode, colorZeros, colorRGB);
 
             if (isWire)
                 Gizmos.DrawWireMesh(hexMesh, pos);
@@ -34,29 +31,13 @@ public static class HexGizmo
         Gizmos.matrix = originalMatrix;
         Gizmos.color = originalColor;
     }
-    private static Color ColorFor(HexCoord coord, int numRings, ColorMode mode) => mode switch
+
+    private static Color ColorFor(HexCoord coord, int numRings, DiagonalColorMode mode, bool colorZeros, bool colorRGB)
     {
-        ColorMode.COLOR_ZEROES => ColorOnZeroes(coord),
-        ColorMode.COLOR_RGB => ColorRgb(coord, numRings),
-        ColorMode.COLOR_DIAGONALS => ColorDiagonals(coord, numRings) ?? Color.grey,
-        ColorMode.COLOR_RGB_AND_DIAGONALS => ColorDiagonals(coord, numRings) ?? ColorRgb(coord, numRings),
-        _ => Color.grey,
-    };
-
-    private static Color ColorOnZeroes(HexCoord c)
-    {
-        // Center
-        if (c.Q == 0 && c.R == 0)
-            return Color.yellowNice;
-
-        if (c.Q == 0)
-            return Color.green;
-        if (c.R == 0)
-            return Color.blue;
-        if (c.S == 0)
-            return Color.magenta;
-
-        return Color.grey;
+        return ColorDiagonals(coord, numRings, mode)                    // color diagonals
+            ?? (colorZeros ? ColorOnZeroes(coord) : null)               // if null, color zeros
+            ?? (colorRGB ? ColorRgb(coord, numRings) : (Color?)null)   // if still null, color rgb
+            ?? Color.grey;                                              // otherwise grey
     }
 
     /**
@@ -82,8 +63,33 @@ public static class HexGizmo
         return new Color(tS, tQ, tR);
     }
 
-    // Note the optional `Color?`
-    private static Color? ColorDiagonals(HexCoord c, int N)
+    private static Color? ColorOnZeroes(HexCoord c)
+    {
+        // Center
+        if (c.Q == 0 && c.R == 0)
+            return Color.yellowNice;
+
+        if (c.Q == 0)
+            return Color.mediumSeaGreen;
+        if (c.R == 0)
+            return Color.steelBlue;
+        if (c.S == 0)
+            return Color.darkSalmon;
+
+        return null;
+    }
+
+    private static Color? ColorDiagonals(HexCoord c, int N, HexGizmo.DiagonalColorMode mode)
+    {
+        switch (mode)
+        {
+            case DiagonalColorMode.POSITIVE: return ColorDiagonalsPositive(c, N);
+            case DiagonalColorMode.ALL: return ColorDiagonalsAll(c, N);
+            default: return null;
+        }
+    }
+
+    private static Color? ColorDiagonalsAll(HexCoord c, int N)
     {
         // Center
         if (c.Q == 0 && c.R == 0)
@@ -100,11 +106,37 @@ public static class HexGizmo
             float t = Mathf.InverseLerp(N, -N, c.Q) / 2f;
             // diagonal goes from pure green at max Q to light green
             return new Color(t, 1.0f, t);
-
         }
         if (c.Q == c.S)
         {
             float t = Mathf.InverseLerp(N, -N, c.R) / 2f;
+            // diagonal goes from pure blue at max R to light blue
+            return new Color(t, t, 1.0f);
+        }
+        return null;
+    }
+
+    private static Color? ColorDiagonalsPositive(HexCoord c, int N)
+    {
+        // Center
+        if (c.Q == 0 && c.R == 0)
+            return Color.yellowNice;
+
+        if (c.Q == c.R && c.S > 0)
+        {
+            float t = Mathf.InverseLerp(N, 0, c.S) / 2f;
+            // diagonal goes from pure red at max S to pink
+            return new Color(1.0f, t, t);
+        }
+        if (c.R == c.S && c.Q > 0)
+        {
+            float t = Mathf.InverseLerp(N, 0, c.Q) / 2f;
+            // diagonal goes from pure green at max Q to light green
+            return new Color(t, 1.0f, t);
+        }
+        if (c.Q == c.S && c.R > 0)
+        {
+            float t = Mathf.InverseLerp(N, 0, c.R) / 2f;
             // diagonal goes from pure blue at max R to light blue
             return new Color(t, t, 1.0f);
         }
