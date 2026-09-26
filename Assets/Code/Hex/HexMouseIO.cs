@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[System.Serializable]
 public class HexMouseIO
 {
 
@@ -60,8 +59,6 @@ public class HexMouseIO
         if (highlighted != null) highlighted.Highlight(highlightColor);
     }
 
-
-    /// Currently assumes Walls have colliders off. Revisit if colliders turned on.
     private HexFlagstone RaycastForFlagstone()
     {
         Vector2 mousePos = Mouse.current.position.ReadValue();

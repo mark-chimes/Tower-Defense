@@ -19,7 +19,7 @@ public class HexGodClass : MonoBehaviour
     CameraControl camControl;
     HexMouseIO mouseIO;
 
-        void Awake()
+    void Awake()
     {
         camControl = new CameraControl();
         camControl.Initialize();
@@ -117,6 +117,7 @@ public class HexGodClass : MonoBehaviour
         //     pathfindingIOManager, enemyController, this, gridWalls); // TODO cross-dependency code-smell
         treasureMap.Recompute();
         mouseIO = new HexMouseIO(gridView, treasureMap, Camera.main);
+
     }
 
 
