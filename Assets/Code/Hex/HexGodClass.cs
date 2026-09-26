@@ -26,7 +26,7 @@ public class HexGodClass : MonoBehaviour
 
     void Start()
     {
-        CreateMapWithWallsToTestWayfinder();
+        CreateMapFromNothing();
     }
 
     void Update()
@@ -39,22 +39,29 @@ public class HexGodClass : MonoBehaviour
         HexGizmo.Draw(gridAuthor, hexMesh, transform, showSpawnAndGoal, isWire, diagonalColorMode, colorZeros, colorRGB);
     }
 
+    void CreateMapFromWallMap(HexMap<bool> wallMap, HexCoord spawnCoord, HexCoord goalCoord)
+    {
+        gridView.Initialize(wallMap, spawnCoord, goalCoord);
+    }
+
+
+    private HexTreasureMap treasureMap;
+
+    // TODO remove this once it is unused
+    void PATHFINDING_UPDATE_PLACEHOLDER()
+    {
+        gridView.ExhibitSignposts(treasureMap.Signposts());
+    }
+
+    void PATHFINDING_CLEAR_PLACEHOLDER()
+    {
+        //
+    }
+
 
     void CreateMapFromNothing()
     {
-        // TODO
-    }
-
-    void CreateMapWithWallsToTestWayfinder()
-    {
         HexMap<bool> wallMap = new HexMap<bool>(gridAuthor.NumRings);
-        HexCoord spawnCoord = gridAuthor.SpawnCoord;
-        HexCoord goalCoord = gridAuthor.GoalCoord;
-
-        // treasureMap = new TreasureMap(wallMap, spawnPos, goalPos, StartingIsStopOnPathFound,
-        //     enemyController.PathfindingUpdate, enemyController.PathfindingClear);
-
-        // CreateMapFromTreasureMap(treasureMap);
 
         //** TEST wall positions **//
         HexCoord wallPos0 = new HexCoord(-0, 0);
@@ -67,32 +74,48 @@ public class HexGodClass : MonoBehaviour
         wallMap.SetAt(wallPos3, true);
         //** TEST wall positions **//
 
+        HexCoord spawnPos = gridAuthor.SpawnCoord;
+        HexCoord goalPos = gridAuthor.GoalCoord;
 
-        HexWayfinder wayfinder = new HexWayfinder(wallMap, spawnCoord, 
-            goalCoord, HexSearch.Dir.FromEnd, true);
-        wayfinder.ComputeFlow();
-        Debug.Log($"wayfinder at spawn coord: {wayfinder.SignpostAt(spawnCoord)}");
+        treasureMap = new HexTreasureMap(wallMap, spawnPos, goalPos,
+            true, // TODO
+                PATHFINDING_UPDATE_PLACEHOLDER, PATHFINDING_CLEAR_PLACEHOLDER// TODO enemyController.PathfindingUpdate, enemyController.PathfindingClear
+            );
 
-        Debug.Log($"wayfinder SpawnCoord neighbors");
-        foreach (HexCoord coord in spawnCoord.Neighbours())
-        {
-            Debug.Log($"wayfinder at {coord} : {wayfinder.SignpostAt(coord)}");
-        }
-
-        Debug.Log($"wayfinder GoalCoord neighbors");
-        foreach (HexCoord coord in goalCoord.Neighbours())
-        {
-            Debug.Log($"wayfinder at {coord} : {wayfinder.SignpostAt(coord)}");
-        }
-
-        CreateMapFromWallMap(wallMap, spawnCoord, goalCoord);
-        gridView.ExhibitSignposts(wayfinder.Signposts());
-
-
+        CreateMapFromTreasureMap(treasureMap, wallMap);
     }
 
-    void CreateMapFromWallMap(HexMap<bool> wallMap, HexCoord spawnCoord, HexCoord goalCoord)
+    // void CreateMapFromData(SaveableLevel loaded)
+    // {
+    //     RectMap<bool> loadedMap = loaded.LoadMap();
+
+    //     treasureMap = new TreasureMap(loadedMap,
+    //         treasureMap.SpawnPos,
+    //         treasureMap.GoalPos,
+    //         StartingIsStopOnPathFound,
+    //         enemyController.PathfindingUpdate,
+    //         enemyController.PathfindingClear);
+    //     CreateMapFromTreasureMap(treasureMap);
+    // }
+
+    void CreateMapFromTreasureMap(HexTreasureMap treasureMap, HexMap<bool> wallMap)
     {
-        gridView.Initialize(wallMap, spawnCoord, goalCoord);
+        gridView.Initialize(wallMap, treasureMap.SpawnPos, treasureMap.GoalPos);
+        // TODO
+        // pathfindingIOManager.Initialize(treasureMap, gridView);
+        // pathfindingIOManager.ClearField();
+
+        // gridWalls.Initialize(treasureMap, layout, pathfindingIOManager.UpdateDistances);
+        // gridIO = new GridMouseHighlightIO(gridWalls, treasureMap, Camera.main);
+
+        // enemyController.Initialize(layout, treasureMap);
+        // enemyController.SpawnEnemy();
+
+        // gui.Initialize(StartingVisualization, StartingIsStopOnPathFound,
+        //     pathfindingIOManager, enemyController, this, gridWalls); // TODO cross-dependency code-smell
+        treasureMap.Recompute();
+
     }
+
+
 }

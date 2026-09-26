@@ -76,6 +76,8 @@ public class HexGridView : MonoBehaviour
         isInitialized = false;
 
         foreach (Transform child in transform) Destroy(child.gameObject);
+        spawnObj = null;
+        goalObj = null;
         flagstones = null;
     }
 

@@ -278,7 +278,7 @@ MonoBehaviour:
   floorTilePrefab: {fileID: 4801450277852019402, guid: 33686cb9992d9df4dac2d2870aa99f41, type: 3}
   wallTilePrefab: {fileID: 4801450277852019402, guid: 91be09977fa273e48a2a9b3b7ad4ff6b, type: 3}
   signpostPrefab: {fileID: 216480145782122077, guid: 69bd31d6fb57a8c4aafb677993ca93a2, type: 3}
-  spawnPrefab: {fileID: 7843005997107329825, guid: db2164dec387741419d8b3c4b1121cf3, type: 3}
+  spawnPrefab: {fileID: 5137708315208882670, guid: a4adfe104dd055b4bb28c60ef6a40ccc, type: 3}
   goalPrefab: {fileID: 3433611214275881382, guid: 7a3a4a18bb2112a4ebffff27999c8b46, type: 3}
 --- !u!4 &341370301
 Transform:
