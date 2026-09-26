@@ -50,6 +50,14 @@ public class HexMap<T>
         return HexCoord.AllWithinRings(NumRings);
     }
 
+    public IEnumerable<T> All()
+    {
+        foreach (HexCoord c in HexCoord.AllWithinRings(NumRings))
+        {
+            yield return At(c);
+        }
+    }
+
     // Implementation assumes a square map
     public T[] MapAsFlatArray()
     {
@@ -80,7 +88,7 @@ public class HexMap<T>
     {
         this.map = map;
         arraySize = map.GetLength(0); //  = 2 * numRings + 1; 
-        NumRings = numRings; 
+        NumRings = numRings;
     }
 
 }

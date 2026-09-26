@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
+using static HexDirectionMarker;
 
 // TODO split out owning the floor (flagstones) and the markers
 
@@ -6,6 +8,7 @@ public class HexGridView : MonoBehaviour
 {
     [SerializeField] private GameObject floorTilePrefab; // TODO rename to water tile or something after code port
     [SerializeField] private GameObject wallTilePrefab; // TODO rename to land tile or something after code port
+    [SerializeField] private GameObject signpostPrefab;
 
 
     // [SerializeField] private GameObject spawnPrefab;
@@ -20,6 +23,7 @@ public class HexGridView : MonoBehaviour
 
     // private DirectionMarker[,] directionMarkers;
     private HexMap<GameObject> flagstones;
+    private HexMap<HexDirectionMarker> directionMarkers;
 
     private GameObject spawnObj;
 
@@ -33,15 +37,29 @@ public class HexGridView : MonoBehaviour
         isInitialized = true;
 
         flagstones = new HexMap<GameObject>(walls.NumRings);
-        foreach (HexCoord coord in flagstones.AllCoords()) 
+        directionMarkers = new HexMap<HexDirectionMarker>(walls.NumRings);
+
+        foreach (HexCoord coord in flagstones.AllCoords())
         {
             GameObject flagstone;
-            if (walls.At(coord))     
-                flagstone = InstantiateAtCoord(wallTilePrefab, coord); 
+            GameObject signpostObj = InstantiateAtCoord(signpostPrefab, coord);
+            HexDirectionMarker directionMarker = signpostObj.GetComponent<HexDirectionMarker>();
+            directionMarker.Initialize(coord);
+            directionMarker.SetIsOnPathableTerrain(!walls.At(coord));
+            directionMarker.SetPathingVisible(true);
+            directionMarker.SetDistanceVisible(true);
+
+            if (walls.At(coord))
+                flagstone = InstantiateAtCoord(wallTilePrefab, coord);
             else
-                flagstone = InstantiateAtCoord(floorTilePrefab, coord); 
+                flagstone = InstantiateAtCoord(floorTilePrefab, coord);
+
             flagstone.name = $"Flagstone_{coord}"; // TODO rename this
             flagstones.SetAt(coord, flagstone);
+
+            directionMarker.name = $"Signpost_{coord}"; // TODO rename this
+            directionMarkers.SetAt(coord, directionMarker);
+
             // TODO spawn and goal pos
         }
     }
@@ -71,37 +89,30 @@ public class HexGridView : MonoBehaviour
         return obj;
     }
 
+    private void UnhighlightAllArrows()
+    {
+        Debug.Assert(isInitialized);
+        foreach (HexDirectionMarker marker in directionMarkers.All())
+        {
+            marker.ExhibitAccent(ArrowAccent.Normal);
+        }
+    }
 
-    // private void UnhighlightAllArrows()
-    // {
-    //     Debug.Assert(isInitialized);
+    public void ExhibitSignposts(IReadOnlyCollection<HexSignpost> signposts)
+    {
+        Debug.Assert(isInitialized);
 
-    //     for (int x = 0; x < layout.Width; x++)
-    //     {
-    //         for (int z = 0; z < layout.Height; z++)
-    //         {
-    //             DirectionMarker directionMarker = directionMarkers[x, z];
-    //             directionMarker.ExhibitAccent(ArrowAccent.Normal);
-    //         }
-    //     }
-
-    // }
-
-    // public void RefreshDistanceLabels(IReadOnlyCollection<Signpost> signposts)
-    // {
-    //     Debug.Assert(isInitialized);
-
-    //     Debug.Log("RefreshDistanceLabels");
+        Debug.Log("RefreshDistanceLabels");
 
 
-    //     foreach (Signpost sign in signposts)
-    //     {
-    //         Coord c = sign.Coord;
-    //         DirectionMarker directionMarker = directionMarkers[c.X, c.Z];
-    //         directionMarker.ExhibitSignpost(sign);
-    //         directionMarker.ExhibitAccent(sign.OnCriticalPath ? ArrowAccent.Path : ArrowAccent.Normal);
-    //     }
-    // }
+        foreach (HexSignpost sign in signposts)
+        {
+            HexCoord c = sign.Coord;
+            HexDirectionMarker directionMarker = directionMarkers.At(c);
+            directionMarker.ExhibitSignpost(sign);
+            directionMarker.ExhibitAccent(sign.OnCriticalPath ? ArrowAccent.Path : ArrowAccent.Normal);
+        }
+    }
 
     // TODO the methods below maybe don't cut at the right seams
 

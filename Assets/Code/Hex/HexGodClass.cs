@@ -68,18 +68,25 @@ public class HexGodClass : MonoBehaviour
         //** TEST wall positions **//
 
 
-        HexWayfinder wayfinder = new HexWayfinder(wallMap, spawnCoord, goalCoord, HexSearch.Dir.FromEnd, true);
+        HexWayfinder wayfinder = new HexWayfinder(wallMap, spawnCoord, 
+            goalCoord, HexSearch.Dir.FromEnd, true);
         wayfinder.ComputeFlow();
         Debug.Log($"wayfinder at spawn coord: {wayfinder.SignpostAt(spawnCoord)}");
-        Debug.Log($"wayfinder away from goal: {wayfinder.SignpostAt(new HexCoord(-3, 0))}");
+
+        Debug.Log($"wayfinder SpawnCoord neighbors");
+        foreach (HexCoord coord in spawnCoord.Neighbours())
+        {
+            Debug.Log($"wayfinder at {coord} : {wayfinder.SignpostAt(coord)}");
+        }
 
         Debug.Log($"wayfinder GoalCoord neighbors");
         foreach (HexCoord coord in goalCoord.Neighbours())
         {
-            Debug.Log($"wayfinder at {coord} : {wayfinder.SignpostAt(new HexCoord(-3, 0))}");
+            Debug.Log($"wayfinder at {coord} : {wayfinder.SignpostAt(coord)}");
         }
 
         CreateMapFromWallMap(wallMap);
+        gridView.ExhibitSignposts(wayfinder.Signposts());
 
 
     }

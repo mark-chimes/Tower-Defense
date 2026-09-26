@@ -277,6 +277,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HexGridView
   floorTilePrefab: {fileID: 4801450277852019402, guid: 33686cb9992d9df4dac2d2870aa99f41, type: 3}
   wallTilePrefab: {fileID: 4801450277852019402, guid: 91be09977fa273e48a2a9b3b7ad4ff6b, type: 3}
+  signpostPrefab: {fileID: 216480145782122077, guid: 69bd31d6fb57a8c4aafb677993ca93a2, type: 3}
 --- !u!4 &341370301
 Transform:
   m_ObjectHideFlags: 0
@@ -286,7 +287,7 @@ Transform:
   m_GameObject: {fileID: 341370299}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 7.27428, y: -0, z: -6.33315}
+  m_LocalPosition: {x: 0, y: -0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -371,12 +372,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HexGodClass
   gridAuthor:
     numRings: 10
-    spawnPosInitQR: {x: 0, y: 0}
-    goalPosInitQR: {x: 1, y: 1}
+    spawnInitQR: {x: -2, y: 0}
+    goalInitQR: {x: 0, y: 2}
   gridView: {fileID: 341370300}
   hexMesh: {fileID: -6145683337337129500, guid: 01dbacd4caa73f44ea66d5317d46c061, type: 3}
-  isWire: 0
-  diagonalColorMode: 2
+  isWire: 1
+  showSpawnAndGoal: 1
+  diagonalColorMode: 1
   colorZeros: 1
   colorRGB: 0
 --- !u!1 &961739749
