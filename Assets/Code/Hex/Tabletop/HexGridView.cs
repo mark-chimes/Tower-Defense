@@ -4,6 +4,7 @@ using static HexDirectionMarker;
 
 // TODO split out owning the floor (flagstones) and the markers
 
+// TODO maybe this should be called terrain or terrain view or something
 public class HexGridView : MonoBehaviour
 {
     [SerializeField] private GameObject floorTilePrefab; // TODO rename to water tile or something after code port
@@ -22,7 +23,7 @@ public class HexGridView : MonoBehaviour
     }
 
     // private DirectionMarker[,] directionMarkers;
-    private HexMap<GameObject> flagstones;
+    private HexMap<HexFlagstone> flagstones;
     private HexMap<HexDirectionMarker> directionMarkers;
 
     private GameObject spawnObj;
@@ -38,12 +39,12 @@ public class HexGridView : MonoBehaviour
         Debug.Assert(!isInitialized);
         isInitialized = true;
 
-        flagstones = new HexMap<GameObject>(walls.NumRings);
+        flagstones = new HexMap<HexFlagstone>(walls.NumRings);
         directionMarkers = new HexMap<HexDirectionMarker>(walls.NumRings);
 
         foreach (HexCoord coord in flagstones.AllCoords())
         {
-            GameObject flagstone;
+            GameObject flagstoneObj;
             GameObject signpostObj = InstantiateAtCoord(signpostPrefab, coord);
             HexDirectionMarker directionMarker = signpostObj.GetComponent<HexDirectionMarker>();
             directionMarker.Initialize(coord);
@@ -52,11 +53,13 @@ public class HexGridView : MonoBehaviour
             directionMarker.SetDistanceVisible(true);
 
             if (walls.At(coord))
-                flagstone = InstantiateAtCoord(wallTilePrefab, coord);
+                flagstoneObj = InstantiateAtCoord(wallTilePrefab, coord);
             else
-                flagstone = InstantiateAtCoord(floorTilePrefab, coord);
+                flagstoneObj = InstantiateAtCoord(floorTilePrefab, coord);
 
-            flagstone.name = $"Flagstone_{coord}"; // TODO rename this
+            flagstoneObj.name = $"Flagstone_{coord}"; // TODO rename this
+            HexFlagstone flagstone = flagstoneObj.GetComponentInChildren<HexFlagstone>();
+            flagstone.Initialize(coord);
             flagstones.SetAt(coord, flagstone);
 
             directionMarker.name = $"Signpost_{coord}"; // TODO rename this
@@ -120,6 +123,22 @@ public class HexGridView : MonoBehaviour
             directionMarker.ExhibitSignpost(sign);
             directionMarker.ExhibitAccent(sign.OnCriticalPath ? ArrowAccent.Path : ArrowAccent.Normal);
         }
+    }
+
+    public void SetTerrainAt(HexCoord c, bool isWall)
+    {
+
+        Destroy(flagstones.At(c).gameObject);
+        GameObject flagstoneObj =
+        isWall ?
+            InstantiateAtCoord(wallTilePrefab, c)
+        :
+            InstantiateAtCoord(floorTilePrefab, c);
+        flagstoneObj.name = $"Flagstone_{c}"; // TODO rename this?
+        HexFlagstone flagstone = flagstoneObj.GetComponentInChildren<HexFlagstone>();
+        flagstone.Initialize(c);
+        flagstones.SetAt(c, flagstone);
+        directionMarkers.At(c).SetIsOnPathableTerrain(!isWall);
     }
 
     // TODO the methods below maybe don't cut at the right seams

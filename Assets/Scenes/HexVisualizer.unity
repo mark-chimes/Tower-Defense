@@ -275,8 +275,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c31ba89a134df574099e5ecd5b9054f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HexGridView
-  floorTilePrefab: {fileID: 4801450277852019402, guid: 33686cb9992d9df4dac2d2870aa99f41, type: 3}
-  wallTilePrefab: {fileID: 4801450277852019402, guid: 91be09977fa273e48a2a9b3b7ad4ff6b, type: 3}
+  floorTilePrefab: {fileID: 4834058753501685816, guid: 83b6d5e406cced54582352072e0a8bee, type: 3}
+  wallTilePrefab: {fileID: 3659481971689907962, guid: 7f343d185bfd31e4f9a2d2ad771aea67, type: 3}
   signpostPrefab: {fileID: 216480145782122077, guid: 69bd31d6fb57a8c4aafb677993ca93a2, type: 3}
   spawnPrefab: {fileID: 5137708315208882670, guid: a4adfe104dd055b4bb28c60ef6a40ccc, type: 3}
   goalPrefab: {fileID: 3433611214275881382, guid: 7a3a4a18bb2112a4ebffff27999c8b46, type: 3}
