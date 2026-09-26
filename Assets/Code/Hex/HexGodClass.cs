@@ -9,7 +9,8 @@ public class HexGodClass : MonoBehaviour
 
     [SerializeField] private Mesh hexMesh;
 
-    [SerializeField] private bool isWire;
+    [SerializeField] private bool isWire = false;
+    [SerializeField] private bool isDrawingColors = true; 
 
 
     CameraControl camControl;
@@ -32,7 +33,7 @@ public class HexGodClass : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        HexGizmo.Draw(gridAuthor, hexMesh, transform,isWire);
+        HexGizmo.Draw(gridAuthor, hexMesh, transform, isWire, isDrawingColors);
     }
 
     
