@@ -42,28 +42,19 @@ public class HexGridView : MonoBehaviour
         flagstones = new HexMap<HexFlagstone>(walls.NumRings);
         directionMarkers = new HexMap<HexDirectionMarker>(walls.NumRings);
 
-        foreach (HexCoord coord in flagstones.AllCoords())
+        foreach (HexCoord c in flagstones.AllCoords())
         {
-            GameObject flagstoneObj;
-            GameObject signpostObj = InstantiateAtCoord(signpostPrefab, coord);
+            GameObject signpostObj = InstantiateAtCoord(signpostPrefab, c);
             HexDirectionMarker directionMarker = signpostObj.GetComponent<HexDirectionMarker>();
-            directionMarker.Initialize(coord);
-            directionMarker.SetIsOnPathableTerrain(!walls.At(coord));
+            directionMarker.Initialize(c);
+            directionMarker.SetIsOnPathableTerrain(!walls.At(c));
             directionMarker.SetPathingVisible(true);
             directionMarker.SetDistanceVisible(true);
 
-            if (walls.At(coord))
-                flagstoneObj = InstantiateAtCoord(wallTilePrefab, coord);
-            else
-                flagstoneObj = InstantiateAtCoord(floorTilePrefab, coord);
+            MakeFlagstoneAt(c, walls.At(c));
 
-            flagstoneObj.name = $"Flagstone_{coord}"; // TODO rename this
-            HexFlagstone flagstone = flagstoneObj.GetComponentInChildren<HexFlagstone>();
-            flagstone.Initialize(coord);
-            flagstones.SetAt(coord, flagstone);
-
-            directionMarker.name = $"Signpost_{coord}"; // TODO rename this
-            directionMarkers.SetAt(coord, directionMarker);
+            directionMarker.name = $"Signpost_{c}"; // TODO rename this
+            directionMarkers.SetAt(c, directionMarker);
 
             // TODO spawn and goal pos
         }
@@ -127,18 +118,20 @@ public class HexGridView : MonoBehaviour
 
     public void SetTerrainAt(HexCoord c, bool isWall)
     {
-
         Destroy(flagstones.At(c).gameObject);
-        GameObject flagstoneObj =
-        isWall ?
-            InstantiateAtCoord(wallTilePrefab, c)
-        :
-            InstantiateAtCoord(floorTilePrefab, c);
-        flagstoneObj.name = $"Flagstone_{c}"; // TODO rename this?
-        HexFlagstone flagstone = flagstoneObj.GetComponentInChildren<HexFlagstone>();
+        MakeFlagstoneAt(c, isWall);
+        directionMarkers.At(c).SetIsOnPathableTerrain(!isWall);
+    }
+
+    private HexFlagstone MakeFlagstoneAt(HexCoord c, bool isWall)
+    {
+        GameObject prefab = isWall ? wallTilePrefab : floorTilePrefab;
+        GameObject flagstoneObj = InstantiateAtCoord(prefab, c);
+        flagstoneObj.name = $"Flagstone_{c}";
+        HexFlagstone flagstone = flagstoneObj.GetComponent<HexFlagstone>();
         flagstone.Initialize(c);
         flagstones.SetAt(c, flagstone);
-        directionMarkers.At(c).SetIsOnPathableTerrain(!isWall);
+        return flagstone;
     }
 
     // TODO the methods below maybe don't cut at the right seams

@@ -17,8 +17,9 @@ public class HexGodClass : MonoBehaviour
     [SerializeField] private bool colorRGB = false;
 
     CameraControl camControl;
+    HexMouseIO mouseIO;
 
-    void Awake()
+        void Awake()
     {
         camControl = new CameraControl();
         camControl.Initialize();
@@ -32,6 +33,7 @@ public class HexGodClass : MonoBehaviour
     void Update()
     {
         camControl.ControlCamera();
+        mouseIO.HandleMouse();
     }
 
     void OnDrawGizmos()
@@ -114,7 +116,7 @@ public class HexGodClass : MonoBehaviour
         // gui.Initialize(StartingVisualization, StartingIsStopOnPathFound,
         //     pathfindingIOManager, enemyController, this, gridWalls); // TODO cross-dependency code-smell
         treasureMap.Recompute();
-
+        mouseIO = new HexMouseIO(gridView, treasureMap, Camera.main);
     }
 
 
