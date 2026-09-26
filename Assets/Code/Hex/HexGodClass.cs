@@ -46,6 +46,14 @@ public class HexGodClass : MonoBehaviour
         //     enemyController.PathfindingUpdate, enemyController.PathfindingClear);
 
         // CreateMapFromTreasureMap(treasureMap);
+
+        //** TEST wall positions **//
+        HexCoord wallPos1 = new HexCoord(0,1);
+        wallMap.SetAt(wallPos1, true);
+        HexCoord wallPos2 = new HexCoord(1,0);
+        wallMap.SetAt(wallPos2, true);
+        //** TEST wall positions **//
+
         CreateMapFromWallMap(wallMap);
     }
 

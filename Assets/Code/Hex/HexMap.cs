@@ -2,7 +2,6 @@
 // See https://www.redblobgames.com/grids/hexagons
 // We use an axial coordinate system which provides a cubic interface
 
-using System;
 using System.Collections.Generic;
 
 public class HexMap<T>

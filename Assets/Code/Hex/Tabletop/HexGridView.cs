@@ -4,7 +4,10 @@ using UnityEngine;
 
 public class HexGridView : MonoBehaviour
 {
-    [SerializeField] private GameObject flagstonePrefab;
+    [SerializeField] private GameObject floorTilePrefab; // TODO rename to water tile or something after code port
+    [SerializeField] private GameObject wallTilePrefab; // TODO rename to land tile or something after code port
+
+
     // [SerializeField] private GameObject spawnPrefab;
     // [SerializeField] private GameObject goalPrefab;
 
@@ -22,6 +25,7 @@ public class HexGridView : MonoBehaviour
 
     private bool isInitialized;
 
+    // TODO reconsider if this should handle "floors" and "walls" together or not? 
     public void Initialize(HexMap<bool> walls)
     // , HexCoord spawnPos, HexCoord goalPos, VisualizationSettings visualizationSettings) // Later
     {
@@ -31,8 +35,12 @@ public class HexGridView : MonoBehaviour
         flagstones = new HexMap<GameObject>(walls.NumRings);
         foreach (HexCoord coord in flagstones.AllCoords()) 
         {
-            GameObject flagstone = InstantiateAtCoord(flagstonePrefab, coord);
-            flagstone.name = $"Flagstone_{coord}";
+            GameObject flagstone;
+            if (walls.At(coord))     
+                flagstone = InstantiateAtCoord(wallTilePrefab, coord); 
+            else
+                flagstone = InstantiateAtCoord(floorTilePrefab, coord); 
+            flagstone.name = $"Flagstone_{coord}"; // TODO rename this
             flagstones.SetAt(coord, flagstone);
             // TODO spawn and goal pos
         }

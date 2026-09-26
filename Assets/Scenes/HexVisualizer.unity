@@ -246,6 +246,51 @@ Transform:
   m_Children: []
   m_Father: {fileID: 346855380}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!1 &341370299
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 341370301}
+  - component: {fileID: 341370300}
+  m_Layer: 0
+  m_Name: HexGridView
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &341370300
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 341370299}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c31ba89a134df574099e5ecd5b9054f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HexGridView
+  flagstonePrefab: {fileID: 4801450277852019402, guid: 91be09977fa273e48a2a9b3b7ad4ff6b, type: 3}
+--- !u!4 &341370301
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 341370299}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 7.27428, y: -0, z: -6.33315}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &346855379
 GameObject:
   m_ObjectHideFlags: 0
@@ -324,11 +369,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HexGodClass
   gridAuthor:
-    numRings: 3
+    numRings: 4
     spawnPosInitXZ: {x: 0, y: 0}
     goalPosInitXZ: {x: 1, y: 1}
-  hexMesh: {fileID: -6145683337337129500, guid: 91be09977fa273e48a2a9b3b7ad4ff6b, type: 3}
-  isWire: 1
+  gridView: {fileID: 341370300}
+  hexMesh: {fileID: -6145683337337129500, guid: 01dbacd4caa73f44ea66d5317d46c061, type: 3}
+  isWire: 0
 --- !u!1 &961739749
 GameObject:
   m_ObjectHideFlags: 0
@@ -472,3 +518,4 @@ SceneRoots:
   m_Roots:
   - {fileID: 346855380}
   - {fileID: 742519894}
+  - {fileID: 341370301}
