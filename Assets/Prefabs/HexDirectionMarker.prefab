@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7383047596560083966}
   - component: {fileID: 4295775000907222820}
   m_Layer: 0
-  m_Name: SignpostView
+  m_Name: HexDirectionMarker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
