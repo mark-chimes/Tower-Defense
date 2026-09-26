@@ -370,13 +370,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HexGodClass
   gridAuthor:
-    numRings: 8
-    spawnPosInitXZ: {x: 0, y: 0}
-    goalPosInitXZ: {x: 1, y: 1}
+    numRings: 10
+    spawnPosInitQR: {x: 0, y: 0}
+    goalPosInitQR: {x: 1, y: 1}
   gridView: {fileID: 341370300}
   hexMesh: {fileID: -6145683337337129500, guid: 01dbacd4caa73f44ea66d5317d46c061, type: 3}
   isWire: 0
-  colorMode: 4
+  diagonalColorMode: 2
+  colorZeros: 1
+  colorRGB: 0
 --- !u!1 &961739749
 GameObject:
   m_ObjectHideFlags: 0

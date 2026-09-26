@@ -39,6 +39,7 @@ public static class HexCompassExtension
 
     public static HexCompass Opposite(this HexCompass dir) => dir switch
     {
+        HexCompass.NONE => HexCompass.NONE,
         HexCompass.E => HexCompass.W,
         HexCompass.NE => HexCompass.SW,
         HexCompass.NW => HexCompass.SE,

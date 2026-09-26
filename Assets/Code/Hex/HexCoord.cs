@@ -53,13 +53,20 @@ public readonly struct HexCoord : IEquatable<HexCoord>
 
     public HexCoord InDirection(HexCompass dir) => Shifted(dir.Offset());
 
-    
+
     // See https://www.redblobgames.com/grids/hexagons/#range
     public static IEnumerable<HexCoord> AllWithinRings(int numRings)
     {
         for (int q = -numRings; q <= numRings; q++)
             for (int r = Math.Max(-numRings, -q - numRings); r <= Math.Min(numRings, -q + numRings); r++)
                 yield return new HexCoord(q, r);
+    }
+
+    public static HexCoord? FromThreeCoords(int q, int r, int s)
+    {
+        if (q + r + s != 0)
+            return null;
+        return new HexCoord(q,r);
     }
 
     // TODO can use something similar to above method for RANGE later

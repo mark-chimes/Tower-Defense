@@ -9,18 +9,31 @@ public static class HexGizmo
         ALL
     }
 
+    private static readonly Color centerColor = Color.darkGray;
+
+    private static readonly Color spawnColor = Color.white;
+    private static readonly Color goalColor = Color.gold;
+
 
     public static void Draw(HexAuthor hexAuthor, Mesh hexMesh, Transform transform,
-        bool isWire, DiagonalColorMode diagonalMode, bool colorZeros, bool colorRGB)
+         bool showSpawnGoal, bool isWire, DiagonalColorMode diagonalMode, bool colorZeros, bool colorRGB)
     {
         Matrix4x4 originalMatrix = Gizmos.matrix;
         Color originalColor = Gizmos.color;
         Gizmos.matrix = transform.localToWorldMatrix;
 
+        HexCoord spawnCoord = hexAuthor.SpawnCoord;
+        HexCoord goalCoord = hexAuthor.GoalCoord;
+
         foreach (HexCoord coord in HexCoord.AllWithinRings(hexAuthor.NumRings))
         {
             Vector3 pos = HexLayout.CoordsToWorld(coord);
             Gizmos.color = ColorFor(coord, hexAuthor.NumRings, diagonalMode, colorZeros, colorRGB);
+            if (showSpawnGoal)
+            {
+                if (coord == spawnCoord) Gizmos.color = spawnColor;
+                if (coord == goalCoord) Gizmos.color = goalColor;
+            }
 
             if (isWire)
                 Gizmos.DrawWireMesh(hexMesh, pos);
@@ -31,6 +44,7 @@ public static class HexGizmo
         Gizmos.matrix = originalMatrix;
         Gizmos.color = originalColor;
     }
+
 
     private static Color ColorFor(HexCoord coord, int numRings, DiagonalColorMode mode, bool colorZeros, bool colorRGB)
     {
@@ -67,7 +81,7 @@ public static class HexGizmo
     {
         // Center
         if (c.Q == 0 && c.R == 0)
-            return Color.yellowNice;
+            return centerColor;
 
         if (c.Q == 0)
             return Color.mediumSeaGreen;
@@ -93,7 +107,7 @@ public static class HexGizmo
     {
         // Center
         if (c.Q == 0 && c.R == 0)
-            return Color.yellowNice;
+            return centerColor;
 
         if (c.Q == c.R)
         {
@@ -120,7 +134,7 @@ public static class HexGizmo
     {
         // Center
         if (c.Q == 0 && c.R == 0)
-            return Color.yellowNice;
+            return centerColor;
 
         if (c.Q == c.R && c.S > 0)
         {
