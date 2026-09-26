@@ -10,8 +10,6 @@ public class HexGodClass : MonoBehaviour
     [SerializeField] private Mesh hexMesh;
 
     [SerializeField] private bool isWire = false;
-    [SerializeField] private bool isDrawingColors = true;
-
     [SerializeField] private HexGizmo.ColorMode colorMode; 
 
     CameraControl camControl;
