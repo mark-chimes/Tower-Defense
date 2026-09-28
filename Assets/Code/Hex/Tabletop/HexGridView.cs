@@ -135,69 +135,63 @@ public class HexGridView : MonoBehaviour
     }
 
     // TODO the methods below maybe don't cut at the right seams
+    // TODO we're getting changed as sigpost, frontier as coords. Could we just get everything as coords? 
+    public void HighlightChangedOrFrontier(
+        bool shouldHighlight,
+        IReadOnlyCollection<HexSignpost> changed,
+        IReadOnlyCollection<HexCoord> frontier)
+    {
+        Debug.Assert(isInitialized);
 
-    // public void HighlightChangedOrFrontier(
-    //     bool shouldHighlight,
-    //     IReadOnlyCollection<Signpost> changed,
-    //     IReadOnlyCollection<Coord> frontier)
-    // {
-    //     Debug.Assert(isInitialized);
+        UnhighlightAllArrows();
+        foreach (HexSignpost sign in changed)
+        {
+            HexCoord c = sign.Coord;
+            HexDirectionMarker directionMarker = directionMarkers.At(c);
+            directionMarker.ExhibitSignpost(sign);
+        }
 
-    //     UnhighlightAllArrows();
-    //     foreach (Signpost sign in changed)
-    //     {
-    //         Coord c = sign.Coord;
-    //         DirectionMarker directionMarker = directionMarkers[c.X, c.Z];
-    //         directionMarker.ExhibitSignpost(sign);
-    //     }
+        if (shouldHighlight)
+        {
+            foreach (HexCoord c in frontier)
+            {
+                HexDirectionMarker directionMarker = directionMarkers.At(c);
+                directionMarker.ExhibitAccent(ArrowAccent.Frontier);
+            }
+        }
+    }
 
-    //     if (shouldHighlight)
-    //     {
-    //         foreach (Coord c in frontier)
-    //         {
-    //             DirectionMarker directionMarker = directionMarkers[c.X, c.Z];
-    //             directionMarker.ExhibitAccent(ArrowAccent.Frontier);
-    //         }
-    //     }
-    // }
+    public void HighlightPath(IReadOnlyCollection<HexSignpost> changed)
+    {
+        Debug.Assert(isInitialized);
 
-    // public void HighlightPath(IReadOnlyCollection<Signpost> changed)
-    // {
-    //     Debug.Assert(isInitialized);
+        foreach (HexSignpost sign in changed)
+        {
+            HexCoord c = sign.Coord;
+            HexDirectionMarker directionMarker = directionMarkers.At(c);
+            directionMarker.ExhibitAccent(ArrowAccent.Path);
+        }
+    }
 
-    //     foreach (Signpost sign in changed)
-    //     {
-    //         Coord c = sign.Coord;
-    //         DirectionMarker directionMarker = directionMarkers[c.X, c.Z];
-    //         directionMarker.ExhibitAccent(ArrowAccent.Path);
-    //     }
-    // }
+    public void SetVisualizationVisible(bool isVisible)
+    {
+        Debug.Assert(isInitialized);
 
-    // public void SetVisualizationVisible(bool isVisible)
-    // {
-    //     Debug.Assert(isInitialized);
+        spawnObj.SetActive(isVisible);
 
-    //     spawnObj.SetActive(isVisible);
+        foreach (HexDirectionMarker directionMarker in directionMarkers.All())
+        {
+            directionMarker.SetPathingVisible(isVisible);
+        }
+    }
 
-    //     for (int x = 0; x < layout.Width; x++)
-    //     {
-    //         for (int z = 0; z < layout.Height; z++)
-    //         {
-    //             directionMarkers[x, z].SetPathingVisible(isVisible);
-    //         }
-    //     }
-    // }
+    public void SetDistanceVisible(bool isVisible)
+    {
+        Debug.Assert(isInitialized);
 
-    // public void SetDistanceVisible(bool isVisible)
-    // {
-    //     Debug.Assert(isInitialized);
-
-    //     for (int x = 0; x < layout.Width; x++)
-    //     {
-    //         for (int z = 0; z < layout.Height; z++)
-    //         {
-    //             directionMarkers[x, z].SetDistanceVisible(isVisible);
-    //         }
-    //     }
-    // }
+        foreach (HexDirectionMarker directionMarker in directionMarkers.All())
+        {
+            directionMarker.SetDistanceVisible(isVisible);
+        }
+    }
 }
