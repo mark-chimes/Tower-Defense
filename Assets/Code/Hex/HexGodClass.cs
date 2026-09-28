@@ -7,6 +7,8 @@ public class HexGodClass : MonoBehaviour
     [SerializeField] private HexGridView gridView;
 
     [SerializeField] HexGUI gui;
+    [SerializeField] private HexEnemyController enemyController;
+
     [SerializeField] HexGridView.VisualizationSettings StartingVisualization;
     [SerializeField] bool StartingIsStopOnPathFound;
 
@@ -63,7 +65,7 @@ public class HexGodClass : MonoBehaviour
         HexSaveableLevel loaded = saveLoadSystem.OnLoad();
 
         gridView.ClearData();
-        // enemyController.ClearData();
+        enemyController.ClearData();
 
         CreateMapFromData(loaded);
     }
@@ -75,18 +77,6 @@ public class HexGodClass : MonoBehaviour
 
 
     private HexTreasureMap treasureMap;
-
-    // TODO remove this once it is unused
-    void PATHFINDING_UPDATE_PLACEHOLDER()
-    {
-        //
-    }
-
-    void PATHFINDING_CLEAR_PLACEHOLDER()
-    {
-        //
-    }
-
 
     void CreateMapFromNothing()
     {
@@ -108,8 +98,8 @@ public class HexGodClass : MonoBehaviour
 
         treasureMap = new HexTreasureMap(wallMap, spawnPos, goalPos,
                 StartingIsStopOnPathFound,
-                PATHFINDING_UPDATE_PLACEHOLDER,
-                PATHFINDING_CLEAR_PLACEHOLDER// TODO enemyController.PathfindingUpdate, enemyController.PathfindingClear
+                enemyController.PathfindingUpdate,
+                enemyController.PathfindingClear
             );
 
         CreateMapFromTreasureMap(treasureMap, wallMap, StartingVisualization);
@@ -123,9 +113,8 @@ public class HexGodClass : MonoBehaviour
             treasureMap.SpawnPos,
             treasureMap.GoalPos,
             StartingIsStopOnPathFound,
-            PATHFINDING_UPDATE_PLACEHOLDER,
-            PATHFINDING_CLEAR_PLACEHOLDER
-            // TODO enemyController.PathfindingUpdate, enemyController.PathfindingClear
+            enemyController.PathfindingUpdate,
+            enemyController.PathfindingClear
             );
         CreateMapFromTreasureMap(treasureMap, loadedMap, StartingVisualization);
     }
@@ -142,10 +131,10 @@ public class HexGodClass : MonoBehaviour
         // gridWalls.Initialize(treasureMap, layout, pathfindingIOManager.UpdateDistances);
         // gridIO = new GridMouseHighlightIO(gridWalls, treasureMap, Camera.main);
 
-        // enemyController.Initialize(layout, treasureMap);
-        // enemyController.SpawnEnemy();
+        enemyController.Initialize(treasureMap);
+        enemyController.SpawnEnemy();
 
-        gui.Initialize(StartingVisualization, StartingIsStopOnPathFound, pathfindingIOManager, this);
+        gui.Initialize(StartingVisualization, StartingIsStopOnPathFound, pathfindingIOManager, enemyController, this);
         //     , enemyController, this, gridWalls); // TODO cross-dependency code-smell
         mouseIO = new HexMouseIO(gridView, treasureMap, Camera.main, pathfindingIOManager.UpdateDistances);
     }

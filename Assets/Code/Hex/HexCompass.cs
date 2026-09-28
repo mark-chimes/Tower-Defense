@@ -28,6 +28,7 @@ public static class HexCompassExtension
 
     public static HexCoord Offset(this HexCompass dir) => dir switch
     {
+        HexCompass.NONE => new HexCoord(0, 0),
         HexCompass.E => new HexCoord(+1, 0),
         HexCompass.NE => new HexCoord(0, +1),
         HexCompass.NW => new HexCoord(-1, +1),

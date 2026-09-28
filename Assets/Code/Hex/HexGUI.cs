@@ -4,12 +4,10 @@ public class HexGUI : MonoBehaviour
 {
 
     private HexPathfindingIOManager pathfindingIOManager;
-    // private EnemyController enemyController;    
-    
+    private HexEnemyController enemyController;
+
     private HexGodClass godClass; // // TODO Cross-dependency code smell not ideal, but I'll fix this later
 
-
-    // private GridWalls gridWalls;
 
     bool autoRefreshEnabled = false;
     bool wasEnabled = false;
@@ -21,12 +19,11 @@ public class HexGUI : MonoBehaviour
     bool stopPathingEarly = false;
     bool wasStopPathingEarly = false;
 
-    public void Initialize(HexGridView.VisualizationSettings visualization, 
+    public void Initialize(HexGridView.VisualizationSettings visualization,
         bool stopPathingEarly,
         HexPathfindingIOManager pathfindingIOManager,
-        // EnemyController enemyController, // TODO remove reference
+        HexEnemyController enemyController, // TODO remove reference
         HexGodClass godClass
-        // GridWalls gridWalls
         )
     {
         visualizeDistanceEnabled = visualization.ShowDistance;
@@ -36,11 +33,10 @@ public class HexGUI : MonoBehaviour
         wasvisualizePathfindingEnabled = visualizePathfindingEnabled;
 
         this.stopPathingEarly = stopPathingEarly;
-        
+
         this.pathfindingIOManager = pathfindingIOManager;
-        // this.enemyController = enemyController;
+        this.enemyController = enemyController;
         this.godClass = godClass; // TODO Cross-dependency code smell 
-        // this.gridWalls = gridWalls;
     }
 
 
@@ -158,39 +154,39 @@ public class HexGUI : MonoBehaviour
         // === //
 
 
-        // GUI.Box(new Rect(boxX, guiBoatY, boxWidth, guiBoatHeight), "BOATS");
+        GUI.Box(new Rect(boxX, guiBoatY, boxWidth, guiBoatHeight), "BOATS");
 
-        // guiBoatY += yBetweenButtons + boxBuffer;
+        guiBoatY += yBetweenButtons + boxBuffer;
 
-        // if (GUI.Button(new Rect(buttonX, guiBoatY, buttonWidth, buttonHeight), "Spawn Boat"))
-        // {
-        //     Debug.Log("Spawn boats pressed");
-        //     enemyController.OnSpawnBoatPressed();
-        // }
+        if (GUI.Button(new Rect(buttonX, guiBoatY, buttonWidth, buttonHeight), "Spawn Boat"))
+        {
+            Debug.Log("Spawn boats pressed");
+            enemyController.OnSpawnBoatPressed();
+        }
 
-        // guiBoatY += yBetweenButtons;
+        guiBoatY += yBetweenButtons;
 
-        // if (GUI.Button(new Rect(buttonX, guiBoatY, buttonWidth, buttonHeight), "Delete Boats"))
-        // {
-        //     Debug.Log("Delete boats pressed");
-        //     enemyController.OnDeleteBoatsPressed();
-        // }
+        if (GUI.Button(new Rect(buttonX, guiBoatY, buttonWidth, buttonHeight), "Delete Boats"))
+        {
+            Debug.Log("Delete boats pressed");
+            enemyController.OnDeleteBoatsPressed();
+        }
 
-        // guiBoatY += yBetweenButtons;
+        guiBoatY += yBetweenButtons;
 
-        // if (GUI.Button(new Rect(buttonX, guiBoatY, buttonWidth, buttonHeight), "Follow existing path"))
-        // {
-        //     Debug.Log("Follow existing path pressed");
-        //     enemyController.OnBoatsFollowExistingPathPressed();
-        // }
+        if (GUI.Button(new Rect(buttonX, guiBoatY, buttonWidth, buttonHeight), "Follow existing path"))
+        {
+            Debug.Log("Follow existing path pressed");
+            enemyController.OnBoatsFollowExistingPathPressed();
+        }
 
-        // guiBoatY += yBetweenButtons;
+        guiBoatY += yBetweenButtons;
 
-        // if (GUI.Button(new Rect(buttonX, guiBoatY, buttonWidth, buttonHeight), "Stop boats"))
-        // {
-        //     Debug.Log("Stop boats pressed");
-        //     enemyController.OnBoatsStopPressed();
-        // }
+        if (GUI.Button(new Rect(buttonX, guiBoatY, buttonWidth, buttonHeight), "Stop boats"))
+        {
+            Debug.Log("Stop boats pressed");
+            enemyController.OnBoatsStopPressed();
+        }
 
         // // === //
 

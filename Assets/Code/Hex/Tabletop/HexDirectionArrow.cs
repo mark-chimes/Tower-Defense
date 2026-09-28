@@ -12,13 +12,7 @@ public class HexDirectionArrow : Highlightable
     {
         MeshRenderer.enabled = false;
     }
-
-    public void TurnTo(Vector3 v)
-    {
-        transform.localRotation = Quaternion.LookRotation(new Vector3(v.x, 0f, v.z), Vector3.up);
-        Show();
-    }
-
+    
     public void TurnTo(HexCompass dir)
     {
         if (dir == HexCompass.NONE)
@@ -26,6 +20,7 @@ public class HexDirectionArrow : Highlightable
             Hide();
             return;
         }
-        TurnTo(HexLayout.CoordsToWorld(dir.Offset()));
+        transform.localRotation = HexLayout.CompassToQuaternion(dir);
+        Show();
     }
 }
