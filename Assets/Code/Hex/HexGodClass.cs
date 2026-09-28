@@ -19,10 +19,14 @@ public class HexGodClass : MonoBehaviour
     CameraControl camControl;
     HexMouseIO mouseIO;
 
+    HexPathfindingIOManager pathfindingIOManager;
+
     void Awake()
     {
         camControl = new CameraControl();
         camControl.Initialize();
+
+        pathfindingIOManager = new HexPathfindingIOManager();
     }
 
     void Start()
@@ -34,6 +38,7 @@ public class HexGodClass : MonoBehaviour
     {
         camControl.ControlCamera();
         mouseIO.HandleMouse();
+        pathfindingIOManager.ContinuallySingleStep();
     }
 
     void OnDrawGizmos()
@@ -52,7 +57,7 @@ public class HexGodClass : MonoBehaviour
     // TODO remove this once it is unused
     void PATHFINDING_UPDATE_PLACEHOLDER()
     {
-        gridView.ExhibitSignposts(treasureMap.Signposts());
+        //
     }
 
     void PATHFINDING_CLEAR_PLACEHOLDER()
@@ -103,9 +108,11 @@ public class HexGodClass : MonoBehaviour
     void CreateMapFromTreasureMap(HexTreasureMap treasureMap, HexMap<bool> wallMap)
     {
         gridView.Initialize(wallMap, treasureMap.SpawnPos, treasureMap.GoalPos);
+        pathfindingIOManager.Initialize(treasureMap, gridView);
+
+        pathfindingIOManager.SetAutoRefreshMode(true); // TODO fix this when debug gui added
+
         // TODO
-        // pathfindingIOManager.Initialize(treasureMap, gridView);
-        // pathfindingIOManager.ClearField();
 
         // gridWalls.Initialize(treasureMap, layout, pathfindingIOManager.UpdateDistances);
         // gridIO = new GridMouseHighlightIO(gridWalls, treasureMap, Camera.main);
@@ -115,7 +122,6 @@ public class HexGodClass : MonoBehaviour
 
         // gui.Initialize(StartingVisualization, StartingIsStopOnPathFound,
         //     pathfindingIOManager, enemyController, this, gridWalls); // TODO cross-dependency code-smell
-        treasureMap.Recompute();
         mouseIO = new HexMouseIO(gridView, treasureMap, Camera.main);
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -20,14 +21,18 @@ public class HexMouseIO
     private HexGridView gridView;
     private Camera cam;
 
+    private Action onWallChange;
+
 
     // private GridWalls wallHandler;
 
-    public HexMouseIO(HexGridView gridView, HexTreasureMap treasureMap, Camera cam)
+    public HexMouseIO(HexGridView gridView, HexTreasureMap treasureMap,
+        Camera cam, Action onWallChange)
     {
         this.gridView = gridView;
         this.treasureMap = treasureMap;
         this.cam = cam;
+        this.onWallChange = onWallChange;
     }
 
     public void HandleMouse()
@@ -74,7 +79,7 @@ public class HexMouseIO
         if (!treasureMap.CanPlaceWall(c)) return; // TODO: red ghost
         treasureMap.SetWall(c, true);
         gridView.SetTerrainAt(c, true);
-        treasureMap.Recompute();
+        onWallChange.Invoke();
     }
 
     private void DestroyWallAtHovered()
@@ -84,6 +89,6 @@ public class HexMouseIO
         if (!treasureMap.HasWall(c)) return;
         treasureMap.SetWall(c, false);
         gridView.SetTerrainAt(c, false);
-        treasureMap.Recompute();
+        onWallChange.Invoke();
     }
 }
