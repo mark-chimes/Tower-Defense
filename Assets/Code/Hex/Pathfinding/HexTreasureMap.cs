@@ -98,10 +98,10 @@ public class HexTreasureMap
         return TileMarker.None;
     }
 
-    // public SaveableLevel AsSaveableData()
-    // {
-    //     return new SaveableLevel(Width, Height, wallMap);
-    // }
+    public HexSaveableLevel AsSaveableData()
+    {
+        return new HexSaveableLevel(wallMap);
+    }
 
     public enum TileMarker
     {

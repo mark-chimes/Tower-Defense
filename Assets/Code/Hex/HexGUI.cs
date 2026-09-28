@@ -6,7 +6,7 @@ public class HexGUI : MonoBehaviour
     private HexPathfindingIOManager pathfindingIOManager;
     // private EnemyController enemyController;    
     
-    // private HexGodClass godClass; // // TODO Cross-dependency code smell not ideal, but I'll fix this later
+    private HexGodClass godClass; // // TODO Cross-dependency code smell not ideal, but I'll fix this later
 
 
     // private GridWalls gridWalls;
@@ -23,9 +23,9 @@ public class HexGUI : MonoBehaviour
 
     public void Initialize(HexGridView.VisualizationSettings visualization, 
         bool stopPathingEarly,
-        HexPathfindingIOManager pathfindingIOManager
+        HexPathfindingIOManager pathfindingIOManager,
         // EnemyController enemyController, // TODO remove reference
-        // HexGodClass godClass,
+        HexGodClass godClass
         // GridWalls gridWalls
         )
     {
@@ -39,7 +39,7 @@ public class HexGUI : MonoBehaviour
         
         this.pathfindingIOManager = pathfindingIOManager;
         // this.enemyController = enemyController;
-        // this.godClass = godClass; // TODO Cross-dependency code smell 
+        this.godClass = godClass; // TODO Cross-dependency code smell 
         // this.gridWalls = gridWalls;
     }
 
@@ -194,22 +194,22 @@ public class HexGUI : MonoBehaviour
 
         // // === //
 
-        // GUI.Box(new Rect(boxX, guiSaveLoadY, boxWidth, guiSaveLoadHeight), "SAVE/LOAD");
-        // guiSaveLoadY += yBetweenButtons + boxBuffer;
+        GUI.Box(new Rect(boxX, guiSaveLoadY, boxWidth, guiSaveLoadHeight), "SAVE/LOAD");
+        guiSaveLoadY += yBetweenButtons + boxBuffer;
 
-        // if (GUI.Button(new Rect(buttonX, guiSaveLoadY, buttonWidth, buttonHeight), "Save"))
-        // {
-        //     Debug.Log("Save pressed");
-        //     godClass.OnSave();
-        // }
+        if (GUI.Button(new Rect(buttonX, guiSaveLoadY, buttonWidth, buttonHeight), "Save"))
+        {
+            Debug.Log("Save pressed");
+            godClass.OnSave();
+        }
 
-        // guiSaveLoadY += yBetweenButtons;
+        guiSaveLoadY += yBetweenButtons;
 
-        // if (GUI.Button(new Rect(buttonX, guiSaveLoadY, buttonWidth, buttonHeight), "Load"))
-        // {
-        //     Debug.Log("Load pressed");
-        //     godClass.OnLoad();
-        // }
+        if (GUI.Button(new Rect(buttonX, guiSaveLoadY, buttonWidth, buttonHeight), "Load"))
+        {
+            Debug.Log("Load pressed");
+            godClass.OnLoad();
+        }
 
         // // === //
 
