@@ -23,9 +23,6 @@ public class HexMouseIO
 
     private Action onWallChange;
 
-
-    // private GridWalls wallHandler;
-
     public HexMouseIO(HexGridView gridView, HexTreasureMap treasureMap,
         Camera cam, Action onWallChange)
     {

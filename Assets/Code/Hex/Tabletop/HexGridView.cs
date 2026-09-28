@@ -33,8 +33,9 @@ public class HexGridView : MonoBehaviour
     private bool isInitialized;
 
     // TODO reconsider if this should handle "floors" and "walls" together or not? 
-    public void Initialize(HexMap<bool> walls, HexCoord spawnCoord, HexCoord goalCoord)
-    // , HexCoord spawnPos, HexCoord goalPos, VisualizationSettings visualizationSettings) // Later
+    public void Initialize(HexMap<bool> walls, HexCoord spawnCoord, HexCoord goalCoord,
+    // HexCoord spawnPos, HexCoord goalPos, 
+        VisualizationSettings visualizationSettings) // Later
     {
         Debug.Assert(!isInitialized);
         isInitialized = true;
@@ -48,8 +49,8 @@ public class HexGridView : MonoBehaviour
             HexDirectionMarker directionMarker = signpostObj.GetComponent<HexDirectionMarker>();
             directionMarker.Initialize(c);
             directionMarker.SetIsOnPathableTerrain(!walls.At(c));
-            directionMarker.SetPathingVisible(true);
-            directionMarker.SetDistanceVisible(true);
+            directionMarker.SetPathingVisible(visualizationSettings.ShowPathfinding);
+            directionMarker.SetDistanceVisible(visualizationSettings.ShowDistance);
 
             MakeFlagstoneAt(c, walls.At(c));
 
@@ -76,11 +77,12 @@ public class HexGridView : MonoBehaviour
     }
 
 
-    public void Reinitialize(HexMap<bool> walls, HexCoord spawnCoord, HexCoord goalCoord)
-    // HexCoord spawnPos, HexCoord goalPos, VisualizationSettings visualizationSettings)
+    public void Reinitialize(HexMap<bool> walls, HexCoord spawnCoord, HexCoord goalCoord,
+    // HexCoord spawnPos, HexCoord goalPos, 
+        VisualizationSettings visualizationSettings)
     {
         ClearData();
-        Initialize(walls, spawnCoord, goalCoord); // visualizationSettings);
+        Initialize(walls, spawnCoord, goalCoord, visualizationSettings);
     }
 
 

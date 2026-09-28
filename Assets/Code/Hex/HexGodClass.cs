@@ -6,6 +6,10 @@ public class HexGodClass : MonoBehaviour
     [SerializeField] private HexAuthor gridAuthor;
     [SerializeField] private HexGridView gridView;
 
+    [SerializeField] HexGUI gui;
+    [SerializeField] HexGridView.VisualizationSettings StartingVisualization;
+    [SerializeField] bool StartingIsStopOnPathFound;
+
 
     [SerializeField] private Mesh hexMesh;
 
@@ -46,10 +50,10 @@ public class HexGodClass : MonoBehaviour
         HexGizmo.Draw(gridAuthor, hexMesh, transform, showSpawnAndGoal, isWire, diagonalColorMode, colorZeros, colorRGB);
     }
 
-    void CreateMapFromWallMap(HexMap<bool> wallMap, HexCoord spawnCoord, HexCoord goalCoord)
-    {
-        gridView.Initialize(wallMap, spawnCoord, goalCoord);
-    }
+    // void CreateMapFromWallMap(HexMap<bool> wallMap, HexCoord spawnCoord, HexCoord goalCoord)
+    // {
+    //     gridView.Initialize(wallMap, spawnCoord, goalCoord);
+    // }
 
 
     private HexTreasureMap treasureMap;
@@ -85,11 +89,11 @@ public class HexGodClass : MonoBehaviour
         HexCoord goalPos = gridAuthor.GoalCoord;
 
         treasureMap = new HexTreasureMap(wallMap, spawnPos, goalPos,
-            true, // TODO
+                StartingIsStopOnPathFound,
                 PATHFINDING_UPDATE_PLACEHOLDER, PATHFINDING_CLEAR_PLACEHOLDER// TODO enemyController.PathfindingUpdate, enemyController.PathfindingClear
             );
 
-        CreateMapFromTreasureMap(treasureMap, wallMap);
+        CreateMapFromTreasureMap(treasureMap, wallMap, StartingVisualization);
     }
 
     // void CreateMapFromData(SaveableLevel loaded)
@@ -105,12 +109,12 @@ public class HexGodClass : MonoBehaviour
     //     CreateMapFromTreasureMap(treasureMap);
     // }
 
-    void CreateMapFromTreasureMap(HexTreasureMap treasureMap, HexMap<bool> wallMap)
+    void CreateMapFromTreasureMap(HexTreasureMap treasureMap,
+        HexMap<bool> wallMap,
+        HexGridView.VisualizationSettings visualizationSettings)
     {
-        gridView.Initialize(wallMap, treasureMap.SpawnPos, treasureMap.GoalPos);
+        gridView.Initialize(wallMap, treasureMap.SpawnPos, treasureMap.GoalPos, visualizationSettings);
         pathfindingIOManager.Initialize(treasureMap, gridView);
-
-        pathfindingIOManager.SetAutoRefreshMode(true); // TODO fix this when debug gui added
 
         // TODO
 
@@ -120,8 +124,8 @@ public class HexGodClass : MonoBehaviour
         // enemyController.Initialize(layout, treasureMap);
         // enemyController.SpawnEnemy();
 
-        // gui.Initialize(StartingVisualization, StartingIsStopOnPathFound,
-        //     pathfindingIOManager, enemyController, this, gridWalls); // TODO cross-dependency code-smell
-        mouseIO = new HexMouseIO(gridView, treasureMap, Camera.main);
+        gui.Initialize(StartingVisualization, StartingIsStopOnPathFound, pathfindingIOManager);
+        //     , enemyController, this, gridWalls); // TODO cross-dependency code-smell
+        mouseIO = new HexMouseIO(gridView, treasureMap, Camera.main, pathfindingIOManager.UpdateDistances);
     }
 }
