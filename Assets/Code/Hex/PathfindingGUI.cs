@@ -10,12 +10,12 @@ public class PathfindingGUI : MonoBehaviour
 
 
     bool autoRefreshEnabled = false;
-    bool wasEnabled = false;
+    bool wasAutoRefreshEnabled = false;
 
     bool visualizeDistanceEnabled = true;
-    bool wasvisualizeDistanceEnabled = true;
+    bool wasVisualizeDistanceEnabled = true;
     bool visualizePathfindingEnabled = true;
-    bool wasvisualizePathfindingEnabled = true;
+    bool wasVisualizePathfindingEnabled = true;
     bool stopPathingEarly = false;
     bool wasStopPathingEarly = false;
 
@@ -27,10 +27,10 @@ public class PathfindingGUI : MonoBehaviour
         )
     {
         visualizeDistanceEnabled = visualization.ShowDistance;
-        wasvisualizeDistanceEnabled = visualizeDistanceEnabled;
+        wasVisualizeDistanceEnabled = visualizeDistanceEnabled;
 
         visualizePathfindingEnabled = visualization.ShowPathfinding;
-        wasvisualizePathfindingEnabled = visualizePathfindingEnabled;
+        wasVisualizePathfindingEnabled = visualizePathfindingEnabled;
 
         this.stopPathingEarly = stopPathingEarly;
 
@@ -120,25 +120,25 @@ public class PathfindingGUI : MonoBehaviour
         guiVisY += yBetweenButtons + boxBuffer;
 
         autoRefreshEnabled = GUI.Toggle(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), autoRefreshEnabled, "Auto-Refresh");
-        if (wasEnabled != autoRefreshEnabled)
+        if (wasAutoRefreshEnabled != autoRefreshEnabled)
         {
-            wasEnabled = autoRefreshEnabled;
+            wasAutoRefreshEnabled = autoRefreshEnabled;
             flowBridge.SetAutoRefreshMode(autoRefreshEnabled);
         }
         guiVisY += yBetweenButtons;
 
         visualizeDistanceEnabled = GUI.Toggle(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), visualizeDistanceEnabled, "Distance Numbers");
-        if (wasvisualizeDistanceEnabled != visualizeDistanceEnabled)
+        if (wasVisualizeDistanceEnabled != visualizeDistanceEnabled)
         {
-            wasvisualizeDistanceEnabled = visualizeDistanceEnabled;
+            wasVisualizeDistanceEnabled = visualizeDistanceEnabled;
             flowBridge.OnSetNumbersVisible(visualizeDistanceEnabled);
         }
         guiVisY += yBetweenButtons;
 
         visualizePathfindingEnabled = GUI.Toggle(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), visualizePathfindingEnabled, "Pathfinding Arrows");
-        if (wasvisualizePathfindingEnabled != visualizePathfindingEnabled)
+        if (wasVisualizePathfindingEnabled != visualizePathfindingEnabled)
         {
-            wasvisualizePathfindingEnabled = visualizePathfindingEnabled;
+            wasVisualizePathfindingEnabled = visualizePathfindingEnabled;
             flowBridge.OnSetVisualizationVisible(visualizePathfindingEnabled);
         }
         guiVisY += yBetweenButtons;

@@ -21,7 +21,7 @@ public class Wayfinder
 
 
     Lattice<bool> visited;
-    Queue<HexCoord> erfQueue;
+    Queue<HexCoord> frontier;
     HexCoord? pathC;
 
 
@@ -44,7 +44,7 @@ public class Wayfinder
     public void ClearField()
     {
         visited = new Lattice<bool>(NumRings);
-        erfQueue = new Queue<HexCoord>();
+        frontier = new Queue<HexCoord>();
         field = new FlowField(NumRings);
         phase = HexSearch.Phase.ExpandFrontier;
 
@@ -72,12 +72,12 @@ public class Wayfinder
 
         visited.SetAt(c, true);
         field.SetTile(c, new FlowField.Tile(0, HexCompass.NONE, false));
-        erfQueue.Enqueue(c);
+        frontier.Enqueue(c);
     }
 
     public IReadOnlyCollection<HexCoord> CurrentFrontier()
     {
-        return erfQueue.ToArray();
+        return frontier.ToArray();
     }
 
     public void ComputeFlow()
@@ -107,7 +107,7 @@ public class Wayfinder
 
         if (phase != HexSearch.Phase.ExpandFrontier) return list;
 
-        if (erfQueue.TryDequeue(out var coord))
+        if (frontier.TryDequeue(out var coord))
         {
             int prevDist = field.TileAt(coord).Distance;
 
@@ -154,7 +154,7 @@ public class Wayfinder
                     return list;
                 }
 
-                erfQueue.Enqueue(c);
+                frontier.Enqueue(c);
             }
         }
         else

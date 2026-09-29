@@ -17,7 +17,7 @@ public class GameMaster : MonoBehaviour
     [SerializeField] private bool isWire = false;
     [SerializeField] private bool showSpawnAndGoal = true;
 
-    [SerializeField] private Gizmo.DiagonalColorMode diagonalColorMode = Gizmo.DiagonalColorMode.POSITIVE;
+    [SerializeField] private Gizmo.DiagonalColorMode diagonalColorMode = Gizmo.DiagonalColorMode.Positive;
     [SerializeField] private bool colorZeros = true;
     [SerializeField] private bool colorRGB = false;
 

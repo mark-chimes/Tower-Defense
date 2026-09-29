@@ -4,9 +4,9 @@ public static class Gizmo
 {
     public enum DiagonalColorMode
     {
-        NONE,
-        POSITIVE,
-        ALL
+        None,
+        Positive,
+        All
     }
 
     private static readonly Color centerColor = Color.darkGray;
@@ -97,8 +97,8 @@ public static class Gizmo
     {
         switch (mode)
         {
-            case DiagonalColorMode.POSITIVE: return ColorDiagonalsPositive(c, N);
-            case DiagonalColorMode.ALL: return ColorDiagonalsAll(c, N);
+            case DiagonalColorMode.Positive: return ColorDiagonalsPositive(c, N);
+            case DiagonalColorMode.All: return ColorDiagonalsAll(c, N);
             default: return null;
         }
     }

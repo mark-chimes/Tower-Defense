@@ -257,7 +257,7 @@ GameObject:
   - component: {fileID: 341370301}
   - component: {fileID: 341370300}
   m_Layer: 0
-  m_Name: HexGridView
+  m_Name: TerrainWithOverlay
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -339,7 +339,7 @@ GameObject:
   - component: {fileID: 742519894}
   - component: {fileID: 742519895}
   m_Layer: 0
-  m_Name: HexGodClass
+  m_Name: GameMaster
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -372,7 +372,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e163985b32971ca429998ceb23113d27, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HexGodClass
-  gridAuthor:
+  layoutSpecs:
     numRings: 8
     spawnInitQR: {x: -5, y: 0}
     goalInitQR: {x: 5, y: 0}
@@ -582,7 +582,7 @@ GameObject:
   - component: {fileID: 1923155180}
   - component: {fileID: 1923155181}
   m_Layer: 0
-  m_Name: GUI
+  m_Name: PathfindingGUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
