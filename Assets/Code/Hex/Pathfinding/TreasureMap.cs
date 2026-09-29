@@ -66,7 +66,6 @@ public class TreasureMap
         onPathfindingClear.Invoke();
     }
 
-    // TODO check this works if pathfinding is not set
     public HexSnapshot At(HexCoord coord)
     {
         return new HexSnapshot(coord, TileMarkerAt(coord), wallMap.At(coord));
@@ -81,8 +80,6 @@ public class TreasureMap
     {
         return wayfinder.Signposts();
     }
-
-    // public HexSignpost SignpostAt(int q, int r) => SignpostAt(new HexCoord(q, r));
 
     public void SetWall(HexCoord c, bool hasWall) => wallMap.SetAt(c, hasWall);
 

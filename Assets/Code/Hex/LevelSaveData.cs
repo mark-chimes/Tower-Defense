@@ -30,7 +30,7 @@ public class LevelSaveData
 
     public override string ToString()
     {
-        return $"SaveableLevel NumRings: {NumRings}";
+        return $"LevelSaveData NumRings: {NumRings}";
     }
 
 }

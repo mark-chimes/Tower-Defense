@@ -81,7 +81,7 @@ public class Lattice<T>
 
     public override string ToString()
     {
-        return $"HexMap<{typeof(T).Name}> with Num Rings: {NumRings}";
+        return $"Lattice<{typeof(T).Name}> with Num Rings: {NumRings}";
     }
 
     private Lattice(T[,] map, int numRings)
