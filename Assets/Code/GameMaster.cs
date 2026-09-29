@@ -39,7 +39,7 @@ public class GameMaster : MonoBehaviour
 
     void Start()
     {
-        CreateMapFromNothing();
+        CreateTestMap();
     }
 
     void Update()
@@ -72,7 +72,7 @@ public class GameMaster : MonoBehaviour
     private TreasureMap treasureMap;
 
     // TODO rename this
-    void CreateMapFromNothing()
+    void CreateTestMap()
     {
         Lattice<bool> wallMap = new Lattice<bool>(layoutSpecs.NumRings);
 
@@ -125,6 +125,6 @@ public class GameMaster : MonoBehaviour
         enemyController.SpawnEnemy();
 
         gui.Initialize(StartingVisualization, StartingIsStopOnPathFound, flowBridge, enemyController, this);
-        boardInput = new BoardInput(gridView, treasureMap, Camera.main, flowBridge.UpdateDistances);
+        boardInput = new BoardInput(gridView, treasureMap, Camera.main, flowBridge.OnWallsChanged);
     }
 }

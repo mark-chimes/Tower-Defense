@@ -51,7 +51,7 @@ public class TerrainWithOverlay : MonoBehaviour
 
             MakeFlagstoneAt(c, walls.At(c));
 
-            signpost.name = $"Signpost_{c}"; // TODO rename this
+            signpost.name = $"Signpost_{c}";
             signposts.SetAt(c, signpost);
 
             // TODO spawn and goal pos

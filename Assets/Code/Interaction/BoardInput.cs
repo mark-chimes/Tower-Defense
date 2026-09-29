@@ -50,7 +50,7 @@ public class BoardInput
         {
             HexCoord c = hovered.Coord;
             HexSnapshot snapshot = treasureMap.At(c);
-            if (snapshot.TileMarker != TreasureMap.TileMarker.None)
+            if (snapshot.Landmark != TreasureMap.Landmark.None)
                 highlightColor = blockedColor;
             else if (snapshot.HasWall)
                 highlightColor = existingWallColor;

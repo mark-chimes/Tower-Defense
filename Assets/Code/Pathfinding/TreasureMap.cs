@@ -47,7 +47,7 @@ public class TreasureMap
         wayfinder = wayfinder.WithNewSearchDir(searchDir);
     }
 
-    public HexSearch.Delta SingleStep()
+    public HexSearch.Delta AdvanceSearch()
     {
         return wayfinder.ComputeSingleStep();
     }
@@ -68,7 +68,7 @@ public class TreasureMap
 
     public HexSnapshot At(HexCoord coord)
     {
-        return new HexSnapshot(coord, TileMarkerAt(coord), wallMap.At(coord));
+        return new HexSnapshot(coord, LandmarkAt(coord), wallMap.At(coord));
     }
 
     public FlowSample FlowAt(HexCoord coord)
@@ -86,13 +86,13 @@ public class TreasureMap
     public bool HasWall(HexCoord c) => wallMap.At(c);
 
 
-    public bool CanPlaceWall(HexCoord c) => TileMarkerAt(c) == TileMarker.None && !HasWall(c);
+    public bool CanPlaceWall(HexCoord c) => LandmarkAt(c) == Landmark.None && !HasWall(c);
 
-    private TileMarker TileMarkerAt(HexCoord coord)
+    private Landmark LandmarkAt(HexCoord coord)
     {
-        if (coord == SpawnPos) return TileMarker.Spawn;
-        else if (coord == GoalPos) return TileMarker.Goal;
-        return TileMarker.None;
+        if (coord == SpawnPos) return Landmark.Spawn;
+        else if (coord == GoalPos) return Landmark.Goal;
+        return Landmark.None;
     }
 
     public LevelSaveData ToSaveData()
@@ -100,7 +100,7 @@ public class TreasureMap
         return new LevelSaveData(wallMap);
     }
 
-    public enum TileMarker
+    public enum Landmark
     {
         None,
         Spawn,

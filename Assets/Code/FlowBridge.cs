@@ -119,12 +119,12 @@ public class FlowBridge
 
     private void SingleStep()
     {
-        HexSearch.Delta delta = treasureMap.SingleStep();
+        HexSearch.Delta delta = treasureMap.AdvanceSearch();
         RefreshFromDeltaHighlightFrontier(delta);
 
     }
 
-    public void UpdateDistances()
+    public void OnWallsChanged()
     {
         if (!isAutoRefreshMode)
         {
