@@ -4,7 +4,6 @@ using System.Collections.Generic;
 // Check https://www.redblobgames.com/grids/hexagons for more info
 // We use an axial coordinate system which provides a cubic interface
 
-// Rename: Keep name
 public readonly struct HexCoord : IEquatable<HexCoord>
 {
     public readonly int Q;

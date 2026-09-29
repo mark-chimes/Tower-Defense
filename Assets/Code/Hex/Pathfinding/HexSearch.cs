@@ -20,9 +20,9 @@ public class HexSearch
     public readonly struct Delta
     {
         public readonly Phase Phase;
-        public readonly IReadOnlyCollection<HexSignpost> Changed;
+        public readonly IReadOnlyCollection<FlowSample> Changed;
 
-        public Delta(Phase phase, IReadOnlyCollection<HexSignpost> changed)
+        public Delta(Phase phase, IReadOnlyCollection<FlowSample> changed)
         {
             Phase = phase;
             Changed = changed;

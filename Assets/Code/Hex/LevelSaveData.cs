@@ -2,13 +2,12 @@ using UnityEngine;
 
 [System.Serializable]
 
-// Rename to LevelSaveData
-public class HexSaveableLevel
+public class LevelSaveData
 {
     public int NumRings;
     public bool[] IsWall; // 1D flattening of 2D array
 
-    public HexSaveableLevel(HexMap<bool> wallMap)
+    public LevelSaveData(Lattice<bool> wallMap)
     {
         NumRings = wallMap.NumRings;
         IsWall = wallMap.MapAsFlatArray();
@@ -19,14 +18,14 @@ public class HexSaveableLevel
         return JsonUtility.ToJson(this);
     }
 
-    public static HexSaveableLevel FromJson(string json)
+    public static LevelSaveData FromJson(string json)
     {
-        return JsonUtility.FromJson<HexSaveableLevel>(json);
+        return JsonUtility.FromJson<LevelSaveData>(json);
     }
 
-    public HexMap<bool> LoadMap()
+    public Lattice<bool> LoadMap()
     {
-        return HexMap<bool>.MapFromArray(IsWall, NumRings);
+        return Lattice<bool>.MapFromArray(IsWall, NumRings);
     }
 
     public override string ToString()

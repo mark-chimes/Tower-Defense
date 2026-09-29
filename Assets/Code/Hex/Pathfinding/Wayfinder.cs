@@ -1,19 +1,18 @@
 using System.Collections.Generic;
 
-// Rename to Wayfinder
-public class HexWayfinder
+public class Wayfinder
 {
     public readonly HexCoord SpawnPos;
     public readonly HexCoord GoalPos;
 
-    private HexMap<bool> wallMap; // Do not modify
+    private Lattice<bool> wallMap; // Do not modify
 
     public int NumRings => wallMap.NumRings;
 
     private readonly HexSearch.Dir SearchDirection;
 
 
-    private HexFlowField currentFlow;
+    private FlowField currentFlow;
 
     private HexSearch.Phase phase = HexSearch.Phase.ExpandFrontier;
 
@@ -21,15 +20,15 @@ public class HexWayfinder
 
 
 
-    HexMap<bool> visited;
+    Lattice<bool> visited;
     Queue<HexCoord> erfQueue;
     HexCoord? pathC;
 
 
-    public HexWayfinder(HexMap<bool> wallMap, HexCoord spawnPos, HexCoord goalPos, HexSearch.Dir searchDirection, bool isStopOnPathFound)
+    public Wayfinder(Lattice<bool> wallMap, HexCoord spawnPos, HexCoord goalPos, HexSearch.Dir searchDirection, bool isStopOnPathFound)
     {
         this.wallMap = wallMap;
-        currentFlow = new HexFlowField(NumRings);
+        currentFlow = new FlowField(NumRings);
         SpawnPos = spawnPos;
         GoalPos = goalPos;
         SearchDirection = searchDirection;
@@ -37,16 +36,16 @@ public class HexWayfinder
         ClearField();
     }
 
-    public HexWayfinder WithNewSearchDir(HexSearch.Dir searchDirection)
+    public Wayfinder WithNewSearchDir(HexSearch.Dir searchDirection)
     {
-        return new HexWayfinder(wallMap, SpawnPos, GoalPos, searchDirection, isStopOnPathFound);
+        return new Wayfinder(wallMap, SpawnPos, GoalPos, searchDirection, isStopOnPathFound);
     }
 
     public void ClearField()
     {
-        visited = new HexMap<bool>(NumRings);
+        visited = new Lattice<bool>(NumRings);
         erfQueue = new Queue<HexCoord>();
-        currentFlow = new HexFlowField(NumRings);
+        currentFlow = new FlowField(NumRings);
         phase = HexSearch.Phase.ExpandFrontier;
 
         HexCoord c;
@@ -72,7 +71,7 @@ public class HexWayfinder
         }
 
         visited.SetAt(c, true);
-        currentFlow.SetTile(c, new HexFlowField.Tile(0, HexCompass.NONE, false));
+        currentFlow.SetTile(c, new FlowField.Sample(0, HexCompass.NONE, false));
         erfQueue.Enqueue(c);
     }
 
@@ -92,19 +91,19 @@ public class HexWayfinder
     public HexSearch.Delta ComputeSingleStep()
     {
         HexSearch.Phase phaseAtStart = phase;
-        IReadOnlyCollection<HexSignpost> changed = phase switch
+        IReadOnlyCollection<FlowSample> changed = phase switch
         {
             HexSearch.Phase.ExpandFrontier => BFSOneDirSingleStep(),
             HexSearch.Phase.TracePath => MarkCriticalPathSingleStep(),
-            _ => System.Array.Empty<HexSignpost>(),
+            _ => System.Array.Empty<FlowSample>(),
         };
         return new HexSearch.Delta(phaseAtStart, changed);
     }
 
 
-    private IReadOnlyCollection<HexSignpost> BFSOneDirSingleStep()
+    private IReadOnlyCollection<FlowSample> BFSOneDirSingleStep()
     {
-        var list = new List<HexSignpost>();
+        var list = new List<FlowSample>();
 
         if (phase != HexSearch.Phase.ExpandFrontier) return list;
 
@@ -145,9 +144,9 @@ public class HexWayfinder
                     default: { phase = HexSearch.Phase.Done; return list; } // TODO
                 }
 
-                HexFlowField.Tile newTile = new HexFlowField.Tile(prevDist + 1, newDir, false);
+                FlowField.Sample newTile = new FlowField.Sample(prevDist + 1, newDir, false);
                 currentFlow.SetTile(c, newTile);
-                list.Add(new HexSignpost(c, newTile));
+                list.Add(new FlowSample(c, newTile));
 
                 if (isStopOnPathFound && c == target)
                 {
@@ -165,9 +164,9 @@ public class HexWayfinder
         return list;
     }
 
-    private IReadOnlyCollection<HexSignpost> MarkCriticalPathSingleStep()
+    private IReadOnlyCollection<FlowSample> MarkCriticalPathSingleStep()
     {
-        IReadOnlyCollection<HexSignpost> empty = System.Array.Empty<HexSignpost>();
+        IReadOnlyCollection<FlowSample> empty = System.Array.Empty<FlowSample>();
         if (phase != HexSearch.Phase.TracePath) { phase = HexSearch.Phase.Done; return empty; }
 
         if (SearchDirection == HexSearch.Dir.Dual) { phase = HexSearch.Phase.Done; return empty; } // TODO
@@ -175,8 +174,8 @@ public class HexWayfinder
         if (pathC == null) { phase = HexSearch.Phase.Done; return empty; }
 
         HexCoord coord = (HexCoord)pathC;
-        HexFlowField.Tile oldTile = currentFlow.TileAt(coord);
-        HexFlowField.Tile newTile = new HexFlowField.Tile(oldTile.Distance, oldTile.DirToGoal, true);
+        FlowField.Sample oldTile = currentFlow.TileAt(coord);
+        FlowField.Sample newTile = new FlowField.Sample(oldTile.Distance, oldTile.DirToGoal, true);
         currentFlow.SetTile(coord, newTile);
 
         HexCompass dir;
@@ -195,15 +194,15 @@ public class HexWayfinder
             HexCoord next = coord.InDirection(dir);
             pathC = wallMap.IsCoordOnMap(next) ? next : null;
         }
-        return new[] { new HexSignpost(coord, newTile) };
+        return new[] { new FlowSample(coord, newTile) };
     }
 
-    public HexSignpost SignpostAt(HexCoord coord)
+    public FlowSample SignpostAt(HexCoord coord)
     {
-        return new HexSignpost(coord, currentFlow.TileAt(coord));
+        return new FlowSample(coord, currentFlow.TileAt(coord));
     }
 
-    public IReadOnlyCollection<HexSignpost> Signposts()
+    public IReadOnlyCollection<FlowSample> Signposts()
     {
         return currentFlow.Signposts();
     }

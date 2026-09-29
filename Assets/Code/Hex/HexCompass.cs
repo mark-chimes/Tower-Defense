@@ -1,6 +1,5 @@
 using System;
 
-// Keep name
 public enum HexCompass
 {
     NONE,

@@ -4,8 +4,7 @@
 
 using System.Collections.Generic;
 
-// Rename to Lattice<T>
-public class HexMap<T>
+public class Lattice<T>
 {
     // See https://www.redblobgames.com/grids/hexagons/#map-storage
     // We currently store it using a "wasted space" array using only Q and R
@@ -13,7 +12,7 @@ public class HexMap<T>
     public readonly int NumRings; // 0 rings is a single hex.
     private readonly int arraySize; // side of square of array
 
-    public HexMap(int numRings)
+    public Lattice(int numRings)
     {
         arraySize = 2 * numRings + 1;
         map = new T[arraySize, arraySize];
@@ -70,14 +69,14 @@ public class HexMap<T>
     }
 
     // Implementation assumes a square map
-    public static HexMap<T> MapFromArray(T[] arrayT, int numRings)
+    public static Lattice<T> MapFromArray(T[] arrayT, int numRings)
     {
         int arraySize = 2 * numRings + 1;
         T[,] mapT = new T[arraySize, arraySize];
         for (int x = 0; x < arraySize; x++)
             for (int z = 0; z < arraySize; z++)
                 mapT[x, z] = arrayT[z * arraySize + x];
-        return new HexMap<T>(mapT, numRings);
+        return new Lattice<T>(mapT, numRings);
     }
 
     public override string ToString()
@@ -85,7 +84,7 @@ public class HexMap<T>
         return $"HexMap<{typeof(T).Name}> with Num Rings: {NumRings}";
     }
 
-    private HexMap(T[,] map, int numRings)
+    private Lattice(T[,] map, int numRings)
     {
         this.map = map;
         arraySize = map.GetLength(0); //  = 2 * numRings + 1; 

@@ -1,8 +1,7 @@
 using UnityEngine;
 
-// rename to LayoutSpecs 
 [System.Serializable]
-public class HexAuthor
+public class LayoutSpecs
 {
     [SerializeField] private int numRings = 3;
 

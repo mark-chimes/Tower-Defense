@@ -1,15 +1,14 @@
 using UnityEngine;
 
-// TODO find better name for this class - Rename to `GameMaster.cs`? 
-public class HexGodClass : MonoBehaviour
+public class GameMaster : MonoBehaviour
 {
-    [SerializeField] private HexAuthor gridAuthor;
-    [SerializeField] private HexGridView gridView;
+    [SerializeField] private LayoutSpecs gridAuthor;
+    [SerializeField] private TerrainWithOverlay gridView;
 
-    [SerializeField] HexGUI gui;
-    [SerializeField] private HexEnemyController enemyController;
+    [SerializeField] PathfindingGUI gui;
+    [SerializeField] private EnemyController enemyController;
 
-    [SerializeField] HexGridView.VisualizationSettings StartingVisualization;
+    [SerializeField] TerrainWithOverlay.VisualizationSettings StartingVisualization;
     [SerializeField] bool StartingIsStopOnPathFound;
 
 
@@ -18,23 +17,23 @@ public class HexGodClass : MonoBehaviour
     [SerializeField] private bool isWire = false;
     [SerializeField] private bool showSpawnAndGoal = true;
 
-    [SerializeField] private HexGizmo.DiagonalColorMode diagonalColorMode = HexGizmo.DiagonalColorMode.POSITIVE;
+    [SerializeField] private Gizmo.DiagonalColorMode diagonalColorMode = Gizmo.DiagonalColorMode.POSITIVE;
     [SerializeField] private bool colorZeros = true;
     [SerializeField] private bool colorRGB = false;
 
-    CameraControl camControl;
-    HexMouseIO mouseIO;
+    CameraRig camControl;
+    BoardInput mouseIO;
 
-    HexPathfindingIOManager pathfindingIOManager;
+    FlowBridge pathfindingIOManager;
 
     HexLevelSaveLoadSystem saveLoadSystem;
 
     void Awake()
     {
-        camControl = new CameraControl();
+        camControl = new CameraRig();
         camControl.Initialize();
 
-        pathfindingIOManager = new HexPathfindingIOManager();
+        pathfindingIOManager = new FlowBridge();
         saveLoadSystem = new HexLevelSaveLoadSystem();
     }
 
@@ -52,7 +51,7 @@ public class HexGodClass : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        HexGizmo.Draw(gridAuthor, hexMesh, transform, showSpawnAndGoal, isWire, diagonalColorMode, colorZeros, colorRGB);
+        Gizmo.Draw(gridAuthor, hexMesh, transform, showSpawnAndGoal, isWire, diagonalColorMode, colorZeros, colorRGB);
     }
 
     public void OnSave()
@@ -62,7 +61,7 @@ public class HexGodClass : MonoBehaviour
 
     public void OnLoad()
     {
-        HexSaveableLevel loaded = saveLoadSystem.OnLoad();
+        LevelSaveData loaded = saveLoadSystem.OnLoad();
 
         gridView.ClearData();
         enemyController.ClearData();
@@ -70,12 +69,12 @@ public class HexGodClass : MonoBehaviour
         CreateMapFromData(loaded);
     }
 
-    private HexTreasureMap treasureMap;
+    private TreasureMap treasureMap;
 
     // TODO rename this
     void CreateMapFromNothing()
     {
-        HexMap<bool> wallMap = new HexMap<bool>(gridAuthor.NumRings);
+        Lattice<bool> wallMap = new Lattice<bool>(gridAuthor.NumRings);
 
         //** TEST wall positions **//
         HexCoord wallPos0 = new HexCoord(-0, 0);
@@ -91,7 +90,7 @@ public class HexGodClass : MonoBehaviour
         HexCoord spawnPos = gridAuthor.SpawnCoord;
         HexCoord goalPos = gridAuthor.GoalCoord;
 
-        treasureMap = new HexTreasureMap(wallMap, spawnPos, goalPos,
+        treasureMap = new TreasureMap(wallMap, spawnPos, goalPos,
                 StartingIsStopOnPathFound,
                 enemyController.PathfindingUpdate,
                 enemyController.PathfindingClear
@@ -100,11 +99,11 @@ public class HexGodClass : MonoBehaviour
         CreateMapFromTreasureMap(treasureMap, wallMap, StartingVisualization);
     }
 
-    void CreateMapFromData(HexSaveableLevel loaded)
+    void CreateMapFromData(LevelSaveData loaded)
     {
-        HexMap<bool> loadedMap = loaded.LoadMap();
+        Lattice<bool> loadedMap = loaded.LoadMap();
 
-        treasureMap = new HexTreasureMap(loadedMap,
+        treasureMap = new TreasureMap(loadedMap,
             treasureMap.SpawnPos,
             treasureMap.GoalPos,
             StartingIsStopOnPathFound,
@@ -114,9 +113,9 @@ public class HexGodClass : MonoBehaviour
         CreateMapFromTreasureMap(treasureMap, loadedMap, StartingVisualization);
     }
 
-    void CreateMapFromTreasureMap(HexTreasureMap treasureMap,
-        HexMap<bool> wallMap,
-        HexGridView.VisualizationSettings visualizationSettings)
+    void CreateMapFromTreasureMap(TreasureMap treasureMap,
+        Lattice<bool> wallMap,
+        TerrainWithOverlay.VisualizationSettings visualizationSettings)
     {
         gridView.Initialize(wallMap, treasureMap.SpawnPos, treasureMap.GoalPos, visualizationSettings);
         pathfindingIOManager.Initialize(treasureMap, gridView);
@@ -125,6 +124,6 @@ public class HexGodClass : MonoBehaviour
         enemyController.SpawnEnemy();
 
         gui.Initialize(StartingVisualization, StartingIsStopOnPathFound, pathfindingIOManager, enemyController, this);
-        mouseIO = new HexMouseIO(gridView, treasureMap, Camera.main, pathfindingIOManager.UpdateDistances);
+        mouseIO = new BoardInput(gridView, treasureMap, Camera.main, pathfindingIOManager.UpdateDistances);
     }
 }

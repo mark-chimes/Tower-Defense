@@ -1,8 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// Rename to CameraRig
-public class CameraControl
+public class CameraRig
 {
 
     // TODO Camera controls should go to their own file eventually

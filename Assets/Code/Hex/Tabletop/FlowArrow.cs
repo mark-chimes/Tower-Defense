@@ -1,7 +1,6 @@
 using UnityEngine;
 
-// Rename to FlowArrow
-public class HexDirectionArrow : Highlightable
+public class FlowArrow : Highlightable
 {
 
     public void Show()
@@ -21,7 +20,7 @@ public class HexDirectionArrow : Highlightable
             Hide();
             return;
         }
-        transform.localRotation = HexLayout.CompassToQuaternion(dir);
+        transform.localRotation = HexProjection.CompassToQuaternion(dir);
         Show();
     }
 }

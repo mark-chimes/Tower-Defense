@@ -1,11 +1,10 @@
 using UnityEngine;
 
-// Rename to Signpost
-public class HexDirectionMarker : MonoBehaviour
+public class Signpost : MonoBehaviour
 {
     [SerializeField] private TMPro.TextMeshPro numberLabel;
 
-    [SerializeField] private HexDirectionArrow arrow;
+    [SerializeField] private FlowArrow arrow;
 
     [SerializeField] private Color pathHighlightColor = Color.cyan;
     [SerializeField] private Color frontierHighlightColor = Color.red;
@@ -51,7 +50,7 @@ public class HexDirectionMarker : MonoBehaviour
         Path
     }
 
-    public void ExhibitSignpost(HexSignpost sign)
+    public void ExhibitSignpost(FlowSample sign)
     {
         UpdateDistance(sign.DistanceToGoal);
         PointTo(sign.DirToGoal);

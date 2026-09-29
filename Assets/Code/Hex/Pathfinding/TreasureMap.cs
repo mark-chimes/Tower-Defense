@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 
-// Rename to TreasureMap
-public class HexTreasureMap
+public class TreasureMap
 {
 
-    private HexMap<bool> wallMap;
+    private Lattice<bool> wallMap;
     public int NumRings => wallMap.NumRings;
 
     public readonly HexCoord SpawnPos;
@@ -16,9 +15,9 @@ public class HexTreasureMap
 
 
 
-    private HexWayfinder wayfinder;
+    private Wayfinder wayfinder;
 
-    public HexTreasureMap(HexMap<bool> wallMap, HexCoord spawnPos, HexCoord goalPos, bool isStopOnPathFound,
+    public TreasureMap(Lattice<bool> wallMap, HexCoord spawnPos, HexCoord goalPos, bool isStopOnPathFound,
     Action onPathfindingUpdate, Action onPathfindingClear)
     {
         this.wallMap = wallMap;
@@ -35,7 +34,7 @@ public class HexTreasureMap
     /// <param name="isStopOnPathFound"></param> stop pathfinding once shortest path found or continue completing the flow-field
     public void RecreateWayfinder(bool isStopOnPathFound)
     {
-        wayfinder = new HexWayfinder(wallMap, SpawnPos, GoalPos, HexSearch.Dir.FromEnd, isStopOnPathFound);
+        wayfinder = new Wayfinder(wallMap, SpawnPos, GoalPos, HexSearch.Dir.FromEnd, isStopOnPathFound);
     }
 
     public IReadOnlyCollection<HexCoord> CurrentFrontier()
@@ -73,12 +72,12 @@ public class HexTreasureMap
         return new HexSnapshot(coord, TileMarkerAt(coord), wallMap.At(coord));
     }
 
-    public HexSignpost SignpostAt(HexCoord coord)
+    public FlowSample SignpostAt(HexCoord coord)
     {
         return wayfinder.SignpostAt(coord);
     }
 
-    public IReadOnlyCollection<HexSignpost> Signposts()
+    public IReadOnlyCollection<FlowSample> Signposts()
     {
         return wayfinder.Signposts();
     }
@@ -99,9 +98,9 @@ public class HexTreasureMap
         return TileMarker.None;
     }
 
-    public HexSaveableLevel AsSaveableData()
+    public LevelSaveData AsSaveableData()
     {
-        return new HexSaveableLevel(wallMap);
+        return new LevelSaveData(wallMap);
     }
 
     public enum TileMarker

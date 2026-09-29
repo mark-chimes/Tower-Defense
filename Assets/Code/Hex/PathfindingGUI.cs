@@ -1,13 +1,12 @@
 using UnityEngine;
 
-// Rename to PathfindingGUI
-public class HexGUI : MonoBehaviour
+public class PathfindingGUI : MonoBehaviour
 {
 
-    private HexPathfindingIOManager pathfindingIOManager;
-    private HexEnemyController enemyController;
+    private FlowBridge pathfindingIOManager;
+    private EnemyController enemyController;
 
-    private HexGodClass godClass; // // TODO Cross-dependency code smell not ideal, but I'll fix this later
+    private GameMaster godClass; // // TODO Cross-dependency code smell not ideal, but I'll fix this later
 
 
     bool autoRefreshEnabled = false;
@@ -20,11 +19,11 @@ public class HexGUI : MonoBehaviour
     bool stopPathingEarly = false;
     bool wasStopPathingEarly = false;
 
-    public void Initialize(HexGridView.VisualizationSettings visualization,
+    public void Initialize(TerrainWithOverlay.VisualizationSettings visualization,
         bool stopPathingEarly,
-        HexPathfindingIOManager pathfindingIOManager,
-        HexEnemyController enemyController, // TODO remove reference
-        HexGodClass godClass
+        FlowBridge pathfindingIOManager,
+        EnemyController enemyController, // TODO remove reference
+        GameMaster godClass
         )
     {
         visualizeDistanceEnabled = visualization.ShowDistance;

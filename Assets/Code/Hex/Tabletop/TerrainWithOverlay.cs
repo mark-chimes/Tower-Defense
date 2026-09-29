@@ -1,13 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
-using static HexDirectionMarker;
+using static Signpost;
 
 // TODO split out owning the floor (flagstones) and the markers
-
-// TODO maybe this should be called terrain or terrain view or something
-
-// Rename to  `TerrainWithOverlay.cs` until it is split out
-public class HexGridView : MonoBehaviour
+public class TerrainWithOverlay : MonoBehaviour
 {
     [SerializeField] private GameObject floorTilePrefab; // TODO rename to water tile or something after code port
     [SerializeField] private GameObject wallTilePrefab; // TODO rename to land tile or something after code port
@@ -25,8 +21,8 @@ public class HexGridView : MonoBehaviour
     }
 
     // private DirectionMarker[,] directionMarkers;
-    private HexMap<HexFlagstone> flagstones;
-    private HexMap<HexDirectionMarker> directionMarkers;
+    private Lattice<Flagstone> flagstones;
+    private Lattice<Signpost> directionMarkers;
 
     private GameObject spawnObj;
     private GameObject goalObj;
@@ -35,20 +31,20 @@ public class HexGridView : MonoBehaviour
     private bool isInitialized;
 
     // TODO reconsider if this should handle "floors" and "walls" together or not? 
-    public void Initialize(HexMap<bool> walls, HexCoord spawnCoord, HexCoord goalCoord,
+    public void Initialize(Lattice<bool> walls, HexCoord spawnCoord, HexCoord goalCoord,
     // HexCoord spawnPos, HexCoord goalPos, 
         VisualizationSettings visualizationSettings) // Later
     {
         Debug.Assert(!isInitialized);
         isInitialized = true;
 
-        flagstones = new HexMap<HexFlagstone>(walls.NumRings);
-        directionMarkers = new HexMap<HexDirectionMarker>(walls.NumRings);
+        flagstones = new Lattice<Flagstone>(walls.NumRings);
+        directionMarkers = new Lattice<Signpost>(walls.NumRings);
 
         foreach (HexCoord c in flagstones.AllCoords())
         {
             GameObject signpostObj = InstantiateAtCoord(signpostPrefab, c);
-            HexDirectionMarker directionMarker = signpostObj.GetComponent<HexDirectionMarker>();
+            Signpost directionMarker = signpostObj.GetComponent<Signpost>();
             directionMarker.Initialize(c);
             directionMarker.SetIsOnPathableTerrain(!walls.At(c));
             directionMarker.SetPathingVisible(visualizationSettings.ShowPathfinding);
@@ -79,7 +75,7 @@ public class HexGridView : MonoBehaviour
     }
 
 
-    public void Reinitialize(HexMap<bool> walls, HexCoord spawnCoord, HexCoord goalCoord,
+    public void Reinitialize(Lattice<bool> walls, HexCoord spawnCoord, HexCoord goalCoord,
     // HexCoord spawnPos, HexCoord goalPos, 
         VisualizationSettings visualizationSettings)
     {
@@ -91,30 +87,30 @@ public class HexGridView : MonoBehaviour
     private GameObject InstantiateAtCoord(GameObject prefab, HexCoord coord)
     {
         GameObject obj = Instantiate(prefab, transform);
-        obj.transform.localPosition = HexLayout.CoordsToWorld(coord);
+        obj.transform.localPosition = HexProjection.CoordsToWorld(coord);
         return obj;
     }
 
     private void UnhighlightAllArrows()
     {
         Debug.Assert(isInitialized);
-        foreach (HexDirectionMarker marker in directionMarkers.All())
+        foreach (Signpost marker in directionMarkers.All())
         {
             marker.ExhibitAccent(ArrowAccent.Normal);
         }
     }
 
-    public void ExhibitSignposts(IReadOnlyCollection<HexSignpost> signposts)
+    public void ExhibitSignposts(IReadOnlyCollection<FlowSample> signposts)
     {
         Debug.Assert(isInitialized);
 
         Debug.Log("RefreshDistanceLabels");
 
 
-        foreach (HexSignpost sign in signposts)
+        foreach (FlowSample sign in signposts)
         {
             HexCoord c = sign.Coord;
-            HexDirectionMarker directionMarker = directionMarkers.At(c);
+            Signpost directionMarker = directionMarkers.At(c);
             directionMarker.ExhibitSignpost(sign);
             directionMarker.ExhibitAccent(sign.OnCriticalPath ? ArrowAccent.Path : ArrowAccent.Normal);
         }
@@ -127,12 +123,12 @@ public class HexGridView : MonoBehaviour
         directionMarkers.At(c).SetIsOnPathableTerrain(!isWall);
     }
 
-    private HexFlagstone MakeFlagstoneAt(HexCoord c, bool isWall)
+    private Flagstone MakeFlagstoneAt(HexCoord c, bool isWall)
     {
         GameObject prefab = isWall ? wallTilePrefab : floorTilePrefab;
         GameObject flagstoneObj = InstantiateAtCoord(prefab, c);
         flagstoneObj.name = $"Flagstone_{c}";
-        HexFlagstone flagstone = flagstoneObj.GetComponent<HexFlagstone>();
+        Flagstone flagstone = flagstoneObj.GetComponent<Flagstone>();
         flagstone.Initialize(c);
         flagstones.SetAt(c, flagstone);
         return flagstone;
@@ -142,16 +138,16 @@ public class HexGridView : MonoBehaviour
     // TODO we're getting changed as sigpost, frontier as coords. Could we just get everything as coords? 
     public void HighlightChangedOrFrontier(
         bool shouldHighlight,
-        IReadOnlyCollection<HexSignpost> changed,
+        IReadOnlyCollection<FlowSample> changed,
         IReadOnlyCollection<HexCoord> frontier)
     {
         Debug.Assert(isInitialized);
 
         UnhighlightAllArrows();
-        foreach (HexSignpost sign in changed)
+        foreach (FlowSample sign in changed)
         {
             HexCoord c = sign.Coord;
-            HexDirectionMarker directionMarker = directionMarkers.At(c);
+            Signpost directionMarker = directionMarkers.At(c);
             directionMarker.ExhibitSignpost(sign);
         }
 
@@ -159,20 +155,20 @@ public class HexGridView : MonoBehaviour
         {
             foreach (HexCoord c in frontier)
             {
-                HexDirectionMarker directionMarker = directionMarkers.At(c);
+                Signpost directionMarker = directionMarkers.At(c);
                 directionMarker.ExhibitAccent(ArrowAccent.Frontier);
             }
         }
     }
 
-    public void HighlightPath(IReadOnlyCollection<HexSignpost> changed)
+    public void HighlightPath(IReadOnlyCollection<FlowSample> changed)
     {
         Debug.Assert(isInitialized);
 
-        foreach (HexSignpost sign in changed)
+        foreach (FlowSample sign in changed)
         {
             HexCoord c = sign.Coord;
-            HexDirectionMarker directionMarker = directionMarkers.At(c);
+            Signpost directionMarker = directionMarkers.At(c);
             directionMarker.ExhibitAccent(ArrowAccent.Path);
         }
     }
@@ -183,7 +179,7 @@ public class HexGridView : MonoBehaviour
 
         spawnObj.SetActive(isVisible);
 
-        foreach (HexDirectionMarker directionMarker in directionMarkers.All())
+        foreach (Signpost directionMarker in directionMarkers.All())
         {
             directionMarker.SetPathingVisible(isVisible);
         }
@@ -193,7 +189,7 @@ public class HexGridView : MonoBehaviour
     {
         Debug.Assert(isInitialized);
 
-        foreach (HexDirectionMarker directionMarker in directionMarkers.All())
+        foreach (Signpost directionMarker in directionMarkers.All())
         {
             directionMarker.SetDistanceVisible(isVisible);
         }

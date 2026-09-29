@@ -1,8 +1,7 @@
 using UnityEngine;
 
 // TODO should this enemy control its own movement or be controlled by central authority?
-// Rename to Boat
-public class HexBoat : MonoBehaviour
+public class Boat : MonoBehaviour
 {
     bool hasPath = false;
     readonly float speed = 10f; // TODO improve how this is handled
@@ -15,7 +14,7 @@ public class HexBoat : MonoBehaviour
 
     Vector3 waypoint;
 
-    private HexTreasureMap treasureMap;
+    private TreasureMap treasureMap;
 
     Quaternion movementDirection = Quaternion.identity;
 
@@ -40,7 +39,7 @@ public class HexBoat : MonoBehaviour
         transform.rotation = movementDirection;
         transform.localPosition = Vector3.MoveTowards(transform.localPosition, waypoint, speed * Time.deltaTime);
 
-        if (HexLayout.AreVector3Close(transform.localPosition, waypoint))
+        if (HexProjection.AreVector3Close(transform.localPosition, waypoint))
         {
             currentCoord = nextCoord;
             if (currentCoord == goalCoord) { hasPath = false; return; }
@@ -50,7 +49,7 @@ public class HexBoat : MonoBehaviour
     }
 
 
-    public void RecalculatePathing(HexTreasureMap treasureMap)
+    public void RecalculatePathing(TreasureMap treasureMap)
     {
         Debug.Log($"Recalculate enemy pathing for {name}.");
         this.treasureMap = treasureMap;
@@ -63,16 +62,16 @@ public class HexBoat : MonoBehaviour
         Debug.Assert(hasPath);
         Debug.Log($"Recalculate pathing target for {name}.");
 
-        HexSignpost signpostHere = treasureMap.SignpostAt(currentCoord);
+        FlowSample signpostHere = treasureMap.SignpostAt(currentCoord);
         if (signpostHere.DirToGoal == HexCompass.NONE)
         {
             Debug.Log($"No direction, boat {name} freezing in place");
             ClearPathing();
             return;
         }
-        movementDirection = HexLayout.CompassToQuaternion(signpostHere.DirToGoal);
+        movementDirection = HexProjection.CompassToQuaternion(signpostHere.DirToGoal);
         nextCoord = currentCoord.InDirection(signpostHere.DirToGoal);
-        waypoint = HexLayout.CoordsToWorld(nextCoord);
+        waypoint = HexProjection.CoordsToWorld(nextCoord);
 
         Debug.Log($"Moving from currentCoord {currentCoord} to {nextCoord}.");
         Debug.Log($"Moving to waypoint {waypoint}.");

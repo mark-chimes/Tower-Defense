@@ -1,5 +1,4 @@
-// Rename to Flagstone
-public class HexFlagstone : Highlightable
+public class Flagstone : Highlightable
 {
     public HexCoord Coord { get; private set; }
 

@@ -1,23 +1,20 @@
 using UnityEngine;
 
 
-// TODO rename this to better suit its behavior
 // TODO split out concerns: 
 // - Spawn enemies on map
 // - Control where they go
-// Names: Spawning could be EnemyConstructionYard, or EnemyShipyard, or EnemyHarbor, the Control could be EnemyAdmiral or EnemyArmy or EnemyNavy  
-// Rename to EnemyController until it is split out
-public class HexEnemyController : MonoBehaviour
+public class EnemyController : MonoBehaviour
 {
-    [SerializeField] private HexBoat boatPrefab;
+    [SerializeField] private Boat boatPrefab;
 
-    private HexTreasureMap treasureMap; 
-    private HexBoat enemy = null;
+    private TreasureMap treasureMap; 
+    private Boat enemy = null;
 
 
     private bool isInitialized;
 
-    public void Initialize(HexTreasureMap treasureMap)
+    public void Initialize(TreasureMap treasureMap)
     {
         Debug.Assert(!isInitialized);
         isInitialized = true;
@@ -36,7 +33,7 @@ public class HexEnemyController : MonoBehaviour
     }
 
 
-    public void Reinitialize(HexTreasureMap treasureMap)
+    public void Reinitialize(TreasureMap treasureMap)
     {
         ClearData();
         Initialize(treasureMap);
@@ -70,7 +67,7 @@ public class HexEnemyController : MonoBehaviour
     public void SpawnEnemy()
     {
         enemy = Instantiate(boatPrefab, transform);
-        Vector3 pos = HexLayout.CoordsToWorld(treasureMap.SpawnPos);
+        Vector3 pos = HexProjection.CoordsToWorld(treasureMap.SpawnPos);
         enemy.transform.localPosition = pos;
         enemy.name = $"Boat";
         enemy.Initialize(treasureMap.SpawnPos, treasureMap.GoalPos);

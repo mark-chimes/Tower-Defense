@@ -6,20 +6,20 @@ using UnityEngine;
 public class HexLevelSaveLoadSystem
 {
     // TODO should I save the map, or something else?
-    public void SaveMap(HexTreasureMap map)
+    public void SaveMap(TreasureMap map)
     {
         Debug.Log("saving...");
-        HexSaveableLevel saveable = map.AsSaveableData();
+        LevelSaveData saveable = map.AsSaveableData();
         Debug.Log($"Saving: {saveable}");
 
         WriteToFile(saveable.ToJson());
     }
 
-    public HexSaveableLevel OnLoad()
+    public LevelSaveData OnLoad()
     {
         Debug.Log("loading...");
         string json = ReadJson();
-        HexSaveableLevel saveable = HexSaveableLevel.FromJson(json);
+        LevelSaveData saveable = LevelSaveData.FromJson(json);
         Debug.Log($"Loaded: {saveable}");
 
         return saveable;

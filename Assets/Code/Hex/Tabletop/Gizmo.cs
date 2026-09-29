@@ -1,7 +1,6 @@
 using UnityEngine;
 
-// Rename to Gizmo
-public static class HexGizmo
+public static class Gizmo
 {
     public enum DiagonalColorMode
     {
@@ -16,7 +15,7 @@ public static class HexGizmo
     private static readonly Color goalColor = Color.gold;
 
 
-    public static void Draw(HexAuthor hexAuthor, Mesh hexMesh, Transform transform,
+    public static void Draw(LayoutSpecs hexAuthor, Mesh hexMesh, Transform transform,
          bool showSpawnGoal, bool isWire, DiagonalColorMode diagonalMode, bool colorZeros, bool colorRGB)
     {
         Matrix4x4 originalMatrix = Gizmos.matrix;
@@ -28,7 +27,7 @@ public static class HexGizmo
 
         foreach (HexCoord coord in HexCoord.AllWithinRings(hexAuthor.NumRings))
         {
-            Vector3 pos = HexLayout.CoordsToWorld(coord);
+            Vector3 pos = HexProjection.CoordsToWorld(coord);
             Gizmos.color = ColorFor(coord, hexAuthor.NumRings, diagonalMode, colorZeros, colorRGB);
             if (showSpawnGoal)
             {
@@ -94,7 +93,7 @@ public static class HexGizmo
         return null;
     }
 
-    private static Color? ColorDiagonals(HexCoord c, int N, HexGizmo.DiagonalColorMode mode)
+    private static Color? ColorDiagonals(HexCoord c, int N, Gizmo.DiagonalColorMode mode)
     {
         switch (mode)
         {

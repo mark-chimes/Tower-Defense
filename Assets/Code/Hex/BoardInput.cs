@@ -2,13 +2,12 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// Rename to BoardInput
 // Possibly call the building functionality BuildTool later
-public class HexMouseIO
+public class BoardInput
 {
 
 
-    private HexFlagstone hovered;
+    private Flagstone hovered;
     private Highlightable highlighted;
 
 
@@ -19,13 +18,13 @@ public class HexMouseIO
 
     private const float maxRayDistance = 500f;
 
-    private HexTreasureMap treasureMap;
-    private HexGridView gridView;
+    private TreasureMap treasureMap;
+    private TerrainWithOverlay gridView;
     private Camera cam;
 
     private Action onWallChange;
 
-    public HexMouseIO(HexGridView gridView, HexTreasureMap treasureMap,
+    public BoardInput(TerrainWithOverlay gridView, TreasureMap treasureMap,
         Camera cam, Action onWallChange)
     {
         this.gridView = gridView;
@@ -51,7 +50,7 @@ public class HexMouseIO
         {
             HexCoord c = hovered.Coord;
             HexSnapshot snapshot = treasureMap.At(c);
-            if (snapshot.TileMarker != HexTreasureMap.TileMarker.None)
+            if (snapshot.TileMarker != TreasureMap.TileMarker.None)
                 highlightColor = blockedColor;
             else if (snapshot.HasWall)
                 highlightColor = existingWallColor;
@@ -63,12 +62,12 @@ public class HexMouseIO
         if (highlighted != null) highlighted.Highlight(highlightColor);
     }
 
-    private HexFlagstone RaycastForFlagstone()
+    private Flagstone RaycastForFlagstone()
     {
         Vector2 mousePos = Mouse.current.position.ReadValue();
         Ray ray = cam.ScreenPointToRay(mousePos);
         if (!Physics.Raycast(ray, out RaycastHit hit, maxRayDistance)) return null;
-        return hit.collider.GetComponentInParent<HexFlagstone>();
+        return hit.collider.GetComponentInParent<Flagstone>();
     }
 
     private void PlaceWallAtHovered()

@@ -1,7 +1,6 @@
 using UnityEngine;
 
-// Rename to ExpeditionLeader
-public class HexPathfindingIOManager
+public class FlowBridge
 {
     private float visualizeFPS = 60f;
 
@@ -15,17 +14,17 @@ public class HexPathfindingIOManager
     private bool isVisualizeMode = false;
 
 
-    public HexPathfindingIOManager()
+    public FlowBridge()
     {
         visualizeTime = 1f / visualizeFPS;
     }
 
-    private HexTreasureMap treasureMap;
-    private HexGridView gridView;
+    private TreasureMap treasureMap;
+    private TerrainWithOverlay gridView;
 
 
 
-    public void Initialize(HexTreasureMap treasureMap, HexGridView gridView)
+    public void Initialize(TreasureMap treasureMap, TerrainWithOverlay gridView)
     {
         this.treasureMap = treasureMap;
         this.gridView = gridView;

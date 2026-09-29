@@ -1,8 +1,7 @@
-// Rename to FlowSample
-public class HexSignpost
+public class FlowSample
 {
     public readonly HexCoord Coord;
-    public readonly HexFlowField.Tile Tile;
+    public readonly FlowField.Sample Tile;
 
     public int DistanceToGoal => Tile.Distance;
 
@@ -10,7 +9,7 @@ public class HexSignpost
 
     public bool OnCriticalPath => Tile.OnCriticalPath;
 
-    public HexSignpost(HexCoord coord, HexFlowField.Tile tile)
+    public FlowSample(HexCoord coord, FlowField.Sample tile)
     {
         Coord = coord;
         Tile = tile;
