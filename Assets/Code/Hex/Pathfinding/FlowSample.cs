@@ -15,6 +15,6 @@ public class FlowSample
         Tile = tile;
     }
 
-    public override string ToString() => $"Signpost at {Coord} points {DirToGoal} and is {DistanceToGoal} steps from goal.";
+    public override string ToString() => $"FlowSample at {Coord} points {DirToGoal} and is {DistanceToGoal} steps from goal.";
 
 }

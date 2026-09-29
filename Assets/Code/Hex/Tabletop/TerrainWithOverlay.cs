@@ -94,23 +94,20 @@ public class TerrainWithOverlay : MonoBehaviour
         Debug.Assert(isInitialized);
         foreach (Signpost signpost in signposts.All())
         {
-            signpost.ExhibitAccent(ArrowAccent.Normal);
+            signpost.SetAccent(ArrowAccent.Normal);
         }
     }
 
-    public void ExhibitSignposts(IReadOnlyCollection<FlowSample> flows)
+    public void ShowFlows(IReadOnlyCollection<FlowSample> flows)
     {
         Debug.Assert(isInitialized);
-
-        Debug.Log("RefreshDistanceLabels");
-
 
         foreach (FlowSample flow in flows)
         {
             HexCoord c = flow.Coord;
             Signpost signpost = signposts.At(c);
-            signpost.ExhibitSignpost(flow);
-            signpost.ExhibitAccent(flow.OnCriticalPath ? ArrowAccent.Path : ArrowAccent.Normal);
+            signpost.ShowFlow(flow);
+            signpost.SetAccent(flow.OnCriticalPath ? ArrowAccent.Path : ArrowAccent.Normal);
         }
     }
 
@@ -146,7 +143,7 @@ public class TerrainWithOverlay : MonoBehaviour
         {
             HexCoord c = flow.Coord;
             Signpost signpost = signposts.At(c);
-            signpost.ExhibitSignpost(flow);
+            signpost.ShowFlow(flow);
         }
 
         if (shouldHighlight)
@@ -154,7 +151,7 @@ public class TerrainWithOverlay : MonoBehaviour
             foreach (HexCoord c in frontier)
             {
                 Signpost signpost = signposts.At(c);
-                signpost.ExhibitAccent(ArrowAccent.Frontier);
+                signpost.SetAccent(ArrowAccent.Frontier);
             }
         }
     }
@@ -167,7 +164,7 @@ public class TerrainWithOverlay : MonoBehaviour
         {
             HexCoord c = flow.Coord;
             Signpost signpost = signposts.At(c);
-            signpost.ExhibitAccent(ArrowAccent.Path);
+            signpost.SetAccent(ArrowAccent.Path);
         }
     }
 

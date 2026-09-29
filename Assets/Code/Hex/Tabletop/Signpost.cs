@@ -50,13 +50,13 @@ public class Signpost : MonoBehaviour
         Path
     }
 
-    public void ExhibitSignpost(FlowSample flow)
+    public void ShowFlow(FlowSample flow)
     {
         UpdateDistance(flow.DistanceToGoal);
         PointTo(flow.DirToGoal);
     }
 
-    public void ExhibitAccent(ArrowAccent accent)
+    public void SetAccent(ArrowAccent accent)
     {
         switch (accent)
         {

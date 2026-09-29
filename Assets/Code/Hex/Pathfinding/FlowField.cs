@@ -12,12 +12,12 @@ public class FlowField
         ClearTiles();
     }
 
-    public IReadOnlyCollection<FlowSample> Signposts()
+    public IReadOnlyCollection<FlowSample> FlowSamples()
     {
-        var list = new List<FlowSample>();
+        var flows = new List<FlowSample>();
         foreach (HexCoord c in tiles.AllCoords())
-            list.Add(new FlowSample(c, tiles.At(c)));
-        return list;
+            flows.Add(new FlowSample(c, tiles.At(c)));
+        return flows;
     }
 
     public Tile TileAt(HexCoord c) => tiles.At(c);

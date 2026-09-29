@@ -37,7 +37,7 @@ public class FlowBridge
         {
             isVisualizeMode = false;
             treasureMap.Recompute();
-            gridView.ExhibitSignposts(treasureMap.Signposts());
+            gridView.ShowFlows(treasureMap.Flows());
         }
     }
 
@@ -45,20 +45,20 @@ public class FlowBridge
     {
         isVisualizeMode = false;
         treasureMap.SetModeAndClear(HexSearch.Dir.FromStart);
-        gridView.ExhibitSignposts(treasureMap.Signposts());
+        gridView.ShowFlows(treasureMap.Flows());
     }
 
     public void OnFromEndModePressed()
     {
         isVisualizeMode = false;
         treasureMap.SetModeAndClear(HexSearch.Dir.FromEnd);
-        gridView.ExhibitSignposts(treasureMap.Signposts());
+        gridView.ShowFlows(treasureMap.Flows());
     }
 
     public void OnRefreshPressed()
     {
         treasureMap.Recompute();
-        gridView.ExhibitSignposts(treasureMap.Signposts());
+        gridView.ShowFlows(treasureMap.Flows());
     }
 
     public void OnClearFieldPressed()
@@ -70,7 +70,7 @@ public class FlowBridge
     public void ClearField()
     {
         treasureMap.ClearField();
-        gridView.ExhibitSignposts(treasureMap.Signposts());
+        gridView.ShowFlows(treasureMap.Flows());
     }
     // TODO if isAutoRefreshMode is on, this clears the field but never redraws it
     // autorefresh should retrigger after the clear.
@@ -100,7 +100,7 @@ public class FlowBridge
     public void ResetPathfindingWithEarlyStoppingMode(bool isStopOnPathFound)
     {
         treasureMap.RecreateWayfinder(isStopOnPathFound);
-        gridView.ExhibitSignposts(treasureMap.Signposts());
+        gridView.ShowFlows(treasureMap.Flows());
     }
 
 
@@ -134,7 +134,7 @@ public class FlowBridge
         {
             treasureMap.Recompute();
         }
-        gridView.ExhibitSignposts(treasureMap.Signposts());
+        gridView.ShowFlows(treasureMap.Flows());
     }
 
 

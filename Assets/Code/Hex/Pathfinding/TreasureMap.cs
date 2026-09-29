@@ -71,14 +71,14 @@ public class TreasureMap
         return new HexSnapshot(coord, TileMarkerAt(coord), wallMap.At(coord));
     }
 
-    public FlowSample SignpostAt(HexCoord coord)
+    public FlowSample FlowAt(HexCoord coord)
     {
-        return wayfinder.SignpostAt(coord);
+        return wayfinder.FlowAt(coord);
     }
 
-    public IReadOnlyCollection<FlowSample> Signposts()
+    public IReadOnlyCollection<FlowSample> Flows()
     {
-        return wayfinder.Signposts();
+        return wayfinder.Flows();
     }
 
     public void SetWall(HexCoord c, bool hasWall) => wallMap.SetAt(c, hasWall);

@@ -62,7 +62,7 @@ public class Boat : MonoBehaviour
         Debug.Assert(hasPath);
         Debug.Log($"Recalculate pathing target for {name}.");
 
-        FlowSample flowHere = treasureMap.SignpostAt(currentCoord);
+        FlowSample flowHere = treasureMap.FlowAt(currentCoord);
         if (flowHere.DirToGoal == HexCompass.NONE)
         {
             Debug.Log($"No direction, boat {name} freezing in place");

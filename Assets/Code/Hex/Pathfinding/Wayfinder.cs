@@ -197,14 +197,14 @@ public class Wayfinder
         return new[] { new FlowSample(coord, newTile) };
     }
 
-    public FlowSample SignpostAt(HexCoord coord)
+    public FlowSample FlowAt(HexCoord coord)
     {
         return new FlowSample(coord, field.TileAt(coord));
     }
 
-    public IReadOnlyCollection<FlowSample> Signposts()
+    public IReadOnlyCollection<FlowSample> Flows()
     {
-        return field.Signposts();
+        return field.FlowSamples();
     }
 
 }
