@@ -1,7 +1,7 @@
 public class FlowSample
 {
     public readonly HexCoord Coord;
-    public readonly FlowField.Sample Tile;
+    public readonly FlowField.Tile Tile;
 
     public int DistanceToGoal => Tile.Distance;
 
@@ -9,7 +9,7 @@ public class FlowSample
 
     public bool OnCriticalPath => Tile.OnCriticalPath;
 
-    public FlowSample(HexCoord coord, FlowField.Sample tile)
+    public FlowSample(HexCoord coord, FlowField.Tile tile)
     {
         Coord = coord;
         Tile = tile;

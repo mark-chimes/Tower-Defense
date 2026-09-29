@@ -15,20 +15,20 @@ public static class Gizmo
     private static readonly Color goalColor = Color.gold;
 
 
-    public static void Draw(LayoutSpecs hexAuthor, Mesh hexMesh, Transform transform,
+    public static void Draw(LayoutSpecs layoutSpecs, Mesh hexMesh, Transform transform,
          bool showSpawnGoal, bool isWire, DiagonalColorMode diagonalMode, bool colorZeros, bool colorRGB)
     {
         Matrix4x4 originalMatrix = Gizmos.matrix;
         Color originalColor = Gizmos.color;
         Gizmos.matrix = transform.localToWorldMatrix;
 
-        HexCoord spawnCoord = hexAuthor.SpawnCoord;
-        HexCoord goalCoord = hexAuthor.GoalCoord;
+        HexCoord spawnCoord = layoutSpecs.SpawnCoord;
+        HexCoord goalCoord = layoutSpecs.GoalCoord;
 
-        foreach (HexCoord coord in HexCoord.AllWithinRings(hexAuthor.NumRings))
+        foreach (HexCoord coord in HexCoord.AllWithinRings(layoutSpecs.NumRings))
         {
             Vector3 pos = HexProjection.CoordsToWorld(coord);
-            Gizmos.color = ColorFor(coord, hexAuthor.NumRings, diagonalMode, colorZeros, colorRGB);
+            Gizmos.color = ColorFor(coord, layoutSpecs.NumRings, diagonalMode, colorZeros, colorRGB);
             if (showSpawnGoal)
             {
                 if (coord == spawnCoord) Gizmos.color = spawnColor;

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class GameMaster : MonoBehaviour
 {
-    [SerializeField] private LayoutSpecs gridAuthor;
+    [SerializeField] private LayoutSpecs layoutSpecs;
     [SerializeField] private TerrainWithOverlay gridView;
 
     [SerializeField] PathfindingGUI gui;
@@ -21,19 +21,19 @@ public class GameMaster : MonoBehaviour
     [SerializeField] private bool colorZeros = true;
     [SerializeField] private bool colorRGB = false;
 
-    CameraRig camControl;
-    BoardInput mouseIO;
+    CameraRig camRig;
+    BoardInput boardInput;
 
-    FlowBridge pathfindingIOManager;
+    FlowBridge flowBridge;
 
     HexLevelSaveLoadSystem saveLoadSystem;
 
     void Awake()
     {
-        camControl = new CameraRig();
-        camControl.Initialize();
+        camRig = new CameraRig();
+        camRig.Initialize();
 
-        pathfindingIOManager = new FlowBridge();
+        flowBridge = new FlowBridge();
         saveLoadSystem = new HexLevelSaveLoadSystem();
     }
 
@@ -44,14 +44,14 @@ public class GameMaster : MonoBehaviour
 
     void Update()
     {
-        camControl.ControlCamera();
-        mouseIO.HandleMouse();
-        pathfindingIOManager.ContinuallySingleStep();
+        camRig.ControlCamera();
+        boardInput.HandleMouse();
+        flowBridge.ContinuallySingleStep();
     }
 
     void OnDrawGizmos()
     {
-        Gizmo.Draw(gridAuthor, hexMesh, transform, showSpawnAndGoal, isWire, diagonalColorMode, colorZeros, colorRGB);
+        Gizmo.Draw(layoutSpecs, hexMesh, transform, showSpawnAndGoal, isWire, diagonalColorMode, colorZeros, colorRGB);
     }
 
     public void OnSave()
@@ -74,7 +74,7 @@ public class GameMaster : MonoBehaviour
     // TODO rename this
     void CreateMapFromNothing()
     {
-        Lattice<bool> wallMap = new Lattice<bool>(gridAuthor.NumRings);
+        Lattice<bool> wallMap = new Lattice<bool>(layoutSpecs.NumRings);
 
         //** TEST wall positions **//
         HexCoord wallPos0 = new HexCoord(-0, 0);
@@ -87,8 +87,8 @@ public class GameMaster : MonoBehaviour
         wallMap.SetAt(wallPos3, true);
         //** TEST wall positions **//
 
-        HexCoord spawnPos = gridAuthor.SpawnCoord;
-        HexCoord goalPos = gridAuthor.GoalCoord;
+        HexCoord spawnPos = layoutSpecs.SpawnCoord;
+        HexCoord goalPos = layoutSpecs.GoalCoord;
 
         treasureMap = new TreasureMap(wallMap, spawnPos, goalPos,
                 StartingIsStopOnPathFound,
@@ -118,12 +118,12 @@ public class GameMaster : MonoBehaviour
         TerrainWithOverlay.VisualizationSettings visualizationSettings)
     {
         gridView.Initialize(wallMap, treasureMap.SpawnPos, treasureMap.GoalPos, visualizationSettings);
-        pathfindingIOManager.Initialize(treasureMap, gridView);
+        flowBridge.Initialize(treasureMap, gridView);
 
         enemyController.Initialize(treasureMap);
         enemyController.SpawnEnemy();
 
-        gui.Initialize(StartingVisualization, StartingIsStopOnPathFound, pathfindingIOManager, enemyController, this);
-        mouseIO = new BoardInput(gridView, treasureMap, Camera.main, pathfindingIOManager.UpdateDistances);
+        gui.Initialize(StartingVisualization, StartingIsStopOnPathFound, flowBridge, enemyController, this);
+        boardInput = new BoardInput(gridView, treasureMap, Camera.main, flowBridge.UpdateDistances);
     }
 }

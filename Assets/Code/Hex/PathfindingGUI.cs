@@ -3,10 +3,10 @@ using UnityEngine;
 public class PathfindingGUI : MonoBehaviour
 {
 
-    private FlowBridge pathfindingIOManager;
+    private FlowBridge flowBridge;
     private EnemyController enemyController;
 
-    private GameMaster godClass; // // TODO Cross-dependency code smell not ideal, but I'll fix this later
+    private GameMaster gameMaster; // // TODO Cross-dependency code smell not ideal, but I'll fix this later
 
 
     bool autoRefreshEnabled = false;
@@ -21,9 +21,9 @@ public class PathfindingGUI : MonoBehaviour
 
     public void Initialize(TerrainWithOverlay.VisualizationSettings visualization,
         bool stopPathingEarly,
-        FlowBridge pathfindingIOManager,
+        FlowBridge flowBridge,
         EnemyController enemyController, // TODO remove reference
-        GameMaster godClass
+        GameMaster gameMaster
         )
     {
         visualizeDistanceEnabled = visualization.ShowDistance;
@@ -34,9 +34,9 @@ public class PathfindingGUI : MonoBehaviour
 
         this.stopPathingEarly = stopPathingEarly;
 
-        this.pathfindingIOManager = pathfindingIOManager;
+        this.flowBridge = flowBridge;
         this.enemyController = enemyController;
-        this.godClass = godClass; // TODO Cross-dependency code smell 
+        this.gameMaster = gameMaster; // TODO Cross-dependency code smell 
     }
 
 
@@ -79,28 +79,28 @@ public class PathfindingGUI : MonoBehaviour
         if (GUI.Button(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), "Instant Refresh"))
         {
             Debug.Log("Refresh");
-            pathfindingIOManager.OnRefreshPressed();
+            flowBridge.OnRefreshPressed();
         }
         guiVisY += yBetweenButtons;
 
         if (GUI.Button(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), "Clear Field"))
         {
             Debug.Log("Clear Field");
-            pathfindingIOManager.OnClearFieldPressed();
+            flowBridge.OnClearFieldPressed();
         }
         guiVisY += yBetweenButtons;
 
         if (GUI.Button(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), "Single Step"))
         {
             Debug.Log("Single Step");
-            pathfindingIOManager.OnSingleStepPressed();
+            flowBridge.OnSingleStepPressed();
         }
         guiVisY += yBetweenButtons;
 
         if (GUI.Button(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), "VISUALIZE"))
         {
             Debug.Log("VISUALIZE");
-            pathfindingIOManager.OnVisualizePressed();
+            flowBridge.OnVisualizePressed();
         }
         guiVisY += yBetweenButtons;
 
@@ -108,14 +108,14 @@ public class PathfindingGUI : MonoBehaviour
         if (GUI.Button(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), "From-Start Mode (clears)"))
         {
             Debug.Log("From-Start Mode");
-            pathfindingIOManager.OnFromStartModePressed();
+            flowBridge.OnFromStartModePressed();
         }
         guiVisY += yBetweenButtons;
 
         if (GUI.Button(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), "From-End Mode (clears)"))
         {
             Debug.Log("From-End Mode");
-            pathfindingIOManager.OnFromEndModePressed();
+            flowBridge.OnFromEndModePressed();
         }
         guiVisY += yBetweenButtons + boxBuffer;
 
@@ -123,7 +123,7 @@ public class PathfindingGUI : MonoBehaviour
         if (wasEnabled != autoRefreshEnabled)
         {
             wasEnabled = autoRefreshEnabled;
-            pathfindingIOManager.SetAutoRefreshMode(autoRefreshEnabled);
+            flowBridge.SetAutoRefreshMode(autoRefreshEnabled);
         }
         guiVisY += yBetweenButtons;
 
@@ -131,7 +131,7 @@ public class PathfindingGUI : MonoBehaviour
         if (wasvisualizeDistanceEnabled != visualizeDistanceEnabled)
         {
             wasvisualizeDistanceEnabled = visualizeDistanceEnabled;
-            pathfindingIOManager.OnSetNumbersVisible(visualizeDistanceEnabled);
+            flowBridge.OnSetNumbersVisible(visualizeDistanceEnabled);
         }
         guiVisY += yBetweenButtons;
 
@@ -139,7 +139,7 @@ public class PathfindingGUI : MonoBehaviour
         if (wasvisualizePathfindingEnabled != visualizePathfindingEnabled)
         {
             wasvisualizePathfindingEnabled = visualizePathfindingEnabled;
-            pathfindingIOManager.OnSetVisualizationVisible(visualizePathfindingEnabled);
+            flowBridge.OnSetVisualizationVisible(visualizePathfindingEnabled);
         }
         guiVisY += yBetweenButtons;
 
@@ -147,7 +147,7 @@ public class PathfindingGUI : MonoBehaviour
         if (wasStopPathingEarly != stopPathingEarly)
         {
             wasStopPathingEarly = stopPathingEarly;
-            pathfindingIOManager.ResetPathfindingWithEarlyStoppingMode(stopPathingEarly);
+            flowBridge.ResetPathfindingWithEarlyStoppingMode(stopPathingEarly);
         }
 
 
@@ -196,7 +196,7 @@ public class PathfindingGUI : MonoBehaviour
         if (GUI.Button(new Rect(buttonX, guiSaveLoadY, buttonWidth, buttonHeight), "Save"))
         {
             Debug.Log("Save pressed");
-            godClass.OnSave();
+            gameMaster.OnSave();
         }
 
         guiSaveLoadY += yBetweenButtons;
@@ -204,7 +204,7 @@ public class PathfindingGUI : MonoBehaviour
         if (GUI.Button(new Rect(buttonX, guiSaveLoadY, buttonWidth, buttonHeight), "Load"))
         {
             Debug.Log("Load pressed");
-            godClass.OnLoad();
+            gameMaster.OnLoad();
         }
 
         // // === //

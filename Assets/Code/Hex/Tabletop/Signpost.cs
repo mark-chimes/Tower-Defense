@@ -50,10 +50,10 @@ public class Signpost : MonoBehaviour
         Path
     }
 
-    public void ExhibitSignpost(FlowSample sign)
+    public void ExhibitSignpost(FlowSample flow)
     {
-        UpdateDistance(sign.DistanceToGoal);
-        PointTo(sign.DirToGoal);
+        UpdateDistance(flow.DistanceToGoal);
+        PointTo(flow.DirToGoal);
     }
 
     public void ExhibitAccent(ArrowAccent accent)

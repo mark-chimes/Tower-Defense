@@ -20,9 +20,8 @@ public class TerrainWithOverlay : MonoBehaviour
         [SerializeField] public bool ShowPathfinding = true;
     }
 
-    // private DirectionMarker[,] directionMarkers;
     private Lattice<Flagstone> flagstones;
-    private Lattice<Signpost> directionMarkers;
+    private Lattice<Signpost> signposts;
 
     private GameObject spawnObj;
     private GameObject goalObj;
@@ -39,21 +38,21 @@ public class TerrainWithOverlay : MonoBehaviour
         isInitialized = true;
 
         flagstones = new Lattice<Flagstone>(walls.NumRings);
-        directionMarkers = new Lattice<Signpost>(walls.NumRings);
+        signposts = new Lattice<Signpost>(walls.NumRings);
 
         foreach (HexCoord c in flagstones.AllCoords())
         {
             GameObject signpostObj = InstantiateAtCoord(signpostPrefab, c);
-            Signpost directionMarker = signpostObj.GetComponent<Signpost>();
-            directionMarker.Initialize(c);
-            directionMarker.SetIsOnPathableTerrain(!walls.At(c));
-            directionMarker.SetPathingVisible(visualizationSettings.ShowPathfinding);
-            directionMarker.SetDistanceVisible(visualizationSettings.ShowDistance);
+            Signpost signpost = signpostObj.GetComponent<Signpost>();
+            signpost.Initialize(c);
+            signpost.SetIsOnPathableTerrain(!walls.At(c));
+            signpost.SetPathingVisible(visualizationSettings.ShowPathfinding);
+            signpost.SetDistanceVisible(visualizationSettings.ShowDistance);
 
             MakeFlagstoneAt(c, walls.At(c));
 
-            directionMarker.name = $"Signpost_{c}"; // TODO rename this
-            directionMarkers.SetAt(c, directionMarker);
+            signpost.name = $"Signpost_{c}"; // TODO rename this
+            signposts.SetAt(c, signpost);
 
             // TODO spawn and goal pos
         }
@@ -76,7 +75,6 @@ public class TerrainWithOverlay : MonoBehaviour
 
 
     public void Reinitialize(Lattice<bool> walls, HexCoord spawnCoord, HexCoord goalCoord,
-    // HexCoord spawnPos, HexCoord goalPos, 
         VisualizationSettings visualizationSettings)
     {
         ClearData();
@@ -94,25 +92,25 @@ public class TerrainWithOverlay : MonoBehaviour
     private void UnhighlightAllArrows()
     {
         Debug.Assert(isInitialized);
-        foreach (Signpost marker in directionMarkers.All())
+        foreach (Signpost signpost in signposts.All())
         {
-            marker.ExhibitAccent(ArrowAccent.Normal);
+            signpost.ExhibitAccent(ArrowAccent.Normal);
         }
     }
 
-    public void ExhibitSignposts(IReadOnlyCollection<FlowSample> signposts)
+    public void ExhibitSignposts(IReadOnlyCollection<FlowSample> flows)
     {
         Debug.Assert(isInitialized);
 
         Debug.Log("RefreshDistanceLabels");
 
 
-        foreach (FlowSample sign in signposts)
+        foreach (FlowSample flow in flows)
         {
-            HexCoord c = sign.Coord;
-            Signpost directionMarker = directionMarkers.At(c);
-            directionMarker.ExhibitSignpost(sign);
-            directionMarker.ExhibitAccent(sign.OnCriticalPath ? ArrowAccent.Path : ArrowAccent.Normal);
+            HexCoord c = flow.Coord;
+            Signpost signpost = signposts.At(c);
+            signpost.ExhibitSignpost(flow);
+            signpost.ExhibitAccent(flow.OnCriticalPath ? ArrowAccent.Path : ArrowAccent.Normal);
         }
     }
 
@@ -120,7 +118,7 @@ public class TerrainWithOverlay : MonoBehaviour
     {
         Destroy(flagstones.At(c).gameObject);
         MakeFlagstoneAt(c, isWall);
-        directionMarkers.At(c).SetIsOnPathableTerrain(!isWall);
+        signposts.At(c).SetIsOnPathableTerrain(!isWall);
     }
 
     private Flagstone MakeFlagstoneAt(HexCoord c, bool isWall)
@@ -144,19 +142,19 @@ public class TerrainWithOverlay : MonoBehaviour
         Debug.Assert(isInitialized);
 
         UnhighlightAllArrows();
-        foreach (FlowSample sign in changed)
+        foreach (FlowSample flow in changed)
         {
-            HexCoord c = sign.Coord;
-            Signpost directionMarker = directionMarkers.At(c);
-            directionMarker.ExhibitSignpost(sign);
+            HexCoord c = flow.Coord;
+            Signpost signpost = signposts.At(c);
+            signpost.ExhibitSignpost(flow);
         }
 
         if (shouldHighlight)
         {
             foreach (HexCoord c in frontier)
             {
-                Signpost directionMarker = directionMarkers.At(c);
-                directionMarker.ExhibitAccent(ArrowAccent.Frontier);
+                Signpost signpost = signposts.At(c);
+                signpost.ExhibitAccent(ArrowAccent.Frontier);
             }
         }
     }
@@ -165,11 +163,11 @@ public class TerrainWithOverlay : MonoBehaviour
     {
         Debug.Assert(isInitialized);
 
-        foreach (FlowSample sign in changed)
+        foreach (FlowSample flow in changed)
         {
-            HexCoord c = sign.Coord;
-            Signpost directionMarker = directionMarkers.At(c);
-            directionMarker.ExhibitAccent(ArrowAccent.Path);
+            HexCoord c = flow.Coord;
+            Signpost signpost = signposts.At(c);
+            signpost.ExhibitAccent(ArrowAccent.Path);
         }
     }
 
@@ -179,9 +177,9 @@ public class TerrainWithOverlay : MonoBehaviour
 
         spawnObj.SetActive(isVisible);
 
-        foreach (Signpost directionMarker in directionMarkers.All())
+        foreach (Signpost signpost in signposts.All())
         {
-            directionMarker.SetPathingVisible(isVisible);
+            signpost.SetPathingVisible(isVisible);
         }
     }
 
@@ -189,9 +187,9 @@ public class TerrainWithOverlay : MonoBehaviour
     {
         Debug.Assert(isInitialized);
 
-        foreach (Signpost directionMarker in directionMarkers.All())
+        foreach (Signpost signpost in signposts.All())
         {
-            directionMarker.SetDistanceVisible(isVisible);
+            signpost.SetDistanceVisible(isVisible);
         }
     }
 }

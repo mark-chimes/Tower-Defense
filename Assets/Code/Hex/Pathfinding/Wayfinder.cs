@@ -12,7 +12,7 @@ public class Wayfinder
     private readonly HexSearch.Dir SearchDirection;
 
 
-    private FlowField currentFlow;
+    private FlowField field;
 
     private HexSearch.Phase phase = HexSearch.Phase.ExpandFrontier;
 
@@ -28,7 +28,7 @@ public class Wayfinder
     public Wayfinder(Lattice<bool> wallMap, HexCoord spawnPos, HexCoord goalPos, HexSearch.Dir searchDirection, bool isStopOnPathFound)
     {
         this.wallMap = wallMap;
-        currentFlow = new FlowField(NumRings);
+        field = new FlowField(NumRings);
         SpawnPos = spawnPos;
         GoalPos = goalPos;
         SearchDirection = searchDirection;
@@ -45,7 +45,7 @@ public class Wayfinder
     {
         visited = new Lattice<bool>(NumRings);
         erfQueue = new Queue<HexCoord>();
-        currentFlow = new FlowField(NumRings);
+        field = new FlowField(NumRings);
         phase = HexSearch.Phase.ExpandFrontier;
 
         HexCoord c;
@@ -71,7 +71,7 @@ public class Wayfinder
         }
 
         visited.SetAt(c, true);
-        currentFlow.SetTile(c, new FlowField.Sample(0, HexCompass.NONE, false));
+        field.SetTile(c, new FlowField.Tile(0, HexCompass.NONE, false));
         erfQueue.Enqueue(c);
     }
 
@@ -109,7 +109,7 @@ public class Wayfinder
 
         if (erfQueue.TryDequeue(out var coord))
         {
-            int prevDist = currentFlow.TileAt(coord).Distance;
+            int prevDist = field.TileAt(coord).Distance;
 
             foreach (HexCompass dir in HexCompassExtension.AllDirs)
             {
@@ -144,8 +144,8 @@ public class Wayfinder
                     default: { phase = HexSearch.Phase.Done; return list; } // TODO
                 }
 
-                FlowField.Sample newTile = new FlowField.Sample(prevDist + 1, newDir, false);
-                currentFlow.SetTile(c, newTile);
+                FlowField.Tile newTile = new FlowField.Tile(prevDist + 1, newDir, false);
+                field.SetTile(c, newTile);
                 list.Add(new FlowSample(c, newTile));
 
                 if (isStopOnPathFound && c == target)
@@ -174,9 +174,9 @@ public class Wayfinder
         if (pathC == null) { phase = HexSearch.Phase.Done; return empty; }
 
         HexCoord coord = (HexCoord)pathC;
-        FlowField.Sample oldTile = currentFlow.TileAt(coord);
-        FlowField.Sample newTile = new FlowField.Sample(oldTile.Distance, oldTile.DirToGoal, true);
-        currentFlow.SetTile(coord, newTile);
+        FlowField.Tile oldTile = field.TileAt(coord);
+        FlowField.Tile newTile = new FlowField.Tile(oldTile.Distance, oldTile.DirToGoal, true);
+        field.SetTile(coord, newTile);
 
         HexCompass dir;
         switch (SearchDirection)
@@ -199,12 +199,12 @@ public class Wayfinder
 
     public FlowSample SignpostAt(HexCoord coord)
     {
-        return new FlowSample(coord, currentFlow.TileAt(coord));
+        return new FlowSample(coord, field.TileAt(coord));
     }
 
     public IReadOnlyCollection<FlowSample> Signposts()
     {
-        return currentFlow.Signposts();
+        return field.Signposts();
     }
 
 }

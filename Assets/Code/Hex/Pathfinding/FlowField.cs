@@ -4,11 +4,11 @@ public class FlowField
 {
 
 
-    private readonly Lattice<Sample> tiles;
+    private readonly Lattice<Tile> tiles;
 
     public FlowField(int numRings)
     {
-        tiles = new Lattice<Sample>(numRings);
+        tiles = new Lattice<Tile>(numRings);
         ClearTiles();
     }
 
@@ -20,9 +20,9 @@ public class FlowField
         return list;
     }
 
-    public Sample TileAt(HexCoord c) => tiles.At(c);
+    public Tile TileAt(HexCoord c) => tiles.At(c);
 
-    public void SetTile(HexCoord c, Sample t) => tiles.SetAt(c, t);
+    public void SetTile(HexCoord c, Tile t) => tiles.SetAt(c, t);
 
     public int DistanceAt(HexCoord c) => TileAt(c).Distance;
     public HexCompass DirectionAt(HexCoord c) => TileAt(c).DirToGoal;
@@ -30,14 +30,14 @@ public class FlowField
     public bool Reachable(HexCoord c) => TileAt(c).Distance >= 0;
 
 
-    public struct Sample
+    public struct Tile
 
     {
         public readonly int Distance;
         public readonly HexCompass DirToGoal;
         public readonly bool OnCriticalPath;
 
-        public Sample(int distance, HexCompass dirToGoal, bool onCriticalPath)
+        public Tile(int distance, HexCompass dirToGoal, bool onCriticalPath)
         {
             Distance = distance;
             DirToGoal = dirToGoal;
@@ -45,7 +45,7 @@ public class FlowField
         }
     }
 
-    public static readonly Sample UnreachedTile = new Sample(-1, HexCompass.NONE, false);
+    public static readonly Tile UnreachedTile = new Tile(-1, HexCompass.NONE, false);
 
     private void ClearTiles() => tiles.Fill(UnreachedTile);
 

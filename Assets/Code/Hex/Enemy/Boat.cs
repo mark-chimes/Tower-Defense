@@ -62,15 +62,15 @@ public class Boat : MonoBehaviour
         Debug.Assert(hasPath);
         Debug.Log($"Recalculate pathing target for {name}.");
 
-        FlowSample signpostHere = treasureMap.SignpostAt(currentCoord);
-        if (signpostHere.DirToGoal == HexCompass.NONE)
+        FlowSample flowHere = treasureMap.SignpostAt(currentCoord);
+        if (flowHere.DirToGoal == HexCompass.NONE)
         {
             Debug.Log($"No direction, boat {name} freezing in place");
             ClearPathing();
             return;
         }
-        movementDirection = HexProjection.CompassToQuaternion(signpostHere.DirToGoal);
-        nextCoord = currentCoord.InDirection(signpostHere.DirToGoal);
+        movementDirection = HexProjection.CompassToQuaternion(flowHere.DirToGoal);
+        nextCoord = currentCoord.InDirection(flowHere.DirToGoal);
         waypoint = HexProjection.CoordsToWorld(nextCoord);
 
         Debug.Log($"Moving from currentCoord {currentCoord} to {nextCoord}.");
