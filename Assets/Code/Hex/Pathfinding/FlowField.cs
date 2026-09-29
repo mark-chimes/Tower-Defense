@@ -12,7 +12,7 @@ public class FlowField
         ClearTiles();
     }
 
-    public IReadOnlyCollection<FlowSample> FlowSamples()
+    public IReadOnlyCollection<FlowSample> Flows()
     {
         var flows = new List<FlowSample>();
         foreach (HexCoord c in tiles.AllCoords())

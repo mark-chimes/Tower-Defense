@@ -114,7 +114,7 @@ public class Wayfinder
             foreach (HexCompass dir in HexCompassExtension.AllDirs)
             {
                 HexCoord c = coord.InDirection(dir);
-                if (!visited.IsCoordOnMap(c) || visited.At(c))
+                if (!visited.Contains(c) || visited.At(c))
                 {
                     continue;
                 }
@@ -192,7 +192,7 @@ public class Wayfinder
         else
         {
             HexCoord next = coord.InDirection(dir);
-            pathC = wallMap.IsCoordOnMap(next) ? next : null;
+            pathC = wallMap.Contains(next) ? next : null;
         }
         return new[] { new FlowSample(coord, newTile) };
     }
@@ -204,7 +204,7 @@ public class Wayfinder
 
     public IReadOnlyCollection<FlowSample> Flows()
     {
-        return field.FlowSamples();
+        return field.Flows();
     }
 
 }

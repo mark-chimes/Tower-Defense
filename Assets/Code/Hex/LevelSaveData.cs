@@ -10,7 +10,7 @@ public class LevelSaveData
     public LevelSaveData(Lattice<bool> wallMap)
     {
         NumRings = wallMap.NumRings;
-        IsWall = wallMap.MapAsFlatArray();
+        IsWall = wallMap.ToFlatArray();
     }
 
     public string ToJson()
@@ -23,9 +23,9 @@ public class LevelSaveData
         return JsonUtility.FromJson<LevelSaveData>(json);
     }
 
-    public Lattice<bool> LoadMap()
+    public Lattice<bool> ToWallMap()
     {
-        return Lattice<bool>.MapFromArray(IsWall, NumRings);
+        return Lattice<bool>.FromFlatArray(IsWall, NumRings);
     }
 
     public override string ToString()

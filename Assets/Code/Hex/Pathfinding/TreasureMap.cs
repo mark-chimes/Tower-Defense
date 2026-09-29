@@ -95,7 +95,7 @@ public class TreasureMap
         return TileMarker.None;
     }
 
-    public LevelSaveData AsSaveableData()
+    public LevelSaveData ToSaveData()
     {
         return new LevelSaveData(wallMap);
     }

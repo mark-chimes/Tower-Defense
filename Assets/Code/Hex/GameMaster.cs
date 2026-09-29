@@ -56,12 +56,12 @@ public class GameMaster : MonoBehaviour
 
     public void OnSave()
     {
-        saveLoadSystem.SaveMap(treasureMap);
+        saveLoadSystem.Save(treasureMap);
     }
 
     public void OnLoad()
     {
-        LevelSaveData loaded = saveLoadSystem.OnLoad();
+        LevelSaveData loaded = saveLoadSystem.Load();
 
         gridView.ClearData();
         enemyController.ClearData();
@@ -101,16 +101,17 @@ public class GameMaster : MonoBehaviour
 
     void CreateMapFromData(LevelSaveData loaded)
     {
-        Lattice<bool> loadedMap = loaded.LoadMap();
+        Lattice<bool> loadedWallMap = loaded.ToWallMap();
 
-        treasureMap = new TreasureMap(loadedMap,
+        treasureMap = new TreasureMap(
+            loadedWallMap,
             treasureMap.SpawnPos,
             treasureMap.GoalPos,
             StartingIsStopOnPathFound,
             enemyController.PathfindingUpdate,
             enemyController.PathfindingClear
             );
-        CreateMapFromTreasureMap(treasureMap, loadedMap, StartingVisualization);
+        CreateMapFromTreasureMap(treasureMap, loadedWallMap, StartingVisualization);
     }
 
     void CreateMapFromTreasureMap(TreasureMap treasureMap,

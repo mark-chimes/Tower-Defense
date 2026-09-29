@@ -8,30 +8,30 @@ public class Lattice<T>
 {
     // See https://www.redblobgames.com/grids/hexagons/#map-storage
     // We currently store it using a "wasted space" array using only Q and R
-    private T[,] map;
+    private T[,] array2D;
     public readonly int NumRings; // 0 rings is a single hex.
-    private readonly int arraySize; // side of square of array
+    private readonly int arrayWidth; // side of square of array
 
     public Lattice(int numRings)
     {
-        arraySize = 2 * numRings + 1;
-        map = new T[arraySize, arraySize];
+        arrayWidth = 2 * numRings + 1;
+        array2D = new T[arrayWidth, arrayWidth];
         NumRings = numRings;
     }
 
     public T At(HexCoord c)
     {
         // We use a square array with wasted space so we have to shift it
-        return map[c.Q + NumRings, c.R + NumRings];
+        return array2D[c.Q + NumRings, c.R + NumRings];
     }
 
     public void SetAt(HexCoord c, T t)
     {
         // We use a square array with wasted space so we have to shift it
-        map[c.Q + NumRings, c.R + NumRings] = t;
+        array2D[c.Q + NumRings, c.R + NumRings] = t;
     }
 
-    public bool IsCoordOnMap(HexCoord c)
+    public bool Contains(HexCoord c)
     {
         return c.Length() <= NumRings;
     }
@@ -39,9 +39,9 @@ public class Lattice<T>
     // fills the entire map with the value t 
     public void Fill(T t)
     {
-        for (int q = 0; q < arraySize; q++)
-            for (int r = 0; r < arraySize; r++)
-                map[q, r] = t;
+        for (int q = 0; q < arrayWidth; q++)
+            for (int r = 0; r < arrayWidth; r++)
+                array2D[q, r] = t;
     }
 
 
@@ -59,24 +59,24 @@ public class Lattice<T>
     }
 
     // Implementation assumes a square map
-    public T[] MapAsFlatArray()
+    public T[] ToFlatArray()
     {
-        T[] flatMap = new T[arraySize * arraySize];
-        for (int x = 0; x < arraySize; x++)
-            for (int z = 0; z < arraySize; z++)
-                flatMap[z * arraySize + x] = map[x, z];
-        return flatMap;
+        T[] flat = new T[arrayWidth * arrayWidth];
+        for (int x = 0; x < arrayWidth; x++)
+            for (int z = 0; z < arrayWidth; z++)
+                flat[z * arrayWidth + x] = array2D[x, z];
+        return flat;
     }
 
     // Implementation assumes a square map
-    public static Lattice<T> MapFromArray(T[] arrayT, int numRings)
+    public static Lattice<T> FromFlatArray(T[] flat, int numRings)
     {
-        int arraySize = 2 * numRings + 1;
-        T[,] mapT = new T[arraySize, arraySize];
-        for (int x = 0; x < arraySize; x++)
-            for (int z = 0; z < arraySize; z++)
-                mapT[x, z] = arrayT[z * arraySize + x];
-        return new Lattice<T>(mapT, numRings);
+        int arrayWidth = 2 * numRings + 1;
+        T[,] array2D = new T[arrayWidth, arrayWidth];
+        for (int x = 0; x < arrayWidth; x++)
+            for (int z = 0; z < arrayWidth; z++)
+                array2D[x, z] = flat[z * arrayWidth + x];
+        return new Lattice<T>(array2D, numRings);
     }
 
     public override string ToString()
@@ -84,10 +84,10 @@ public class Lattice<T>
         return $"Lattice<{typeof(T).Name}> with Num Rings: {NumRings}";
     }
 
-    private Lattice(T[,] map, int numRings)
+    private Lattice(T[,] array2D, int numRings)
     {
-        this.map = map;
-        arraySize = map.GetLength(0); //  = 2 * numRings + 1; 
+        this.array2D = array2D;
+        arrayWidth = array2D.GetLength(0); //  = 2 * numRings + 1; 
         NumRings = numRings;
     }
 
