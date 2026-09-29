@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7383047596560083966}
   - component: {fileID: 4295775000907222820}
   m_Layer: 0
-  m_Name: HexDirectionMarker
+  m_Name: Signpost
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -281,7 +281,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -3059316330033648023, guid: 6409ce0ae21b1e94eb2c8f0d88a7696f, type: 3}
       propertyPath: m_Name
-      value: arrow
+      value: FlowArrow
       objectReference: {fileID: 0}
     - target: {fileID: -134117285229718369, guid: 6409ce0ae21b1e94eb2c8f0d88a7696f, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
