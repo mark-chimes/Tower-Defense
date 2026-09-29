@@ -5,11 +5,13 @@ using UnityEngine;
 // TODO split out concerns: 
 // - Spawn enemies on map
 // - Control where they go
+// Names: Spawning could be EnemyConstructionYard, or EnemyShipyard, or EnemyHarbor, the Control could be EnemyAdmiral or EnemyArmy or EnemyNavy  
+// Rename to EnemyController until it is split out
 public class HexEnemyController : MonoBehaviour
 {
     [SerializeField] private HexBoat boatPrefab;
 
-    private HexTreasureMap treasureMap;
+    private HexTreasureMap treasureMap; 
     private HexBoat enemy = null;
 
 

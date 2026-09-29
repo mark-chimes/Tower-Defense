@@ -1,5 +1,6 @@
 using UnityEngine;
 
+// Rename to Signpost
 public class HexDirectionMarker : MonoBehaviour
 {
     [SerializeField] private TMPro.TextMeshPro numberLabel;

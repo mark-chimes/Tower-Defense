@@ -2,6 +2,8 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+// Rename to BoardInput
+// Possibly call the building functionality BuildTool later
 public class HexMouseIO
 {
 

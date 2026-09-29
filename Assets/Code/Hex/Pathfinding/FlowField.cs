@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using UnityEngine;
 
+// Rename to FlowField
 public class HexFlowField
 {
 
@@ -31,6 +31,7 @@ public class HexFlowField
     public bool Reachable(HexCoord c) => TileAt(c).Distance >= 0;
 
 
+    // Rename to Sample
     public struct Tile
 
     {

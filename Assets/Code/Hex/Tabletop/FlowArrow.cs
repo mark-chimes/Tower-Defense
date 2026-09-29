@@ -1,5 +1,6 @@
 using UnityEngine;
 
+// Rename to FlowArrow
 public class HexDirectionArrow : Highlightable
 {
 

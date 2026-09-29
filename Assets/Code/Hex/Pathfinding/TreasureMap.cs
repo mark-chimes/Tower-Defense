@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 
+// Rename to TreasureMap
 public class HexTreasureMap
 {
 

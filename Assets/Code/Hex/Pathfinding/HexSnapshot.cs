@@ -1,3 +1,4 @@
+// Rename: Keep name
 public readonly struct HexSnapshot
 {
     public HexCoord Coord { get; }

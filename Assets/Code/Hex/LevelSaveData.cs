@@ -2,6 +2,7 @@ using UnityEngine;
 
 [System.Serializable]
 
+// Rename to LevelSaveData
 public class HexSaveableLevel
 {
     public int NumRings;

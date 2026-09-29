@@ -1,5 +1,6 @@
 using UnityEngine;
 
+// rename to LayoutSpecs 
 [System.Serializable]
 public class HexAuthor
 {

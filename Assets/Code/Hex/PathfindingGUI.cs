@@ -1,5 +1,6 @@
 using UnityEngine;
 
+// Rename to PathfindingGUI
 public class HexGUI : MonoBehaviour
 {
 

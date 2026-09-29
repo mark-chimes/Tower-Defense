@@ -1,5 +1,6 @@
 using UnityEngine;
 
+// Rename to ExpeditionLeader
 public class HexPathfindingIOManager
 {
     private float visualizeFPS = 60f;

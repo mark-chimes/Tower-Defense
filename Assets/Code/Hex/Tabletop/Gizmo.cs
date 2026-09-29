@@ -1,5 +1,6 @@
 using UnityEngine;
 
+// Rename to Gizmo
 public static class HexGizmo
 {
     public enum DiagonalColorMode

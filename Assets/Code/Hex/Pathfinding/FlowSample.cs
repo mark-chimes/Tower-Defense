@@ -1,5 +1,4 @@
-using UnityEngine;
-
+// Rename to FlowSample
 public class HexSignpost
 {
     public readonly HexCoord Coord;

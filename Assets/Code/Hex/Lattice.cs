@@ -4,6 +4,7 @@
 
 using System.Collections.Generic;
 
+// Rename to Lattice<T>
 public class HexMap<T>
 {
     // See https://www.redblobgames.com/grids/hexagons/#map-storage

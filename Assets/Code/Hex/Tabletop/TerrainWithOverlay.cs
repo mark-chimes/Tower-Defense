@@ -5,6 +5,8 @@ using static HexDirectionMarker;
 // TODO split out owning the floor (flagstones) and the markers
 
 // TODO maybe this should be called terrain or terrain view or something
+
+// Rename to  `TerrainWithOverlay.cs` until it is split out
 public class HexGridView : MonoBehaviour
 {
     [SerializeField] private GameObject floorTilePrefab; // TODO rename to water tile or something after code port

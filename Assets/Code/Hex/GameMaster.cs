@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// TODO find better name for this class
+// TODO find better name for this class - Rename to `GameMaster.cs`? 
 public class HexGodClass : MonoBehaviour
 {
     [SerializeField] private HexAuthor gridAuthor;
@@ -70,14 +70,9 @@ public class HexGodClass : MonoBehaviour
         CreateMapFromData(loaded);
     }
 
-    // void CreateMapFromWallMap(HexMap<bool> wallMap, HexCoord spawnCoord, HexCoord goalCoord)
-    // {
-    //     gridView.Initialize(wallMap, spawnCoord, goalCoord);
-    // }
-
-
     private HexTreasureMap treasureMap;
 
+    // TODO rename this
     void CreateMapFromNothing()
     {
         HexMap<bool> wallMap = new HexMap<bool>(gridAuthor.NumRings);
@@ -126,16 +121,10 @@ public class HexGodClass : MonoBehaviour
         gridView.Initialize(wallMap, treasureMap.SpawnPos, treasureMap.GoalPos, visualizationSettings);
         pathfindingIOManager.Initialize(treasureMap, gridView);
 
-        // TODO
-
-        // gridWalls.Initialize(treasureMap, layout, pathfindingIOManager.UpdateDistances);
-        // gridIO = new GridMouseHighlightIO(gridWalls, treasureMap, Camera.main);
-
         enemyController.Initialize(treasureMap);
         enemyController.SpawnEnemy();
 
         gui.Initialize(StartingVisualization, StartingIsStopOnPathFound, pathfindingIOManager, enemyController, this);
-        //     , enemyController, this, gridWalls); // TODO cross-dependency code-smell
         mouseIO = new HexMouseIO(gridView, treasureMap, Camera.main, pathfindingIOManager.UpdateDistances);
     }
 }

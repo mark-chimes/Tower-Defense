@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+// Rename to CameraRig
 public class CameraControl
 {
 

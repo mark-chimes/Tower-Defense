@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 
+// Keep name for now until it's better organized
 public class HexSearch
 {
     public enum Phase

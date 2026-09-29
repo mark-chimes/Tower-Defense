@@ -2,7 +2,7 @@
 using System.IO;
 using UnityEngine;
 
-// TODO this class should be reworked when I figure it out.
+// TODO this class should be reworked when I figure it out. Rename when it's reworked
 public class HexLevelSaveLoadSystem
 {
     // TODO should I save the map, or something else?

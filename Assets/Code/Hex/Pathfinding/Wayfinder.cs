@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 
+// Rename to Wayfinder
 public class HexWayfinder
 {
     public readonly HexCoord SpawnPos;

@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 
+// Rename to HexProjection
 public static class HexLayout
 {
     public const float CellWidth = 10f; // center of one cell to center of another - the small diameter
