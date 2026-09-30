@@ -10,7 +10,7 @@ public class FlowBridge
     private float visualizeTime;
     private float tempTime;
 
-    private bool isAutoRefreshMode = false;
+    public bool IsAutoRefreshMode { get; private set; } = false;
     private bool isVisualizeMode = false;
 
 
@@ -32,8 +32,8 @@ public class FlowBridge
 
     public void SetAutoRefreshMode(bool isEnabled)
     {
-        isAutoRefreshMode = isEnabled;
-        if (isAutoRefreshMode)
+        IsAutoRefreshMode = isEnabled;
+        if (IsAutoRefreshMode)
         {
             isVisualizeMode = false;
             Refresh();
@@ -45,11 +45,12 @@ public class FlowBridge
         isVisualizeMode = false;
         treasureMap.SetModeAndClear(dir);
         gridView.ShowFlows(treasureMap.Flows());
+        RefreshIfAutoRefresh();
     }
 
     public void RefreshIfAutoRefresh()
     {
-        if (!isAutoRefreshMode) return;
+        if (!IsAutoRefreshMode) return;
         Refresh();
     }
 
@@ -71,11 +72,10 @@ public class FlowBridge
         gridView.ShowFlows(treasureMap.Flows());
     }
 
-    // TODO if isAutoRefreshMode is on, this clears the field but never redraws it
-    // autorefresh should retrigger after the clear.
     public void StartVisualize()
     {
         ClearFieldAndRedraw();
+        IsAutoRefreshMode = false;
         isVisualizeMode = true;
     }
 
@@ -88,12 +88,13 @@ public class FlowBridge
     {
         treasureMap.RecreateWayfinder(isStopOnPathFound);
         gridView.ShowFlows(treasureMap.Flows());
+        RefreshIfAutoRefresh();
     }
 
 
     public void ContinuallySingleStep()
     {
-        if (isAutoRefreshMode) return;
+        if (IsAutoRefreshMode) return;
         if (!isVisualizeMode) return;
 
         tempTime += Time.deltaTime;
@@ -114,7 +115,7 @@ public class FlowBridge
     {
         gridView.SetTerrainAt(c, treasureMap.HasWall(c));
 
-        if (!isAutoRefreshMode)
+        if (!IsAutoRefreshMode)
         {
             Debug.Log("Auto refresh mode disabled, not updating distances");
         }
@@ -124,8 +125,6 @@ public class FlowBridge
         }
         gridView.ShowFlows(treasureMap.Flows());
     }
-
-
 
     private void RefreshFromDeltaHighlightFrontier(HexSearch.Delta delta)
     {

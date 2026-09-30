@@ -8,10 +8,6 @@ public class PathfindingGUI : MonoBehaviour
 
     private GameMaster gameMaster; // // TODO Cross-dependency code smell not ideal, but I'll fix this later
 
-
-    bool autoRefreshEnabled = false;
-    bool wasAutoRefreshEnabled = false;
-
     bool visualizeDistanceEnabled = true;
     bool wasVisualizeDistanceEnabled = true;
     bool visualizePathfindingEnabled = true;
@@ -119,12 +115,9 @@ public class PathfindingGUI : MonoBehaviour
         }
         guiVisY += yBetweenButtons + boxBuffer;
 
-        autoRefreshEnabled = GUI.Toggle(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), autoRefreshEnabled, "Auto-Refresh");
-        if (wasAutoRefreshEnabled != autoRefreshEnabled)
-        {
-            wasAutoRefreshEnabled = autoRefreshEnabled;
-            flowBridge.SetAutoRefreshMode(autoRefreshEnabled);
-        }
+        Rect rect = new Rect(buttonX, guiVisY, buttonWidth, buttonHeight);
+        bool isAutoRefreshWanted = GUI.Toggle(rect, flowBridge.IsAutoRefreshMode, "Auto-Refresh");
+        if (isAutoRefreshWanted != flowBridge.IsAutoRefreshMode) flowBridge.SetAutoRefreshMode(isAutoRefreshWanted);
         guiVisY += yBetweenButtons;
 
         visualizeDistanceEnabled = GUI.Toggle(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), visualizeDistanceEnabled, "Distance Numbers");
