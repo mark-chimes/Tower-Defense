@@ -40,24 +40,11 @@ public class FlowBridge
         }
     }
 
-    public void OnFromStartModePressed()
+    public void SetSearchDir(HexSearch.Dir dir)
     {
         isVisualizeMode = false;
-        treasureMap.SetModeAndClear(HexSearch.Dir.FromStart);
+        treasureMap.SetModeAndClear(dir);
         gridView.ShowFlows(treasureMap.Flows());
-    }
-
-    public void OnFromEndModePressed()
-    {
-        isVisualizeMode = false;
-        treasureMap.SetModeAndClear(HexSearch.Dir.FromEnd);
-        gridView.ShowFlows(treasureMap.Flows());
-    }
-
-    // TODO reconsider structure of 3 functions below
-    public void OnRefreshPressed()
-    {
-        Refresh();
     }
 
     public void RefreshIfAutoRefresh()
@@ -66,20 +53,19 @@ public class FlowBridge
         Refresh();
     }
 
-    private void Refresh()
+    public void Refresh()
     {
         treasureMap.Recompute();
         gridView.ShowFlows(treasureMap.Flows());
     }
 
-
-    public void OnClearFieldPressed()
+    public void ClearField()
     {
         isVisualizeMode = false;
-        ClearField();
+        ClearFieldAndRedraw();
     }
 
-    public void ClearField()
+    private void ClearFieldAndRedraw()
     {
         treasureMap.ClearField();
         gridView.ShowFlows(treasureMap.Flows());
@@ -87,26 +73,14 @@ public class FlowBridge
 
     // TODO if isAutoRefreshMode is on, this clears the field but never redraws it
     // autorefresh should retrigger after the clear.
-    public void OnVisualizePressed()
+    public void StartVisualize()
     {
-        ClearField();
+        ClearFieldAndRedraw();
         isVisualizeMode = true;
     }
 
-    public void OnSingleStepPressed()
-    {
-        SingleStep();
-    }
-
-    public void OnSetVisualizationVisible(bool isEnabled)
-    {
-        gridView.SetVisualizationVisible(isEnabled);
-    }
-
-    public void OnSetNumbersVisible(bool isEnabled)
-    {
-        gridView.SetDistanceVisible(isEnabled);
-    }
+    public void SetVisualizationVisible(bool isEnabled) => gridView.SetVisualizationVisible(isEnabled);
+    public void SetNumbersVisible(bool isEnabled) => gridView.SetDistanceVisible(isEnabled);
 
     // Whether this should continue pathfinding after shortest path found or continue to produce a full flow-field
     // TODO later we should have a bunch of settings like the spawn point and goal point that can be moved around etc.
@@ -130,7 +104,7 @@ public class FlowBridge
         }
     }
 
-    private void SingleStep()
+    public void SingleStep()
     {
         HexSearch.Delta delta = treasureMap.AdvanceSearch();
         RefreshFromDeltaHighlightFrontier(delta);
@@ -153,7 +127,7 @@ public class FlowBridge
 
 
 
-    public void RefreshFromDeltaHighlightFrontier(HexSearch.Delta delta)
+    private void RefreshFromDeltaHighlightFrontier(HexSearch.Delta delta)
     {
         Debug.Log("Refresh from delta");
 

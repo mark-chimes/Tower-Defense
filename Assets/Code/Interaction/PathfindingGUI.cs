@@ -79,28 +79,28 @@ public class PathfindingGUI : MonoBehaviour
         if (GUI.Button(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), "Instant Refresh"))
         {
             Debug.Log("Refresh");
-            flowBridge.OnRefreshPressed();
+            flowBridge.Refresh();
         }
         guiVisY += yBetweenButtons;
 
         if (GUI.Button(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), "Clear Field"))
         {
             Debug.Log("Clear Field");
-            flowBridge.OnClearFieldPressed();
+            flowBridge.ClearField();
         }
         guiVisY += yBetweenButtons;
 
         if (GUI.Button(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), "Single Step"))
         {
             Debug.Log("Single Step");
-            flowBridge.OnSingleStepPressed();
+            flowBridge.SingleStep();
         }
         guiVisY += yBetweenButtons;
 
         if (GUI.Button(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), "VISUALIZE"))
         {
             Debug.Log("VISUALIZE");
-            flowBridge.OnVisualizePressed();
+            flowBridge.StartVisualize();
         }
         guiVisY += yBetweenButtons;
 
@@ -108,14 +108,14 @@ public class PathfindingGUI : MonoBehaviour
         if (GUI.Button(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), "From-Start Mode (clears)"))
         {
             Debug.Log("From-Start Mode");
-            flowBridge.OnFromStartModePressed();
+            flowBridge.SetSearchDir(HexSearch.Dir.FromStart);
         }
         guiVisY += yBetweenButtons;
 
         if (GUI.Button(new Rect(buttonX, guiVisY, buttonWidth, buttonHeight), "From-End Mode (clears)"))
         {
             Debug.Log("From-End Mode");
-            flowBridge.OnFromEndModePressed();
+            flowBridge.SetSearchDir(HexSearch.Dir.FromEnd);
         }
         guiVisY += yBetweenButtons + boxBuffer;
 
@@ -131,7 +131,7 @@ public class PathfindingGUI : MonoBehaviour
         if (wasVisualizeDistanceEnabled != visualizeDistanceEnabled)
         {
             wasVisualizeDistanceEnabled = visualizeDistanceEnabled;
-            flowBridge.OnSetNumbersVisible(visualizeDistanceEnabled);
+            flowBridge.SetNumbersVisible(visualizeDistanceEnabled);
         }
         guiVisY += yBetweenButtons;
 
@@ -139,7 +139,7 @@ public class PathfindingGUI : MonoBehaviour
         if (wasVisualizePathfindingEnabled != visualizePathfindingEnabled)
         {
             wasVisualizePathfindingEnabled = visualizePathfindingEnabled;
-            flowBridge.OnSetVisualizationVisible(visualizePathfindingEnabled);
+            flowBridge.SetVisualizationVisible(visualizePathfindingEnabled);
         }
         guiVisY += yBetweenButtons;
 
