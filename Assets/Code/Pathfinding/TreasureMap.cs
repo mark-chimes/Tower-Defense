@@ -18,7 +18,7 @@ public class TreasureMap
     private Wayfinder wayfinder;
 
     public TreasureMap(Lattice<bool> wallMap, HexCoord spawnCoord, HexCoord goalCoord, bool isStopOnPathFound,
-    Action onPathfindingUpdate, Action onPathfindingClear, Action<HexCoord> onWallsChanged)
+    Action onPathfindingUpdate, Action onPathfindingClear, Action<HexCoord> onWallChange)
     {
         this.wallMap = wallMap;
         SpawnCoord = spawnCoord;
@@ -26,7 +26,7 @@ public class TreasureMap
         RecreateWayfinder(isStopOnPathFound);
         this.onPathfindingUpdate = onPathfindingUpdate;
         this.onPathfindingClear = onPathfindingClear;
-        this.onWallChange = onWallsChanged;
+        this.onWallChange = onWallChange;
     }
 
     /// <summary>

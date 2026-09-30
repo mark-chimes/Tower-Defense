@@ -123,6 +123,7 @@ public class GameMaster : MonoBehaviour
 
         enemyController.Initialize(treasureMap);
         enemyController.SpawnEnemy();
+        flowBridge.RefreshIfAutoRefresh();
 
         gui.Initialize(StartingVisualization, StartingIsStopOnPathFound, flowBridge, enemyController, this);
         boardInput = new BoardInput(treasureMap, Camera.main);

@@ -2,8 +2,8 @@ using System.Collections.Generic;
 
 public class Wayfinder
 {
-    public readonly HexCoord SpawnPos;
-    public readonly HexCoord GoalPos;
+    public readonly HexCoord SpawnCoord;
+    public readonly HexCoord GoalCoord;
 
     private Lattice<bool> wallMap; // Do not modify
 
@@ -25,12 +25,12 @@ public class Wayfinder
     HexCoord? pathC;
 
 
-    public Wayfinder(Lattice<bool> wallMap, HexCoord spawnPos, HexCoord goalPos, HexSearch.Dir searchDirection, bool isStopOnPathFound)
+    public Wayfinder(Lattice<bool> wallMap, HexCoord spawnCoord, HexCoord goalCoord, HexSearch.Dir searchDirection, bool isStopOnPathFound)
     {
         this.wallMap = wallMap;
         field = new FlowField(NumRings);
-        SpawnPos = spawnPos;
-        GoalPos = goalPos;
+        SpawnCoord = spawnCoord;
+        GoalCoord = goalCoord;
         SearchDirection = searchDirection;
         this.isStopOnPathFound = isStopOnPathFound;
         ClearField();
@@ -38,7 +38,7 @@ public class Wayfinder
 
     public Wayfinder WithNewSearchDir(HexSearch.Dir searchDirection)
     {
-        return new Wayfinder(wallMap, SpawnPos, GoalPos, searchDirection, isStopOnPathFound);
+        return new Wayfinder(wallMap, SpawnCoord, GoalCoord, searchDirection, isStopOnPathFound);
     }
 
     public void ClearField()
@@ -53,14 +53,14 @@ public class Wayfinder
         {
             case HexSearch.Dir.FromStart:
                 {
-                    c = SpawnPos;
-                    pathC = GoalPos;
+                    c = SpawnCoord;
+                    pathC = GoalCoord;
                     break;
                 }
             case HexSearch.Dir.FromEnd:
                 {
-                    c = GoalPos;
-                    pathC = SpawnPos;
+                    c = GoalCoord;
+                    pathC = SpawnCoord;
                     break;
                 }
             default:
@@ -132,13 +132,13 @@ public class Wayfinder
                     case HexSearch.Dir.FromStart:
                         {
                             newDir = dir;
-                            target = GoalPos;
+                            target = GoalCoord;
                             break;
                         }
                     case HexSearch.Dir.FromEnd:
                         {
                             newDir = dir.Opposite();
-                            target = SpawnPos;
+                            target = SpawnCoord;
                             break;
                         }
                     default: { phase = HexSearch.Phase.Done; return list; } // TODO

@@ -36,8 +36,7 @@ public class FlowBridge
         if (isAutoRefreshMode)
         {
             isVisualizeMode = false;
-            treasureMap.Recompute();
-            gridView.ShowFlows(treasureMap.Flows());
+            Refresh();
         }
     }
 
@@ -55,11 +54,24 @@ public class FlowBridge
         gridView.ShowFlows(treasureMap.Flows());
     }
 
+    // TODO reconsider structure of 3 functions below
     public void OnRefreshPressed()
+    {
+        Refresh();
+    }
+
+    public void RefreshIfAutoRefresh()
+    {
+        if (!isAutoRefreshMode) return;
+        Refresh();
+    }
+
+    private void Refresh()
     {
         treasureMap.Recompute();
         gridView.ShowFlows(treasureMap.Flows());
     }
+
 
     public void OnClearFieldPressed()
     {
@@ -72,6 +84,7 @@ public class FlowBridge
         treasureMap.ClearField();
         gridView.ShowFlows(treasureMap.Flows());
     }
+
     // TODO if isAutoRefreshMode is on, this clears the field but never redraws it
     // autorefresh should retrigger after the clear.
     public void OnVisualizePressed()
@@ -121,13 +134,12 @@ public class FlowBridge
     {
         HexSearch.Delta delta = treasureMap.AdvanceSearch();
         RefreshFromDeltaHighlightFrontier(delta);
-
     }
 
     public void OnWallChange(HexCoord c)
     {
         gridView.SetTerrainAt(c, treasureMap.HasWall(c));
-        
+
         if (!isAutoRefreshMode)
         {
             Debug.Log("Auto refresh mode disabled, not updating distances");
@@ -138,6 +150,7 @@ public class FlowBridge
         }
         gridView.ShowFlows(treasureMap.Flows());
     }
+
 
 
     public void RefreshFromDeltaHighlightFrontier(HexSearch.Delta delta)

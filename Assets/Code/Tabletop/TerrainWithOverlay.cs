@@ -70,8 +70,7 @@ public class TerrainWithOverlay : MonoBehaviour
     }
 
 
-    public void Reinitialize(TreasureMap treasureMap, HexCoord spawnCoord, HexCoord goalCoord,
-        VisualizationSettings visualizationSettings)
+    public void Reinitialize(TreasureMap treasureMap, VisualizationSettings visualizationSettings)
     {
         ClearData();
         Initialize(treasureMap, visualizationSettings);
