@@ -20,6 +20,14 @@ public class BoardInput
     private TreasureMap treasureMap;
     private Camera cam;
 
+    public enum BuildType
+    {
+        Wall,
+        Tower,
+    }
+
+    public BuildType BuildMode { get; private set; } = BuildType.Wall;
+
 
     public BoardInput(TreasureMap treasureMap, Camera cam)
     {
@@ -30,10 +38,21 @@ public class BoardInput
     public void HandleMouse()
     {
         if (Mouse.current == null) return;
+        if (BuildMode == BuildType.Tower) return;
 
         HighlightAtHovered();
         if (Mouse.current.leftButton.wasPressedThisFrame) PlaceWallAtHovered();
         if (Mouse.current.rightButton.wasPressedThisFrame) DestroyWallAtHovered();
+    }
+
+    public void SetBuildMode(BuildType buildMode)
+    {
+        this.BuildMode = buildMode;
+        if (buildMode == BuildType.Tower)
+        {
+            if (highlighted != null) highlighted.Unhighlight();
+            highlighted = null;
+        }
     }
 
     private void HighlightAtHovered()

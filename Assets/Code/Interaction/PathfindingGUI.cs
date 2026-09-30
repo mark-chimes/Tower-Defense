@@ -5,6 +5,8 @@ public class PathfindingGUI : MonoBehaviour
 
     private FlowBridge flowBridge;
     private EnemyController enemyController;
+    private BoardInput boardInput;
+
 
     private GameMaster gameMaster; // // TODO Cross-dependency code smell not ideal, but I'll fix this later
 
@@ -17,6 +19,7 @@ public class PathfindingGUI : MonoBehaviour
 
     public void Initialize(TerrainWithOverlay.VisualizationSettings visualization,
         bool stopPathingEarly,
+        BoardInput boardInput,
         FlowBridge flowBridge,
         EnemyController enemyController, // TODO remove reference
         GameMaster gameMaster
@@ -32,6 +35,7 @@ public class PathfindingGUI : MonoBehaviour
 
         this.flowBridge = flowBridge;
         this.enemyController = enemyController;
+        this.boardInput = boardInput;
         this.gameMaster = gameMaster; // TODO Cross-dependency code smell 
     }
 
@@ -202,22 +206,16 @@ public class PathfindingGUI : MonoBehaviour
 
         // // === //
 
-        // GUI.Box(new Rect(boxX, guiBuildingY, boxWidth, guiBuildingHeight), "Building");
-        // guiBuildingY += yBetweenButtons + boxBuffer;
+        GUI.Box(new Rect(boxX, guiBuildingY, boxWidth, guiBuildingHeight), "Building");
+        guiBuildingY += yBetweenButtons + boxBuffer;
 
-        // if (GUI.Button(new Rect(buttonX, guiBuildingY, buttonWidth, buttonHeight), "Wall"))
-        // {
-        //     Debug.Log("Build wall pressed");
-        //     gridWalls.OnBuildWallsMode();
-        // }
+        string[] buildModeLabels = { "Land", "Tower" };
+        int current = (int)boardInput.BuildMode;
+        int selected = GUI.Toolbar(new Rect(buttonX, guiBuildingY, buttonWidth, buttonHeight), current, buildModeLabels);
+        if (selected != current) boardInput.SetBuildMode((BoardInput.BuildType)selected);
 
-        // guiBuildingY += yBetweenButtons;
+        guiBuildingY += yBetweenButtons;
 
-        // if (GUI.Button(new Rect(buttonX, guiBuildingY, buttonWidth, buttonHeight), "Tower"))
-        // {
-        //     Debug.Log("Build tower pressed");
-        //     gridWalls.OnBuildTowersMode();
-        // }
 
     }
 }

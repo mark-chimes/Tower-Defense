@@ -7,6 +7,7 @@ public class GameMaster : MonoBehaviour
 
     [SerializeField] PathfindingGUI gui;
     [SerializeField] private EnemyController enemyController;
+    [SerializeField] private TowerController towerController;
 
     [SerializeField] TerrainWithOverlay.VisualizationSettings StartingVisualization;
     [SerializeField] bool StartingIsStopOnPathFound;
@@ -65,6 +66,7 @@ public class GameMaster : MonoBehaviour
 
         gridView.ClearData();
         enemyController.ClearData();
+        towerController.ClearData();
 
         CreateMapFromData(loaded);
     }
@@ -120,12 +122,14 @@ public class GameMaster : MonoBehaviour
     {
         gridView.Initialize(treasureMap, visualizationSettings);
         flowBridge.Initialize(treasureMap, gridView);
-
         enemyController.Initialize(treasureMap);
+        towerController.Initialize(treasureMap);
+
         enemyController.SpawnEnemy();
         flowBridge.RefreshIfAutoRefresh();
 
-        gui.Initialize(StartingVisualization, StartingIsStopOnPathFound, flowBridge, enemyController, this);
         boardInput = new BoardInput(treasureMap, Camera.main);
+        gui.Initialize(StartingVisualization, StartingIsStopOnPathFound, 
+            boardInput, flowBridge, enemyController, this);
     }
 }

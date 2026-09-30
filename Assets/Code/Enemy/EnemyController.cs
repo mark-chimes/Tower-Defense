@@ -32,13 +32,6 @@ public class EnemyController : MonoBehaviour
         enemy = null;
     }
 
-
-    public void Reinitialize(TreasureMap treasureMap)
-    {
-        ClearData();
-        Initialize(treasureMap);
-    }
-
     public void OnSpawnBoatPressed()
     {
         OnDeleteBoatsPressed(); // we can only have one boat at the moment.
