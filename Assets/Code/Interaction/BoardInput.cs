@@ -21,6 +21,10 @@ public class BoardInput
     private Camera cam;
     private TowerController towerController;
 
+    public bool DestroysTowerWithLand { get; set; } = false;
+
+
+
     public enum BuildType
     {
         Wall,
@@ -111,7 +115,8 @@ public class BoardInput
         if (hovered == null) return;
         HexCoord c = hovered.Coord;
         if (!treasureMap.HasWall(c)) return;
-        if (towerController.HasTower(c)) return; // TODO this will be parameter-controlled later
+        if (towerController.HasTower(c) &&  !DestroysTowerWithLand) return;
+        if (towerController.HasTower(c)) towerController.RemoveTower(c);
         treasureMap.SetWall(c, false);
     }
 }

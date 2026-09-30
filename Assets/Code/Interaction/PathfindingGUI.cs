@@ -60,6 +60,7 @@ public class PathfindingGUI : MonoBehaviour
         int buttonX = leftButtonX;
 
         int yBetweenButtons = buttonHeight;
+        int yBetweenBuildingButtons = buttonHeight + boxBuffer;
 
         int numVisControls = 10;
         int guiVisY = yBetweenButtons;
@@ -76,9 +77,9 @@ public class PathfindingGUI : MonoBehaviour
         int guiSaveLoadHeight = (numSaveLoadControls + 2) * yBetweenButtons + boxBuffer;
         int guiSaveLoadEnd = guiSaveLoadY + guiSaveLoadHeight;
 
-        int numBuildingControls = 2;
+        int numBuildingControls = 3;
         int guiBuildingY = guiSaveLoadEnd + yBetweenButtons + boxBuffer;
-        int guiBuildingHeight = (numBuildingControls + 2) * yBetweenButtons + boxBuffer;
+        int guiBuildingHeight = (numBuildingControls + 2) * yBetweenBuildingButtons + boxBuffer;
         int guiBuildingEnd = guiBuildingY + guiBuildingHeight;
 
         GUI.Box(new Rect(boxX, guiVisY, boxWidth, guiVisHeight), "VISUALIZE");
@@ -217,18 +218,23 @@ public class PathfindingGUI : MonoBehaviour
 
         boxX = rightBoxX;
         buttonX = rightButtonX;
-        guiBuildingY = yBetweenButtons;
+        guiBuildingY = yBetweenBuildingButtons + boxBuffer;
 
         GUI.Box(new Rect(boxX, guiBuildingY, boxWidth, guiBuildingHeight),
             "Building");
-        guiBuildingY += yBetweenButtons + boxBuffer;
+        guiBuildingY += yBetweenBuildingButtons;
 
         string[] buildModeLabels = { "Land", "Tower" };
         int current = (int)boardInput.BuildMode;
         int selected = GUI.Toolbar(new Rect(buttonX, guiBuildingY, buttonWidth, buttonHeight), current, buildModeLabels);
         if (selected != current) boardInput.SetBuildMode((BoardInput.BuildType)selected);
 
-        guiBuildingY += yBetweenButtons;
+        guiBuildingY += yBetweenBuildingButtons;
+        bool wanted = GUI.Toggle(new Rect(buttonX, guiBuildingY, buttonWidth, buttonHeight), boardInput.DestroysTowerWithLand,
+            "Land removal destroys tower");
+        if (wanted != boardInput.DestroysTowerWithLand) boardInput.DestroysTowerWithLand = wanted;
+
+        guiBuildingY += yBetweenBuildingButtons;
 
         if (GUI.Button(new Rect(buttonX, guiBuildingY, buttonWidth, buttonHeight),
             "Remove All Towers"))
@@ -236,6 +242,8 @@ public class PathfindingGUI : MonoBehaviour
             Debug.Log("Remove All Towers pressed");
             towerController.RemoveAllTowers();
         }
+
+        guiBuildingY += yBetweenBuildingButtons;
 
 
     }

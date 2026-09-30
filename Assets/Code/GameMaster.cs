@@ -129,7 +129,7 @@ public class GameMaster : MonoBehaviour
         flowBridge.RefreshIfAutoRefresh();
 
         boardInput = new BoardInput(treasureMap, Camera.main, towerController);
-        gui.Initialize(StartingVisualization, StartingIsStopOnPathFound, 
+        gui.Initialize(StartingVisualization, StartingIsStopOnPathFound,
             boardInput, flowBridge, enemyController, towerController, this);
     }
 }
