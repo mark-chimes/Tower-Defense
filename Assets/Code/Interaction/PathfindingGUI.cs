@@ -205,13 +205,18 @@ public class PathfindingGUI : MonoBehaviour
         }
 
         // // === //
+        // Move to right-side 
 
-        GUI.Box(new Rect(boxX, guiBuildingY, boxWidth, guiBuildingHeight), "Building");
+        int rightBoxX = Screen.width - boxWidth - boxX;
+        int rightButtonX = rightBoxX + boxBuffer;
+        guiBuildingY = yBetweenButtons;
+
+        GUI.Box(new Rect(rightBoxX, guiBuildingY, boxWidth, guiBuildingHeight), "Building");
         guiBuildingY += yBetweenButtons + boxBuffer;
 
         string[] buildModeLabels = { "Land", "Tower" };
         int current = (int)boardInput.BuildMode;
-        int selected = GUI.Toolbar(new Rect(buttonX, guiBuildingY, buttonWidth, buttonHeight), current, buildModeLabels);
+        int selected = GUI.Toolbar(new Rect(rightButtonX, guiBuildingY, buttonWidth, buttonHeight), current, buildModeLabels);
         if (selected != current) boardInput.SetBuildMode((BoardInput.BuildType)selected);
 
         guiBuildingY += yBetweenButtons;
