@@ -6,6 +6,7 @@ public class PathfindingGUI : MonoBehaviour
     private FlowBridge flowBridge;
     private EnemyController enemyController;
     private BoardInput boardInput;
+    private TowerController towerController;
 
 
     private GameMaster gameMaster; // // TODO Cross-dependency code smell not ideal, but I'll fix this later
@@ -22,6 +23,7 @@ public class PathfindingGUI : MonoBehaviour
         BoardInput boardInput,
         FlowBridge flowBridge,
         EnemyController enemyController, // TODO remove reference
+        TowerController towerController,
         GameMaster gameMaster
         )
     {
@@ -36,6 +38,7 @@ public class PathfindingGUI : MonoBehaviour
         this.flowBridge = flowBridge;
         this.enemyController = enemyController;
         this.boardInput = boardInput;
+        this.towerController = towerController;
         this.gameMaster = gameMaster; // TODO Cross-dependency code smell 
     }
 
@@ -45,11 +48,16 @@ public class PathfindingGUI : MonoBehaviour
     void OnGUI()
     {
         int boxBuffer = 10;
-        int boxX = 10;
+        int leftBoxX = 10;
         int boxWidth = 210;
-        int buttonX = boxX + boxBuffer;
+        int leftButtonX = leftBoxX + boxBuffer;
+        int rightBoxX = Screen.width - boxWidth - leftBoxX;
+        int rightButtonX = rightBoxX + boxBuffer;
+
         int buttonWidth = boxWidth - 2 * boxBuffer;
         int buttonHeight = 20;
+        int boxX = leftBoxX;
+        int buttonX = leftButtonX;
 
         int yBetweenButtons = buttonHeight;
 
@@ -205,21 +213,29 @@ public class PathfindingGUI : MonoBehaviour
         }
 
         // // === //
-        // Move to right-side 
+        // On right-side 
 
-        int rightBoxX = Screen.width - boxWidth - boxX;
-        int rightButtonX = rightBoxX + boxBuffer;
+        boxX = rightBoxX;
+        buttonX = rightButtonX;
         guiBuildingY = yBetweenButtons;
 
-        GUI.Box(new Rect(rightBoxX, guiBuildingY, boxWidth, guiBuildingHeight), "Building");
+        GUI.Box(new Rect(boxX, guiBuildingY, boxWidth, guiBuildingHeight),
+            "Building");
         guiBuildingY += yBetweenButtons + boxBuffer;
 
         string[] buildModeLabels = { "Land", "Tower" };
         int current = (int)boardInput.BuildMode;
-        int selected = GUI.Toolbar(new Rect(rightButtonX, guiBuildingY, buttonWidth, buttonHeight), current, buildModeLabels);
+        int selected = GUI.Toolbar(new Rect(buttonX, guiBuildingY, buttonWidth, buttonHeight), current, buildModeLabels);
         if (selected != current) boardInput.SetBuildMode((BoardInput.BuildType)selected);
 
         guiBuildingY += yBetweenButtons;
+
+        if (GUI.Button(new Rect(buttonX, guiBuildingY, buttonWidth, buttonHeight),
+            "Remove All Towers"))
+        {
+            Debug.Log("Remove All Towers pressed");
+            towerController.RemoveAllTowers();
+        }
 
 
     }

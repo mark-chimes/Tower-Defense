@@ -19,6 +19,7 @@ public class BoardInput
 
     private TreasureMap treasureMap;
     private Camera cam;
+    private TowerController towerController;
 
     public enum BuildType
     {
@@ -29,16 +30,30 @@ public class BoardInput
     public BuildType BuildMode { get; private set; } = BuildType.Wall;
 
 
-    public BoardInput(TreasureMap treasureMap, Camera cam)
+    public BoardInput(TreasureMap treasureMap, Camera cam, TowerController towerController)
     {
         this.treasureMap = treasureMap;
         this.cam = cam;
+        this.towerController = towerController;
     }
 
     public void HandleMouse()
     {
         if (Mouse.current == null) return;
-        if (BuildMode == BuildType.Tower) return;
+
+        hovered = RaycastForFlagstone();
+
+        if (BuildMode == BuildType.Tower)
+        {
+            if (hovered != null)
+            {
+                if (Mouse.current.leftButton.wasPressedThisFrame)
+                    towerController.PlaceTower(hovered.Coord);
+                if (Mouse.current.rightButton.wasPressedThisFrame)
+                    towerController.RemoveTower(hovered.Coord);
+            }
+            return;
+        }
 
         HighlightAtHovered();
         if (Mouse.current.leftButton.wasPressedThisFrame) PlaceWallAtHovered();
@@ -55,9 +70,9 @@ public class BoardInput
         }
     }
 
+    // TODO rename/restructure with wall/land pass
     private void HighlightAtHovered()
     {
-        hovered = RaycastForFlagstone();
         Color highlightColor = Color.magenta; // something went wrong if this is the highlight color
         if (hovered != null)
         {
@@ -96,6 +111,7 @@ public class BoardInput
         if (hovered == null) return;
         HexCoord c = hovered.Coord;
         if (!treasureMap.HasWall(c)) return;
+        if (towerController.HasTower(c)) return; // TODO this will be parameter-controlled later
         treasureMap.SetWall(c, false);
     }
 }

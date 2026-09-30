@@ -44,6 +44,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Hextower12_with_vines
       objectReference: {fileID: 0}
+    - target: {fileID: 6017592046921030063, guid: bdd012aeab85a2042a6978292179808c, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6848118987470930110, guid: bdd012aeab85a2042a6978292179808c, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
