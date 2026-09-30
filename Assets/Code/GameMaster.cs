@@ -71,7 +71,6 @@ public class GameMaster : MonoBehaviour
 
     private TreasureMap treasureMap;
 
-    // TODO rename this
     void CreateTestMap()
     {
         Lattice<bool> wallMap = new Lattice<bool>(layoutSpecs.NumRings);
@@ -93,10 +92,11 @@ public class GameMaster : MonoBehaviour
         treasureMap = new TreasureMap(wallMap, spawnPos, goalPos,
                 StartingIsStopOnPathFound,
                 enemyController.PathfindingUpdate,
-                enemyController.PathfindingClear
+                enemyController.PathfindingClear,
+                flowBridge.OnWallChange
             );
 
-        CreateMapFromTreasureMap(treasureMap, wallMap, StartingVisualization);
+        CreateMapFromTreasureMap(treasureMap, StartingVisualization);
     }
 
     void CreateMapFromData(LevelSaveData loaded)
@@ -105,26 +105,26 @@ public class GameMaster : MonoBehaviour
 
         treasureMap = new TreasureMap(
             loadedWallMap,
-            treasureMap.SpawnPos,
-            treasureMap.GoalPos,
+            treasureMap.SpawnCoord,
+            treasureMap.GoalCoord,
             StartingIsStopOnPathFound,
             enemyController.PathfindingUpdate,
-            enemyController.PathfindingClear
+            enemyController.PathfindingClear,
+            flowBridge.OnWallChange
             );
-        CreateMapFromTreasureMap(treasureMap, loadedWallMap, StartingVisualization);
+        CreateMapFromTreasureMap(treasureMap, StartingVisualization);
     }
 
     void CreateMapFromTreasureMap(TreasureMap treasureMap,
-        Lattice<bool> wallMap,
         TerrainWithOverlay.VisualizationSettings visualizationSettings)
     {
-        gridView.Initialize(wallMap, treasureMap.SpawnPos, treasureMap.GoalPos, visualizationSettings);
+        gridView.Initialize(treasureMap, visualizationSettings);
         flowBridge.Initialize(treasureMap, gridView);
 
         enemyController.Initialize(treasureMap);
         enemyController.SpawnEnemy();
 
         gui.Initialize(StartingVisualization, StartingIsStopOnPathFound, flowBridge, enemyController, this);
-        boardInput = new BoardInput(gridView, treasureMap, Camera.main, flowBridge.OnWallsChanged);
+        boardInput = new BoardInput(treasureMap, Camera.main);
     }
 }

@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -19,18 +18,13 @@ public class BoardInput
     private const float maxRayDistance = 500f;
 
     private TreasureMap treasureMap;
-    private TerrainWithOverlay gridView;
     private Camera cam;
 
-    private Action onWallChange;
 
-    public BoardInput(TerrainWithOverlay gridView, TreasureMap treasureMap,
-        Camera cam, Action onWallChange)
+    public BoardInput(TreasureMap treasureMap, Camera cam)
     {
-        this.gridView = gridView;
         this.treasureMap = treasureMap;
         this.cam = cam;
-        this.onWallChange = onWallChange;
     }
 
     public void HandleMouse()
@@ -76,8 +70,6 @@ public class BoardInput
         HexCoord c = hovered.Coord;
         if (!treasureMap.CanPlaceWall(c)) return; // TODO: red ghost
         treasureMap.SetWall(c, true);
-        gridView.SetTerrainAt(c, true);
-        onWallChange.Invoke();
     }
 
     private void DestroyWallAtHovered()
@@ -86,7 +78,5 @@ public class BoardInput
         HexCoord c = hovered.Coord;
         if (!treasureMap.HasWall(c)) return;
         treasureMap.SetWall(c, false);
-        gridView.SetTerrainAt(c, false);
-        onWallChange.Invoke();
     }
 }

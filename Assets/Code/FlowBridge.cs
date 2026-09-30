@@ -124,8 +124,10 @@ public class FlowBridge
 
     }
 
-    public void OnWallsChanged()
+    public void OnWallChange(HexCoord c)
     {
+        gridView.SetTerrainAt(c, treasureMap.HasWall(c));
+        
         if (!isAutoRefreshMode)
         {
             Debug.Log("Auto refresh mode disabled, not updating distances");

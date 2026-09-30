@@ -7,25 +7,26 @@ public class TreasureMap
     private Lattice<bool> wallMap;
     public int NumRings => wallMap.NumRings;
 
-    public readonly HexCoord SpawnPos;
-    public readonly HexCoord GoalPos;
+    public readonly HexCoord SpawnCoord;
+    public readonly HexCoord GoalCoord;
 
     private readonly Action onPathfindingUpdate;
     private readonly Action onPathfindingClear;
-
+    private readonly Action<HexCoord> onWallChange;
 
 
     private Wayfinder wayfinder;
 
-    public TreasureMap(Lattice<bool> wallMap, HexCoord spawnPos, HexCoord goalPos, bool isStopOnPathFound,
-    Action onPathfindingUpdate, Action onPathfindingClear)
+    public TreasureMap(Lattice<bool> wallMap, HexCoord spawnCoord, HexCoord goalCoord, bool isStopOnPathFound,
+    Action onPathfindingUpdate, Action onPathfindingClear, Action<HexCoord> onWallsChanged)
     {
         this.wallMap = wallMap;
-        SpawnPos = spawnPos;
-        GoalPos = goalPos;
+        SpawnCoord = spawnCoord;
+        GoalCoord = goalCoord;
         RecreateWayfinder(isStopOnPathFound);
         this.onPathfindingUpdate = onPathfindingUpdate;
         this.onPathfindingClear = onPathfindingClear;
+        this.onWallChange = onWallsChanged;
     }
 
     /// <summary>
@@ -34,7 +35,7 @@ public class TreasureMap
     /// <param name="isStopOnPathFound"></param> stop pathfinding once shortest path found or continue completing the flow-field
     public void RecreateWayfinder(bool isStopOnPathFound)
     {
-        wayfinder = new Wayfinder(wallMap, SpawnPos, GoalPos, HexSearch.Dir.FromEnd, isStopOnPathFound);
+        wayfinder = new Wayfinder(wallMap, SpawnCoord, GoalCoord, HexSearch.Dir.FromEnd, isStopOnPathFound);
     }
 
     public IReadOnlyCollection<HexCoord> CurrentFrontier()
@@ -81,7 +82,11 @@ public class TreasureMap
         return wayfinder.Flows();
     }
 
-    public void SetWall(HexCoord c, bool hasWall) => wallMap.SetAt(c, hasWall);
+    public void SetWall(HexCoord c, bool hasWall) 
+    {
+        wallMap.SetAt(c, hasWall);
+        onWallChange.Invoke(c);
+    }
 
     public bool HasWall(HexCoord c) => wallMap.At(c);
 
@@ -90,8 +95,8 @@ public class TreasureMap
 
     private Landmark LandmarkAt(HexCoord coord)
     {
-        if (coord == SpawnPos) return Landmark.Spawn;
-        else if (coord == GoalPos) return Landmark.Goal;
+        if (coord == SpawnCoord) return Landmark.Spawn;
+        else if (coord == GoalCoord) return Landmark.Goal;
         return Landmark.None;
     }
 

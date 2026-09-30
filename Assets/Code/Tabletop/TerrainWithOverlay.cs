@@ -30,35 +30,31 @@ public class TerrainWithOverlay : MonoBehaviour
     private bool isInitialized;
 
     // TODO reconsider if this should handle "floors" and "walls" together or not? 
-    public void Initialize(Lattice<bool> walls, HexCoord spawnCoord, HexCoord goalCoord,
-    // HexCoord spawnPos, HexCoord goalPos, 
-        VisualizationSettings visualizationSettings) // Later
+    public void Initialize(TreasureMap treasureMap, VisualizationSettings visualizationSettings)
     {
         Debug.Assert(!isInitialized);
         isInitialized = true;
 
-        flagstones = new Lattice<Flagstone>(walls.NumRings);
-        signposts = new Lattice<Signpost>(walls.NumRings);
+        flagstones = new Lattice<Flagstone>(treasureMap.NumRings);
+        signposts = new Lattice<Signpost>(treasureMap.NumRings);
 
         foreach (HexCoord c in flagstones.AllCoords())
         {
             GameObject signpostObj = InstantiateAtCoord(signpostPrefab, c);
             Signpost signpost = signpostObj.GetComponent<Signpost>();
             signpost.Initialize(c);
-            signpost.SetIsOnPathableTerrain(!walls.At(c));
+            signpost.SetIsOnPathableTerrain(!treasureMap.HasWall(c));
             signpost.SetPathingVisible(visualizationSettings.ShowPathfinding);
             signpost.SetDistanceVisible(visualizationSettings.ShowDistance);
 
-            MakeFlagstoneAt(c, walls.At(c));
+            MakeFlagstoneAt(c, treasureMap.HasWall(c));
 
             signpost.name = $"Signpost_{c}";
             signposts.SetAt(c, signpost);
-
-            // TODO spawn and goal pos
         }
 
-        spawnObj = InstantiateAtCoord(spawnPrefab, spawnCoord);
-        goalObj = InstantiateAtCoord(goalPrefab, goalCoord);
+        spawnObj = InstantiateAtCoord(spawnPrefab, treasureMap.SpawnCoord);
+        goalObj = InstantiateAtCoord(goalPrefab, treasureMap.GoalCoord);
 
     }
 
@@ -74,11 +70,11 @@ public class TerrainWithOverlay : MonoBehaviour
     }
 
 
-    public void Reinitialize(Lattice<bool> walls, HexCoord spawnCoord, HexCoord goalCoord,
+    public void Reinitialize(TreasureMap treasureMap, HexCoord spawnCoord, HexCoord goalCoord,
         VisualizationSettings visualizationSettings)
     {
         ClearData();
-        Initialize(walls, spawnCoord, goalCoord, visualizationSettings);
+        Initialize(treasureMap, visualizationSettings);
     }
 
 

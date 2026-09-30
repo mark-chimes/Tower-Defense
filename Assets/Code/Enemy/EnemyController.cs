@@ -67,10 +67,10 @@ public class EnemyController : MonoBehaviour
     public void SpawnEnemy()
     {
         enemy = Instantiate(boatPrefab, transform);
-        Vector3 pos = HexProjection.CoordsToWorld(treasureMap.SpawnPos);
+        Vector3 pos = HexProjection.CoordsToWorld(treasureMap.SpawnCoord);
         enemy.transform.localPosition = pos;
         enemy.name = $"Boat";
-        enemy.Initialize(treasureMap.SpawnPos, treasureMap.GoalPos);
+        enemy.Initialize(treasureMap.SpawnCoord, treasureMap.GoalCoord);
         // TODO save enemies in a list 
     }
 
