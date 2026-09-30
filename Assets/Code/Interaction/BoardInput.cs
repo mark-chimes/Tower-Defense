@@ -10,9 +10,10 @@ public class BoardInput
     private Highlightable highlighted;
 
 
-    private Color placeableColor = Color.green;
-    private Color blockedColor = Color.red;
-    private Color existingWallColor = Color.yellow;
+    private Color placeableColor = Color.darkGreen;
+    private Color blockedColor = Color.grey;
+    private Color existingWallColor = Color.darkSalmon;
+    private Color lockedLandColor = Color.grey;
 
 
     private const float maxRayDistance = 500f;
@@ -84,6 +85,8 @@ public class BoardInput
             HexSnapshot snapshot = treasureMap.At(c);
             if (snapshot.Landmark != TreasureMap.Landmark.None)
                 highlightColor = blockedColor;
+            else if (snapshot.HasWall && towerController.HasTower(c) && !DestroysTowerWithLand) 
+                highlightColor = lockedLandColor;
             else if (snapshot.HasWall)
                 highlightColor = existingWallColor;
             else
@@ -115,7 +118,7 @@ public class BoardInput
         if (hovered == null) return;
         HexCoord c = hovered.Coord;
         if (!treasureMap.HasWall(c)) return;
-        if (towerController.HasTower(c) &&  !DestroysTowerWithLand) return;
+        if (towerController.HasTower(c) && !DestroysTowerWithLand) return;
         if (towerController.HasTower(c)) towerController.RemoveTower(c);
         treasureMap.SetWall(c, false);
     }
