@@ -9,6 +9,8 @@ public class BoardInput
     private Flagstone hovered;
     private Highlightable highlighted;
 
+    private HexCoord? justPlacedAt;
+
 
     private Color placeableColor = Color.darkGreen;
     private Color blockedColor = Color.grey;
@@ -63,21 +65,33 @@ public class BoardInput
     {
         if (hovered == null)
         {
+            justPlacedAt = null;
             towerController.HideGhosts();
             return;
         }
 
+        HexCoord c = hovered.Coord;
+
+        if (justPlacedAt != c)
+            justPlacedAt = null;
+
         if (Mouse.current.leftButton.wasPressedThisFrame)
-            towerController.PlaceTower(hovered.Coord);
+        {
+            if (towerController.CanPlaceTower(c))
+            { 
+                towerController.PlaceTower(c);
+                justPlacedAt = c;
+            }
+        }
 
         if (Mouse.current.rightButton.wasPressedThisFrame)
-            towerController.RemoveTower(hovered.Coord);
+            towerController.RemoveTowerIfPresent(c);
 
-        if (towerController.CanPlaceTower(hovered.Coord))
-            towerController.ShowPlaceableGhostAt(hovered.Coord);
-        else if (towerController.HasTower(hovered.Coord))
-            towerController.ShowBlockedGhostAt(hovered.Coord);
-        else 
+        if (towerController.CanPlaceTower(c))
+            towerController.ShowPlaceableGhostAt(c);
+        else if (towerController.HasTower(c) && justPlacedAt != c)
+            towerController.ShowBlockedGhostAt(c);
+        else
             towerController.HideGhosts();
     }
 
@@ -86,6 +100,7 @@ public class BoardInput
     public void SetBuildMode(BuildType buildMode)
     {
         BuildMode = buildMode;
+
         if (buildMode == BuildType.Tower)
         {
             if (highlighted != null) highlighted.Unhighlight();

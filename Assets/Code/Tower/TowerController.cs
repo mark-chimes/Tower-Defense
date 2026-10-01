@@ -55,8 +55,10 @@ public class TowerController : MonoBehaviour
         return treasureMap.HasWall(coord) && !HasTower(coord);
     }
 
+    // Only call this if the tower is 
     public void PlaceTower(HexCoord coord)
     {
+        Debug.Assert(CanPlaceTower(coord), $"Cannot place tower at {coord}");
         if (!CanPlaceTower(coord)) return;
 
         GameObject tower = Instantiate(towerPrefab, transform);
@@ -73,7 +75,6 @@ public class TowerController : MonoBehaviour
         ghostBlocked = CreateGhost(ghostBlockedMaterial, "TowerBlockedGhost");
         ghostBlocked.transform.localScale *= 1.03f;
     }
-
 
     private GameObject CreateGhost(Material material, string objName)
     {
@@ -119,16 +120,22 @@ public class TowerController : MonoBehaviour
 
     public void RemoveTower(HexCoord coord)
     {
-        if (!HasTower(coord)) return;
+        Debug.Assert(HasTower(coord), $"No tower at {coord} to remove.");
+        if (!HasTower(coord)) return; // TODO optional?
         Destroy(towers.At(coord));
         towers.SetAt(coord, null);
+    }
+
+    public void RemoveTowerIfPresent(HexCoord coord)
+    {
+        if (HasTower(coord)) RemoveTower(coord);
     }
 
     public void RemoveAllTowers()
     {
         foreach (HexCoord c in towers.AllCoords())
         {
-            RemoveTower(c);
+            RemoveTowerIfPresent(c);
         }
     }
 
@@ -151,13 +158,11 @@ public class TowerController : MonoBehaviour
         {
             bool isTower = towersLoaded.At(c);
             if (!isTower) continue;
-
             if (!CanPlaceTower(c))
             {
                 Debug.LogWarning($"Loaded tower cannot be placed at {c}");
                 continue;
             }
-
             PlaceTower(c);
         }
     }
