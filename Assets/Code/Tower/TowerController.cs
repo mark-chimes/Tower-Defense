@@ -5,6 +5,10 @@ public class TowerController : MonoBehaviour
 {
     [SerializeField] private GameObject towerPrefab;
 
+    [SerializeField] private Material ghostMaterial;
+
+    private GameObject ghost;
+
     // TODO make these a specific object type later
     // Also this data might split out later, especially when towers affect pathfinding
     private Lattice<GameObject> towers;
@@ -20,6 +24,8 @@ public class TowerController : MonoBehaviour
 
         this.treasureMap = treasureMap;
         towers = new Lattice<GameObject>(treasureMap.NumRings);
+
+        CreateGhost();
     }
 
     public void ClearData()
@@ -28,9 +34,11 @@ public class TowerController : MonoBehaviour
         isInitialized = false;
 
         RemoveAllTowers();
-        towers = null;
         foreach (Transform child in transform) Destroy(child.gameObject);
+
+        towers = null;
         treasureMap = null;
+        ghost = null;
     }
 
     public bool HasTower(HexCoord coord)
@@ -55,6 +63,34 @@ public class TowerController : MonoBehaviour
         // Might need tower.Initialize later if this becomes its own object
         towers.SetAt(coord, tower);
     }
+
+    public void CreateGhost()
+    {
+        ghost = Instantiate(towerPrefab, transform);
+        ghost.name = $"TowerPlacementGhost";
+        foreach (Renderer renderer in ghost.GetComponentsInChildren<Renderer>())
+        {
+            for (int i = 0; i < renderer.sharedMaterials.Length; i++)
+            {
+                renderer.sharedMaterials[i] = ghostMaterial;
+            }
+            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        }
+        ghost.SetActive(false);
+    }
+
+    public void ShowGhostAt(HexCoord coord)
+    {
+        Vector3 pos = HexProjection.CoordsToLandSurface(coord);
+        ghost.transform.localPosition = pos;
+        ghost.SetActive(true);
+    }
+
+    public void HideGhost()
+    {
+        ghost.SetActive(false);
+    }
+
 
     public void RemoveTower(HexCoord coord)
     {

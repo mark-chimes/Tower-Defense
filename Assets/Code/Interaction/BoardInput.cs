@@ -50,13 +50,7 @@ public class BoardInput
 
         if (BuildMode == BuildType.Tower)
         {
-            if (hovered != null)
-            {
-                if (Mouse.current.leftButton.wasPressedThisFrame)
-                    towerController.PlaceTower(hovered.Coord);
-                if (Mouse.current.rightButton.wasPressedThisFrame)
-                    towerController.RemoveTower(hovered.Coord);
-            }
+            HandleMouseForTowerMode();
             return;
         }
 
@@ -65,13 +59,35 @@ public class BoardInput
         if (Mouse.current.rightButton.wasPressedThisFrame) DestroyWallAtHovered();
     }
 
+    private void HandleMouseForTowerMode()
+    {
+        if (hovered == null)
+            return;
+
+        if (towerController.CanPlaceTower(hovered.Coord))
+            towerController.ShowGhostAt(hovered.Coord);
+        else
+            towerController.HideGhost();
+
+        if (Mouse.current.leftButton.wasPressedThisFrame)
+            towerController.PlaceTower(hovered.Coord);
+
+        if (Mouse.current.rightButton.wasPressedThisFrame)
+            towerController.RemoveTower(hovered.Coord);
+
+    }
+
     public void SetBuildMode(BuildType buildMode)
     {
-        this.BuildMode = buildMode;
+        BuildMode = buildMode;
         if (buildMode == BuildType.Tower)
         {
             if (highlighted != null) highlighted.Unhighlight();
             highlighted = null;
+        }
+        else
+        {
+            towerController.HideGhost();
         }
     }
 
@@ -85,7 +101,7 @@ public class BoardInput
             HexSnapshot snapshot = treasureMap.At(c);
             if (snapshot.Landmark != TreasureMap.Landmark.None)
                 highlightColor = blockedColor;
-            else if (snapshot.HasWall && towerController.HasTower(c) && !DestroysTowerWithLand) 
+            else if (snapshot.HasWall && towerController.HasTower(c) && !DestroysTowerWithLand)
                 highlightColor = lockedLandColor;
             else if (snapshot.HasWall)
                 highlightColor = existingWallColor;
