@@ -5,7 +5,7 @@ public class GameMaster : MonoBehaviour
     [SerializeField] private LayoutSpecs layoutSpecs;
     [SerializeField] private TerrainWithOverlay gridView;
 
-    [SerializeField] PathfindingGUI gui;
+    [SerializeField] DebugGUI gui;
     [SerializeField] private EnemyController enemyController;
     [SerializeField] private TowerController towerController;
 

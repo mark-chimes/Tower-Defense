@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PathfindingGUI : MonoBehaviour
+public class DebugGUI : MonoBehaviour
 {
 
     private FlowBridge flowBridge;
