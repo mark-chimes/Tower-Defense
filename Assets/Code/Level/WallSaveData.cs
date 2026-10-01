@@ -1,7 +1,7 @@
 using UnityEngine;
 
 // Will rename to LandSaveData or something after wall-rename
-    [System.Serializable]
+[System.Serializable]
 
 public class WallSaveData
 {
@@ -12,17 +12,7 @@ public class WallSaveData
         IsWall = wallMap.ToFlatArray();
     }
 
-    public string ToJson()
-    {
-        return JsonUtility.ToJson(this);
-    }
-
-    public static LevelSaveData FromJson(string json)
-    {
-        return JsonUtility.FromJson<LevelSaveData>(json);
-    }
-
-    public Lattice<bool> ToWallMap(int NumRings)
+    public Lattice<bool> GetWallMap(int NumRings)
     {
         return Lattice<bool>.FromFlatArray(IsWall, NumRings);
     }

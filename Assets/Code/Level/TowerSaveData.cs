@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[System.Serializable]
 public class TowerSaveData
 {
     public bool[] IsTower;
@@ -9,18 +10,18 @@ public class TowerSaveData
         IsTower = towerMap.ToFlatArray();
     }
 
-    public string ToJson()
-    {
-        return JsonUtility.ToJson(this);
-    }
+    // public string ToJson()
+    // {
+    //     return JsonUtility.ToJson(this);
+    // }
 
-    public static LevelSaveData FromJson(string json)
-    {
-        return JsonUtility.FromJson<LevelSaveData>(json);
-    }
+    // public static TowerSaveData FromJson(string json)
+    // {
+    //     return JsonUtility.FromJson<TowerSaveData>(json);
+    // }
 
-    public Lattice<bool> ToWallMap(int NumRings)
+    public Lattice<bool> GetTowerMap(int NumRings)
     {
         return Lattice<bool>.FromFlatArray(IsTower, NumRings);
-    } 
+    }
 }

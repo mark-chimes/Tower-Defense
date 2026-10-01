@@ -23,6 +23,7 @@ public class LevelSaveData
         return JsonUtility.FromJson<LevelSaveData>(json);
     }
 
+    // TODO GetLevelSaveData
     public Lattice<bool> ToWallMap()
     {
         return Lattice<bool>.FromFlatArray(IsWall, NumRings);
