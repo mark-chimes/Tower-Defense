@@ -5,37 +5,22 @@ using UnityEngine.InputSystem;
 public class BoardInput
 {
 
+    //** Split by Shared, Land, and Tower **//
 
-    private Flagstone hovered;
-    private Highlightable highlighted;
-
-    private HexCoord? justPlacedAt;
-
-
-    private Color placeableColor = Color.darkGreen;
-    private Color blockedColor = Color.grey;
-    private Color existingLandColor = Color.darkSalmon;
-    private Color lockedLandColor = Color.grey;
-
+    //** === Shared === **//
 
     private const float maxRayDistance = 500f;
-
     private TreasureMap treasureMap;
     private Camera cam;
     private TowerController towerController;
-
-    public bool DestroysTowerWithLand { get; set; } = false;
-
-
+    private Flagstone hovered;
 
     public enum BuildType
     {
         Land,
         Tower,
     }
-
     public BuildType BuildMode { get; private set; } = BuildType.Land;
-
 
     public BoardInput(TreasureMap treasureMap, Camera cam, TowerController towerController)
     {
@@ -50,49 +35,19 @@ public class BoardInput
 
         hovered = RaycastForFlagstone();
 
-        if (BuildMode == BuildType.Tower)
+        switch (BuildMode)
         {
-            HandleMouseForTowerMode();
-            return;
+            case BuildType.Tower: HandleMouseForTowerMode(); break;
+            case BuildType.Land: HandleMouseForLandMode(); break;
         }
-
-        HighlightAtHovered();
-        if (Mouse.current.leftButton.wasPressedThisFrame) PlaceLandAtHovered();
-        if (Mouse.current.rightButton.wasPressedThisFrame) RemoveLandAtHovered();
     }
 
-    private void HandleMouseForTowerMode()
+    private Flagstone RaycastForFlagstone()
     {
-        if (hovered == null)
-        {
-            justPlacedAt = null;
-            towerController.HideGhosts();
-            return;
-        }
-
-        HexCoord c = hovered.Coord;
-
-        if (justPlacedAt != c)
-            justPlacedAt = null;
-
-        if (Mouse.current.leftButton.wasPressedThisFrame)
-        {
-            if (towerController.CanPlaceTower(c))
-            { 
-                towerController.PlaceTower(c);
-                justPlacedAt = c;
-            }
-        }
-
-        if (Mouse.current.rightButton.wasPressedThisFrame)
-            towerController.RemoveTowerIfPresent(c);
-
-        if (towerController.CanPlaceTower(c))
-            towerController.ShowPlaceableGhostAt(c);
-        else if (towerController.HasTower(c) && justPlacedAt != c)
-            towerController.ShowBlockedGhostAt(c);
-        else
-            towerController.HideGhosts();
+        Vector2 mousePos = Mouse.current.position.ReadValue();
+        Ray ray = cam.ScreenPointToRay(mousePos);
+        if (!Physics.Raycast(ray, out RaycastHit hit, maxRayDistance)) return null;
+        return hit.collider.GetComponentInParent<Flagstone>();
     }
 
     public void SetBuildMode(BuildType buildMode)
@@ -108,6 +63,24 @@ public class BoardInput
         {
             towerController.HideGhosts();
         }
+    }
+
+    //** === Land === **//
+
+    private Highlightable highlighted;
+    private Color placeableColor = Color.darkGreen;
+    private Color blockedColor = Color.grey;
+    private Color existingLandColor = Color.darkSalmon;
+    private Color lockedLandColor = Color.grey;
+
+    // land-removal policy touches towers. TODO: moves to the board later
+    public bool DestroysTowerWithLand { get; set; } = false;
+
+    private void HandleMouseForLandMode()
+    {
+        HighlightAtHovered();
+        if (Mouse.current.leftButton.wasPressedThisFrame) PlaceLandAtHovered();
+        if (Mouse.current.rightButton.wasPressedThisFrame) RemoveLandAtHovered();
     }
 
     // TODO rename/restructure with wall/land pass
@@ -132,14 +105,6 @@ public class BoardInput
         if (highlighted != null) highlighted.Highlight(highlightColor);
     }
 
-    private Flagstone RaycastForFlagstone()
-    {
-        Vector2 mousePos = Mouse.current.position.ReadValue();
-        Ray ray = cam.ScreenPointToRay(mousePos);
-        if (!Physics.Raycast(ray, out RaycastHit hit, maxRayDistance)) return null;
-        return hit.collider.GetComponentInParent<Flagstone>();
-    }
-
     private void PlaceLandAtHovered()
     {
         if (hovered == null) return;
@@ -156,5 +121,43 @@ public class BoardInput
         if (towerController.HasTower(c) && !DestroysTowerWithLand) return;
         if (towerController.HasTower(c)) towerController.RemoveTower(c);
         treasureMap.SetLand(c, false);
+    }
+
+    //** === Tower === **//
+
+    private HexCoord? justPlacedAt;
+
+    private void HandleMouseForTowerMode()
+    {
+        if (hovered == null)
+        {
+            justPlacedAt = null;
+            towerController.HideGhosts();
+            return;
+        }
+
+        HexCoord c = hovered.Coord;
+
+        if (justPlacedAt != c)
+            justPlacedAt = null;
+
+        if (Mouse.current.leftButton.wasPressedThisFrame)
+        {
+            if (towerController.CanPlaceTower(c))
+            {
+                towerController.PlaceTower(c);
+                justPlacedAt = c;
+            }
+        }
+
+        if (Mouse.current.rightButton.wasPressedThisFrame)
+            towerController.RemoveTowerIfPresent(c);
+
+        if (towerController.CanPlaceTower(c))
+            towerController.ShowPlaceableGhostAt(c);
+        else if (towerController.HasTower(c) && justPlacedAt != c)
+            towerController.ShowBlockedGhostAt(c);
+        else
+            towerController.HideGhosts();
     }
 }
