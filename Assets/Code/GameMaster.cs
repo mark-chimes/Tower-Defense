@@ -56,7 +56,7 @@ public class GameMaster : MonoBehaviour
     }
 
     public void OnSave()
-    {   
+    {
         WallSaveData walls = treasureMap.GetSaveData();
         TowerSaveData towers = towerController.GetSaveData();
         LevelSaveData saveData = new LevelSaveData(treasureMap.NumRings, walls, towers);
@@ -105,9 +105,8 @@ public class GameMaster : MonoBehaviour
     }
 
     void CreateMapFromData(LevelSaveData loaded)
-    {   
-        int N = loaded.NumRings;
-        Lattice<bool> loadedWalls = loaded.Walls.GetWallMap(N);
+    {
+        Lattice<bool> loadedWalls = loaded.Walls.GetWallMap(loaded.NumRings);
 
         treasureMap = new TreasureMap(
             loadedWalls,

@@ -9,11 +9,11 @@ public class LevelSaveData
     public WallSaveData Walls; // TODO will be terrain or something later
     public TowerSaveData Towers;
 
-    public LevelSaveData(int numRings, WallSaveData Walls, TowerSaveData Towers)
+    public LevelSaveData(int numRings, WallSaveData walls, TowerSaveData towers)
     {
         NumRings = numRings;
-        this.Walls = Walls;
-        this.Towers = Towers;
+        Walls = walls;
+        Towers = towers;
     }
 
     public string ToJson()

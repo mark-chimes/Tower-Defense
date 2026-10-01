@@ -1,4 +1,3 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
 // Later, this might split or become a view / control class
@@ -94,7 +93,7 @@ public class TowerController : MonoBehaviour
 
             if (!CanPlaceTower(c))
             {
-                Debug.LogWarning("Loaded tower cannot be placed at {c}");
+                Debug.LogWarning($"Loaded tower cannot be placed at {c}");
                 continue;
             }
 
