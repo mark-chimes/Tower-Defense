@@ -62,12 +62,10 @@ public class BoardInput
     private void HandleMouseForTowerMode()
     {
         if (hovered == null)
-            return;
-
-        if (towerController.CanPlaceTower(hovered.Coord))
-            towerController.ShowGhostAt(hovered.Coord);
-        else
+        {
             towerController.HideGhost();
+            return;
+        }
 
         if (Mouse.current.leftButton.wasPressedThisFrame)
             towerController.PlaceTower(hovered.Coord);
@@ -75,7 +73,13 @@ public class BoardInput
         if (Mouse.current.rightButton.wasPressedThisFrame)
             towerController.RemoveTower(hovered.Coord);
 
+        if (towerController.CanPlaceTower(hovered.Coord))
+            towerController.ShowGhostAt(hovered.Coord);
+        else
+            towerController.HideGhost();
     }
+
+
 
     public void SetBuildMode(BuildType buildMode)
     {

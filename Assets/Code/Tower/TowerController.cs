@@ -64,16 +64,18 @@ public class TowerController : MonoBehaviour
         towers.SetAt(coord, tower);
     }
 
-    public void CreateGhost()
+    private void CreateGhost()
     {
         ghost = Instantiate(towerPrefab, transform);
-        ghost.name = $"TowerPlacementGhost";
+        ghost.name = "TowerPlacementGhost";
         foreach (Renderer renderer in ghost.GetComponentsInChildren<Renderer>())
         {
-            for (int i = 0; i < renderer.sharedMaterials.Length; i++)
+            Material[] mats = new Material[renderer.sharedMaterials.Length];
+            for (int i = 0; i < mats.Length; i++)
             {
-                renderer.sharedMaterials[i] = ghostMaterial;
+                mats[i] = ghostMaterial;
             }
+            renderer.sharedMaterials = mats;
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         }
         ghost.SetActive(false);
