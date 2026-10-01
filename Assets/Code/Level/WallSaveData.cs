@@ -1,15 +1,14 @@
 using UnityEngine;
 
-[System.Serializable]
+// Will rename to LandSaveData or something after wall-rename
+    [System.Serializable]
 
-public class LevelSaveData
+public class WallSaveData
 {
-    public int NumRings;
     public bool[] IsWall; // 1D flattening of 2D array
 
-    public LevelSaveData(Lattice<bool> wallMap)
+    public WallSaveData(Lattice<bool> wallMap)
     {
-        NumRings = wallMap.NumRings;
         IsWall = wallMap.ToFlatArray();
     }
 
@@ -23,7 +22,7 @@ public class LevelSaveData
         return JsonUtility.FromJson<LevelSaveData>(json);
     }
 
-    public Lattice<bool> ToWallMap()
+    public Lattice<bool> ToWallMap(int NumRings)
     {
         return Lattice<bool>.FromFlatArray(IsWall, NumRings);
     }
