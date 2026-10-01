@@ -12,8 +12,8 @@ public class WallSaveData
         IsWall = wallMap.ToFlatArray();
     }
 
-    public Lattice<bool> GetWallMap(int NumRings)
+    public Lattice<bool> GetWallMap(int numRings)
     {
-        return Lattice<bool>.FromFlatArray(IsWall, NumRings);
+        return Lattice<bool>.FromFlatArray(IsWall, numRings);
     }
 }

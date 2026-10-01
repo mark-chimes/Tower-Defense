@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 // Later, this might split or become a view / control class
@@ -68,6 +69,36 @@ public class TowerController : MonoBehaviour
         foreach (HexCoord c in towers.AllCoords())
         {
             RemoveTower(c);
+        }
+    }
+
+    public TowerSaveData GetSaveData()
+    {
+        Lattice<bool> towerMap = new Lattice<bool>(towers.NumRings);
+        foreach (HexCoord c in towers.AllCoords())
+        {
+            towerMap.SetAt(c, HasTower(c));
+        }
+        return new TowerSaveData(towerMap);
+    }
+
+
+    public void LoadFromSaveData(TowerSaveData data)
+    {
+        Debug.Assert(isInitialized);
+        Lattice<bool> towersLoaded = data.GetTowerMap(treasureMap.NumRings);
+        foreach (HexCoord c in towersLoaded.AllCoords())
+        {
+            bool isTower = towersLoaded.At(c);
+            if (!isTower) continue;
+
+            if (!CanPlaceTower(c))
+            {
+                Debug.LogWarning("Loaded tower cannot be placed at {c}");
+                continue;
+            }
+
+            PlaceTower(c);
         }
     }
 

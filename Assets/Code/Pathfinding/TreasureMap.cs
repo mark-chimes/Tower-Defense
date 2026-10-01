@@ -100,9 +100,9 @@ public class TreasureMap
         return Landmark.None;
     }
 
-    public LevelSaveData ToSaveData()
+    public WallSaveData GetSaveData()
     {
-        return new LevelSaveData(wallMap);
+        return new WallSaveData(wallMap);
     }
 
     public enum Landmark

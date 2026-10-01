@@ -10,18 +10,8 @@ public class TowerSaveData
         IsTower = towerMap.ToFlatArray();
     }
 
-    // public string ToJson()
-    // {
-    //     return JsonUtility.ToJson(this);
-    // }
-
-    // public static TowerSaveData FromJson(string json)
-    // {
-    //     return JsonUtility.FromJson<TowerSaveData>(json);
-    // }
-
-    public Lattice<bool> GetTowerMap(int NumRings)
+    public Lattice<bool> GetTowerMap(int numRings)
     {
-        return Lattice<bool>.FromFlatArray(IsTower, NumRings);
+        return Lattice<bool>.FromFlatArray(IsTower, numRings);
     }
 }

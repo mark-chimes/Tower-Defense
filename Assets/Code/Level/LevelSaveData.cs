@@ -5,12 +5,15 @@ using UnityEngine;
 public class LevelSaveData
 {
     public int NumRings;
-    public bool[] IsWall; // 1D flattening of 2D array
 
-    public LevelSaveData(Lattice<bool> wallMap)
+    public WallSaveData Walls; // TODO will be terrain or something later
+    public TowerSaveData Towers;
+
+    public LevelSaveData(int numRings, WallSaveData Walls, TowerSaveData Towers)
     {
-        NumRings = wallMap.NumRings;
-        IsWall = wallMap.ToFlatArray();
+        NumRings = numRings;
+        this.Walls = Walls;
+        this.Towers = Towers;
     }
 
     public string ToJson()
@@ -21,11 +24,5 @@ public class LevelSaveData
     public static LevelSaveData FromJson(string json)
     {
         return JsonUtility.FromJson<LevelSaveData>(json);
-    }
-
-    // TODO GetLevelSaveData
-    public Lattice<bool> ToWallMap()
-    {
-        return Lattice<bool>.FromFlatArray(IsWall, NumRings);
     }
 }

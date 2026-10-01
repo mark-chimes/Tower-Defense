@@ -56,8 +56,11 @@ public class GameMaster : MonoBehaviour
     }
 
     public void OnSave()
-    {
-        saveLoadSystem.Save(treasureMap);
+    {   
+        WallSaveData walls = treasureMap.GetSaveData();
+        TowerSaveData towers = towerController.GetSaveData();
+        LevelSaveData saveData = new LevelSaveData(treasureMap.NumRings, walls, towers);
+        saveLoadSystem.Save(saveData);
     }
 
     public void OnLoad()
@@ -102,11 +105,12 @@ public class GameMaster : MonoBehaviour
     }
 
     void CreateMapFromData(LevelSaveData loaded)
-    {
-        Lattice<bool> loadedWallMap = loaded.ToWallMap();
+    {   
+        int N = loaded.NumRings;
+        Lattice<bool> loadedWalls = loaded.Walls.GetWallMap(N);
 
         treasureMap = new TreasureMap(
-            loadedWallMap,
+            loadedWalls,
             treasureMap.SpawnCoord,
             treasureMap.GoalCoord,
             StartingIsStopOnPathFound,
@@ -115,6 +119,8 @@ public class GameMaster : MonoBehaviour
             flowBridge.OnWallChange
             );
         CreateMapFromTreasureMap(treasureMap, StartingVisualization);
+
+        towerController.LoadFromSaveData(loaded.Towers);
     }
 
     void CreateMapFromTreasureMap(TreasureMap treasureMap,

@@ -6,12 +6,8 @@ using UnityEngine;
 public class HexLevelSaveLoadSystem
 {
     // TODO should I save the map, or something else?
-    public void Save(TreasureMap map)
+    public void Save(LevelSaveData saveable)
     {
-        Debug.Log("saving...");
-        LevelSaveData saveable = map.ToSaveData();
-        Debug.Log($"Saving: {saveable}");
-
         WriteToFile(saveable.ToJson());
     }
 
@@ -26,7 +22,8 @@ public class HexLevelSaveLoadSystem
 
     }
 
-    private readonly string filePath = Path.Combine(Application.persistentDataPath, "walls_save.json");
+    private readonly string filePath = Path.Combine(Application.persistentDataPath, 
+        "level_save.json");
 
     public void WriteToFile(string jsonData)
     {
