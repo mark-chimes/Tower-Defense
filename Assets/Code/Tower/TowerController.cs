@@ -51,8 +51,7 @@ public class TowerController : MonoBehaviour
 
     public bool CanPlaceTower(HexCoord coord)
     {
-        // remember "wall" is actually land
-        return treasureMap.HasWall(coord) && !HasTower(coord);
+        return treasureMap.IsLand(coord) && !HasTower(coord);
     }
 
     // Only call this if the tower is 

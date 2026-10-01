@@ -122,9 +122,9 @@ public class BoardInput
             HexSnapshot snapshot = treasureMap.At(c);
             if (snapshot.Landmark != TreasureMap.Landmark.None)
                 highlightColor = blockedColor;
-            else if (snapshot.HasWall && towerController.HasTower(c) && !DestroysTowerWithLand)
+            else if (snapshot.IsLand && towerController.HasTower(c) && !DestroysTowerWithLand)
                 highlightColor = lockedLandColor;
-            else if (snapshot.HasWall)
+            else if (snapshot.IsLand)
                 highlightColor = existingWallColor;
             else
                 highlightColor = placeableColor;
@@ -146,17 +146,17 @@ public class BoardInput
     {
         if (hovered == null) return;
         HexCoord c = hovered.Coord;
-        if (!treasureMap.CanPlaceWall(c)) return; // TODO: red ghost
-        treasureMap.SetWall(c, true);
+        if (!treasureMap.CanPlaceLand(c)) return; // TODO: red ghost
+        treasureMap.SetLand(c, true);
     }
 
     private void DestroyWallAtHovered()
     {
         if (hovered == null) return;
         HexCoord c = hovered.Coord;
-        if (!treasureMap.HasWall(c)) return;
+        if (!treasureMap.IsLand(c)) return;
         if (towerController.HasTower(c) && !DestroysTowerWithLand) return;
         if (towerController.HasTower(c)) towerController.RemoveTower(c);
-        treasureMap.SetWall(c, false);
+        treasureMap.SetLand(c, false);
     }
 }

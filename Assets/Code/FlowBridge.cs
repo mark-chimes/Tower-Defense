@@ -111,9 +111,9 @@ public class FlowBridge
         RefreshFromDeltaHighlightFrontier(delta);
     }
 
-    public void OnWallChange(HexCoord c)
+    public void OnTerrainChange(HexCoord c)
     {
-        gridView.SetTerrainAt(c, treasureMap.HasWall(c));
+        gridView.SetTerrainAt(c, treasureMap.IsLand(c));
 
         if (!IsAutoRefreshMode)
         {

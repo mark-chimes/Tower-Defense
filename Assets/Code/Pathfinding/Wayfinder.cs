@@ -5,9 +5,9 @@ public class Wayfinder
     public readonly HexCoord SpawnCoord;
     public readonly HexCoord GoalCoord;
 
-    private Lattice<bool> wallMap; // Do not modify
+    private readonly Lattice<bool> landMap; // Do not modify
 
-    public int NumRings => wallMap.NumRings;
+    public int NumRings => landMap.NumRings;
 
     private readonly HexSearch.Dir SearchDirection;
 
@@ -25,9 +25,9 @@ public class Wayfinder
     HexCoord? pathC;
 
 
-    public Wayfinder(Lattice<bool> wallMap, HexCoord spawnCoord, HexCoord goalCoord, HexSearch.Dir searchDirection, bool isStopOnPathFound)
+    public Wayfinder(Lattice<bool> landMap, HexCoord spawnCoord, HexCoord goalCoord, HexSearch.Dir searchDirection, bool isStopOnPathFound)
     {
-        this.wallMap = wallMap;
+        this.landMap = landMap;
         field = new FlowField(NumRings);
         SpawnCoord = spawnCoord;
         GoalCoord = goalCoord;
@@ -38,7 +38,7 @@ public class Wayfinder
 
     public Wayfinder WithNewSearchDir(HexSearch.Dir searchDirection)
     {
-        return new Wayfinder(wallMap, SpawnCoord, GoalCoord, searchDirection, isStopOnPathFound);
+        return new Wayfinder(landMap, SpawnCoord, GoalCoord, searchDirection, isStopOnPathFound);
     }
 
     public void ClearField()
@@ -120,7 +120,7 @@ public class Wayfinder
                 }
 
                 visited.SetAt(c, true);
-                if (wallMap.At(c))
+                if (landMap.At(c))
                 {
                     continue;
                 }
@@ -192,7 +192,7 @@ public class Wayfinder
         else
         {
             HexCoord next = coord.InDirection(dir);
-            pathC = wallMap.Contains(next) ? next : null;
+            pathC = landMap.Contains(next) ? next : null;
         }
         return new[] { new FlowSample(coord, newTile) };
     }

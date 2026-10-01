@@ -98,7 +98,7 @@ public class GameMaster : MonoBehaviour
                 StartingIsStopOnPathFound,
                 enemyController.PathfindingUpdate,
                 enemyController.PathfindingClear,
-                flowBridge.OnWallChange
+                flowBridge.OnTerrainChange
             );
 
         CreateMapFromTreasureMap(treasureMap, StartingVisualization);
@@ -115,7 +115,7 @@ public class GameMaster : MonoBehaviour
             StartingIsStopOnPathFound,
             enemyController.PathfindingUpdate,
             enemyController.PathfindingClear,
-            flowBridge.OnWallChange
+            flowBridge.OnTerrainChange
             );
         CreateMapFromTreasureMap(treasureMap, StartingVisualization);
 

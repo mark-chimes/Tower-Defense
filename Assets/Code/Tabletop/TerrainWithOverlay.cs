@@ -43,11 +43,11 @@ public class TerrainWithOverlay : MonoBehaviour
             GameObject signpostObj = InstantiateAtCoord(signpostPrefab, c);
             Signpost signpost = signpostObj.GetComponent<Signpost>();
             signpost.Initialize(c);
-            signpost.SetIsOnPathableTerrain(!treasureMap.HasWall(c));
+            signpost.SetIsOnPathableTerrain(!treasureMap.IsLand(c));
             signpost.SetPathingVisible(visualizationSettings.ShowPathfinding);
             signpost.SetDistanceVisible(visualizationSettings.ShowDistance);
 
-            MakeFlagstoneAt(c, treasureMap.HasWall(c));
+            MakeFlagstoneAt(c, treasureMap.IsLand(c));
 
             signpost.name = $"Signpost_{c}";
             signposts.SetAt(c, signpost);
