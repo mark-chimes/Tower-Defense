@@ -67,11 +67,6 @@ public class TreasureMap
         onPathfindingClear.Invoke();
     }
 
-    public HexSnapshot At(HexCoord coord)
-    {
-        return new HexSnapshot(coord, LandmarkAt(coord), landMap.At(coord));
-    }
-
     public FlowSample FlowAt(HexCoord coord)
     {
         return wayfinder.FlowAt(coord);
