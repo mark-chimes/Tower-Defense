@@ -100,7 +100,7 @@ public class TreasureMap
         return new TerrainSaveData(landMap);
     }
 
-    public enum Landmark
+    private enum Landmark
     {
         None,
         Spawn,
