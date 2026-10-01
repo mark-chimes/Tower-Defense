@@ -83,26 +83,27 @@ public class BoardInput
         if (Mouse.current.rightButton.wasPressedThisFrame) RemoveLandAtHovered();
     }
 
-    // TODO rename/restructure with wall/land pass
     private void HighlightAtHovered()
     {
-        Color highlightColor = Color.magenta; // something went wrong if this is the highlight color
-        if (hovered != null)
-        {
-            HexCoord c = hovered.Coord;
-            HexSnapshot snapshot = treasureMap.At(c);
-            if (snapshot.Landmark != TreasureMap.Landmark.None)
-                highlightColor = blockedColor;
-            else if (snapshot.IsLand && towerController.HasTower(c) && !DestroysTowerWithLand)
-                highlightColor = lockedLandColor;
-            else if (snapshot.IsLand)
-                highlightColor = existingLandColor;
-            else
-                highlightColor = placeableColor;
-        }
         if (highlighted != null) highlighted.Unhighlight();
+
         highlighted = hovered;
-        if (highlighted != null) highlighted.Highlight(highlightColor);
+        if (highlighted == null) return;
+        highlighted.Highlight(HighlightColorAt(hovered.Coord));
+    }
+
+    private Color HighlightColorAt(HexCoord coord)
+    {
+        if (treasureMap.IsLand(coord))
+            return CanRemoveLand(coord) ? existingLandColor : lockedLandColor;
+
+        return treasureMap.CanPlaceLand(coord) ? placeableColor : blockedColor;
+    }
+
+    private bool CanRemoveLand(HexCoord coord)
+    {
+        if (!treasureMap.IsLand(coord)) return false;
+        return !towerController.HasTower(coord) || DestroysTowerWithLand;
     }
 
     private void PlaceLandAtHovered()
@@ -117,9 +118,10 @@ public class BoardInput
     {
         if (hovered == null) return;
         HexCoord c = hovered.Coord;
-        if (!treasureMap.IsLand(c)) return;
-        if (towerController.HasTower(c) && !DestroysTowerWithLand) return;
-        if (towerController.HasTower(c)) towerController.RemoveTower(c);
+
+        if (!CanRemoveLand(c)) return;
+
+        towerController.RemoveTowerIfPresent(c);
         treasureMap.SetLand(c, false);
     }
 
