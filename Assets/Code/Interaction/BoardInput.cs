@@ -63,7 +63,7 @@ public class BoardInput
     {
         if (hovered == null)
         {
-            towerController.HideGhost();
+            towerController.HideGhosts();
             return;
         }
 
@@ -74,9 +74,11 @@ public class BoardInput
             towerController.RemoveTower(hovered.Coord);
 
         if (towerController.CanPlaceTower(hovered.Coord))
-            towerController.ShowGhostAt(hovered.Coord);
-        else
-            towerController.HideGhost();
+            towerController.ShowPlaceableGhostAt(hovered.Coord);
+        else if (towerController.HasTower(hovered.Coord))
+            towerController.ShowBlockedGhostAt(hovered.Coord);
+        else 
+            towerController.HideGhosts();
     }
 
 
@@ -91,7 +93,7 @@ public class BoardInput
         }
         else
         {
-            towerController.HideGhost();
+            towerController.HideGhosts();
         }
     }
 

@@ -6,8 +6,10 @@ public class TowerController : MonoBehaviour
     [SerializeField] private GameObject towerPrefab;
 
     [SerializeField] private Material ghostMaterial;
+    [SerializeField] private Material ghostBlockedMaterial;
 
-    private GameObject ghost;
+    private GameObject ghostPlaceable;
+    private GameObject ghostBlocked;
 
     // TODO make these a specific object type later
     // Also this data might split out later, especially when towers affect pathfinding
@@ -25,7 +27,7 @@ public class TowerController : MonoBehaviour
         this.treasureMap = treasureMap;
         towers = new Lattice<GameObject>(treasureMap.NumRings);
 
-        CreateGhost();
+        CreateGhosts();
     }
 
     public void ClearData()
@@ -38,7 +40,8 @@ public class TowerController : MonoBehaviour
 
         towers = null;
         treasureMap = null;
-        ghost = null;
+        ghostPlaceable = null;
+        ghostBlocked = null;
     }
 
     public bool HasTower(HexCoord coord)
@@ -64,33 +67,53 @@ public class TowerController : MonoBehaviour
         towers.SetAt(coord, tower);
     }
 
-    private void CreateGhost()
+    private void CreateGhosts()
     {
-        ghost = Instantiate(towerPrefab, transform);
-        ghost.name = "TowerPlacementGhost";
+        ghostPlaceable = CreateGhost(ghostMaterial, "TowerPlaceableGhost");
+        ghostBlocked = CreateGhost(ghostBlockedMaterial, "TowerBlockedGhost");
+        ghostBlocked.transform.localScale *= 1.03f;
+    }
+
+
+    private GameObject CreateGhost(Material material, string objName)
+    {
+        GameObject ghost = Instantiate(towerPrefab, transform);
+        ghost.name = objName;
         foreach (Renderer renderer in ghost.GetComponentsInChildren<Renderer>())
         {
             Material[] mats = new Material[renderer.sharedMaterials.Length];
             for (int i = 0; i < mats.Length; i++)
             {
-                mats[i] = ghostMaterial;
+                mats[i] = material;
             }
             renderer.sharedMaterials = mats;
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         }
         ghost.SetActive(false);
+        return ghost;
     }
 
-    public void ShowGhostAt(HexCoord coord)
+    public void ShowPlaceableGhostAt(HexCoord coord)
     {
         Vector3 pos = HexProjection.CoordsToLandSurface(coord);
-        ghost.transform.localPosition = pos;
-        ghost.SetActive(true);
+        ghostPlaceable.transform.localPosition = pos;
+        ghostPlaceable.SetActive(true);
+        ghostBlocked.SetActive(false);
     }
 
-    public void HideGhost()
+    public void ShowBlockedGhostAt(HexCoord coord)
     {
-        ghost.SetActive(false);
+        Vector3 pos = HexProjection.CoordsToLandSurface(coord);
+        ghostBlocked.transform.localPosition = pos;
+        ghostPlaceable.SetActive(false);
+        ghostBlocked.SetActive(true);
+    }
+
+
+    public void HideGhosts()
+    {
+        ghostPlaceable.SetActive(false);
+        ghostBlocked.SetActive(false);
     }
 
 

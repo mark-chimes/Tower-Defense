@@ -358,6 +358,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TowerController
   towerPrefab: {fileID: 8116792329295308466, guid: e482a1c665777fe47a6fad6bd4a832a1, type: 3}
+  ghostMaterial: {fileID: 2100000, guid: edb84a7e703ff32449a5bd881f33ab91, type: 2}
 --- !u!4 &564934985
 Transform:
   m_ObjectHideFlags: 0
