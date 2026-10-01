@@ -6,13 +6,13 @@ public class LevelSaveData
 {
     public int NumRings;
 
-    public WallSaveData Walls; // TODO will be terrain or something later
+    public TerrainSaveData Terrain;
     public TowerSaveData Towers;
 
-    public LevelSaveData(int numRings, WallSaveData walls, TowerSaveData towers)
+    public LevelSaveData(int numRings, TerrainSaveData terrain, TowerSaveData towers)
     {
         NumRings = numRings;
-        Walls = walls;
+        Terrain = terrain;
         Towers = towers;
     }
 

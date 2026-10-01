@@ -275,8 +275,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c31ba89a134df574099e5ecd5b9054f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HexGridView
-  floorTilePrefab: {fileID: 4834058753501685816, guid: 83b6d5e406cced54582352072e0a8bee, type: 3}
-  wallTilePrefab: {fileID: 3659481971689907962, guid: 7f343d185bfd31e4f9a2d2ad771aea67, type: 3}
+  seaTilePrefab: {fileID: 4834058753501685816, guid: 83b6d5e406cced54582352072e0a8bee, type: 3}
+  landTilePrefab: {fileID: 3659481971689907962, guid: 7f343d185bfd31e4f9a2d2ad771aea67, type: 3}
   signpostPrefab: {fileID: 216480145782122077, guid: 69bd31d6fb57a8c4aafb677993ca93a2, type: 3}
   spawnPrefab: {fileID: 1854376111048780903, guid: db2164dec387741419d8b3c4b1121cf3, type: 3}
   goalPrefab: {fileID: 517897423953314604, guid: 7a3a4a18bb2112a4ebffff27999c8b46, type: 3}
@@ -359,6 +359,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TowerController
   towerPrefab: {fileID: 8116792329295308466, guid: e482a1c665777fe47a6fad6bd4a832a1, type: 3}
   ghostMaterial: {fileID: 2100000, guid: edb84a7e703ff32449a5bd881f33ab91, type: 2}
+  ghostBlockedMaterial: {fileID: 2100000, guid: 9ce52987a2834d14a986f3028a0909e0, type: 2}
 --- !u!4 &564934985
 Transform:
   m_ObjectHideFlags: 0

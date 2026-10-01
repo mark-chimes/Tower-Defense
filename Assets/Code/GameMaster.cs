@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GameMaster : MonoBehaviour
@@ -57,9 +58,9 @@ public class GameMaster : MonoBehaviour
 
     public void OnSave()
     {
-        WallSaveData walls = treasureMap.GetSaveData();
+        TerrainSaveData terrain = treasureMap.GetSaveData();
         TowerSaveData towers = towerController.GetSaveData();
-        LevelSaveData saveData = new LevelSaveData(treasureMap.NumRings, walls, towers);
+        LevelSaveData saveData = new LevelSaveData(treasureMap.NumRings, terrain, towers);
         saveLoadSystem.Save(saveData);
     }
 
@@ -78,23 +79,26 @@ public class GameMaster : MonoBehaviour
 
     void CreateTestMap()
     {
-        Lattice<bool> wallMap = new Lattice<bool>(layoutSpecs.NumRings);
+        Lattice<bool> landMap = new Lattice<bool>(layoutSpecs.NumRings);
 
-        //** TEST wall positions **//
-        HexCoord wallPos0 = new HexCoord(-0, 0);
-        wallMap.SetAt(wallPos0, true);
-        HexCoord wallPos1 = new HexCoord(-1, 1);
-        wallMap.SetAt(wallPos1, true);
-        HexCoord wallPos2 = new HexCoord(-2, 2);
-        wallMap.SetAt(wallPos2, true);
-        HexCoord wallPos3 = new HexCoord(-3, 3);
-        wallMap.SetAt(wallPos3, true);
-        //** TEST wall positions **//
+        //** TEST terrain **//
+        List<HexCoord> landCoords = new List<HexCoord>() {
+            new HexCoord(-0, 0),
+            new HexCoord(-1, 1),
+            new HexCoord(-2, 2),
+            new HexCoord(-3, 3),
+        };
+
+        foreach (HexCoord c in landCoords)
+        {
+            landMap.SetAt(c, true);
+        }
+        //** TEST terrain **//
 
         HexCoord spawnPos = layoutSpecs.SpawnCoord;
         HexCoord goalPos = layoutSpecs.GoalCoord;
 
-        treasureMap = new TreasureMap(wallMap, spawnPos, goalPos,
+        treasureMap = new TreasureMap(landMap, spawnPos, goalPos,
                 StartingIsStopOnPathFound,
                 enemyController.PathfindingUpdate,
                 enemyController.PathfindingClear,
@@ -106,10 +110,10 @@ public class GameMaster : MonoBehaviour
 
     void CreateMapFromData(LevelSaveData loaded)
     {
-        Lattice<bool> loadedWalls = loaded.Walls.GetWallMap(loaded.NumRings);
+        Lattice<bool> loadedLand = loaded.Terrain.GetLandMap(loaded.NumRings);
 
         treasureMap = new TreasureMap(
-            loadedWalls,
+            loadedLand,
             treasureMap.SpawnCoord,
             treasureMap.GoalCoord,
             StartingIsStopOnPathFound,

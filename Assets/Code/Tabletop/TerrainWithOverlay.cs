@@ -2,13 +2,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using static Signpost;
 
-// TODO split out owning the floor (flagstones) and the markers
+// TODO split out owning the terrain (flagstones) and the markers
 public class TerrainWithOverlay : MonoBehaviour
 {
-    [SerializeField] private GameObject floorTilePrefab; // TODO rename to water tile or something after code port
-    [SerializeField] private GameObject wallTilePrefab; // TODO rename to land tile or something after code port
+    [SerializeField] private GameObject seaTilePrefab;
+    [SerializeField] private GameObject landTilePrefab;
     [SerializeField] private GameObject signpostPrefab;
-
 
     [SerializeField] private GameObject spawnPrefab;
     [SerializeField] private GameObject goalPrefab;
@@ -26,10 +25,8 @@ public class TerrainWithOverlay : MonoBehaviour
     private GameObject spawnObj;
     private GameObject goalObj;
 
-
     private bool isInitialized;
 
-    // TODO reconsider if this should handle "floors" and "walls" together or not? 
     public void Initialize(TreasureMap treasureMap, VisualizationSettings visualizationSettings)
     {
         Debug.Assert(!isInitialized);
@@ -55,7 +52,6 @@ public class TerrainWithOverlay : MonoBehaviour
 
         spawnObj = InstantiateAtCoord(spawnPrefab, treasureMap.SpawnCoord);
         goalObj = InstantiateAtCoord(goalPrefab, treasureMap.GoalCoord);
-
     }
 
     public void ClearData()
@@ -69,13 +65,11 @@ public class TerrainWithOverlay : MonoBehaviour
         flagstones = null;
     }
 
-
     public void Reinitialize(TreasureMap treasureMap, VisualizationSettings visualizationSettings)
     {
         ClearData();
         Initialize(treasureMap, visualizationSettings);
     }
-
 
     private GameObject InstantiateAtCoord(GameObject prefab, HexCoord coord)
     {
@@ -106,16 +100,16 @@ public class TerrainWithOverlay : MonoBehaviour
         }
     }
 
-    public void SetTerrainAt(HexCoord c, bool isWall)
+    public void SetTerrainAt(HexCoord c, bool isLand)
     {
         Destroy(flagstones.At(c).gameObject);
-        MakeFlagstoneAt(c, isWall);
-        signposts.At(c).SetIsOnPathableTerrain(!isWall);
+        MakeFlagstoneAt(c, isLand);
+        signposts.At(c).SetIsOnPathableTerrain(!isLand);
     }
 
-    private Flagstone MakeFlagstoneAt(HexCoord c, bool isWall)
+    private Flagstone MakeFlagstoneAt(HexCoord c, bool isLand)
     {
-        GameObject prefab = isWall ? wallTilePrefab : floorTilePrefab;
+        GameObject prefab = isLand ? landTilePrefab : seaTilePrefab;
         GameObject flagstoneObj = InstantiateAtCoord(prefab, c);
         flagstoneObj.name = $"Flagstone_{c}";
         Flagstone flagstone = flagstoneObj.GetComponent<Flagstone>();

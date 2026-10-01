@@ -14,7 +14,7 @@ public class BoardInput
 
     private Color placeableColor = Color.darkGreen;
     private Color blockedColor = Color.grey;
-    private Color existingWallColor = Color.darkSalmon;
+    private Color existingLandColor = Color.darkSalmon;
     private Color lockedLandColor = Color.grey;
 
 
@@ -30,11 +30,11 @@ public class BoardInput
 
     public enum BuildType
     {
-        Wall,
+        Land,
         Tower,
     }
 
-    public BuildType BuildMode { get; private set; } = BuildType.Wall;
+    public BuildType BuildMode { get; private set; } = BuildType.Land;
 
 
     public BoardInput(TreasureMap treasureMap, Camera cam, TowerController towerController)
@@ -57,8 +57,8 @@ public class BoardInput
         }
 
         HighlightAtHovered();
-        if (Mouse.current.leftButton.wasPressedThisFrame) PlaceWallAtHovered();
-        if (Mouse.current.rightButton.wasPressedThisFrame) DestroyWallAtHovered();
+        if (Mouse.current.leftButton.wasPressedThisFrame) PlaceLandAtHovered();
+        if (Mouse.current.rightButton.wasPressedThisFrame) RemoveLandAtHovered();
     }
 
     private void HandleMouseForTowerMode()
@@ -95,8 +95,6 @@ public class BoardInput
             towerController.HideGhosts();
     }
 
-
-
     public void SetBuildMode(BuildType buildMode)
     {
         BuildMode = buildMode;
@@ -125,7 +123,7 @@ public class BoardInput
             else if (snapshot.IsLand && towerController.HasTower(c) && !DestroysTowerWithLand)
                 highlightColor = lockedLandColor;
             else if (snapshot.IsLand)
-                highlightColor = existingWallColor;
+                highlightColor = existingLandColor;
             else
                 highlightColor = placeableColor;
         }
@@ -142,7 +140,7 @@ public class BoardInput
         return hit.collider.GetComponentInParent<Flagstone>();
     }
 
-    private void PlaceWallAtHovered()
+    private void PlaceLandAtHovered()
     {
         if (hovered == null) return;
         HexCoord c = hovered.Coord;
@@ -150,7 +148,7 @@ public class BoardInput
         treasureMap.SetLand(c, true);
     }
 
-    private void DestroyWallAtHovered()
+    private void RemoveLandAtHovered()
     {
         if (hovered == null) return;
         HexCoord c = hovered.Coord;

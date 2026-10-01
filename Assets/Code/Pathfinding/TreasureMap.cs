@@ -100,9 +100,9 @@ public class TreasureMap
         return Landmark.None;
     }
 
-    public WallSaveData GetSaveData()
+    public TerrainSaveData GetSaveData()
     {
-        return new WallSaveData(landMap);
+        return new TerrainSaveData(landMap);
     }
 
     public enum Landmark
