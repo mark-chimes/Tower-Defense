@@ -85,6 +85,8 @@ public class TreasureMap
 
     public bool IsLand(HexCoord c) => landMap.At(c);
 
+    public bool Contains(HexCoord c) => landMap.Contains(c);
+
 
     public bool CanPlaceLand(HexCoord c) => LandmarkAt(c) == Landmark.None && !IsLand(c);
 

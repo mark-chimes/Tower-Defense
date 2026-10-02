@@ -8,18 +8,20 @@ public class EnemyController : MonoBehaviour
 {
     [SerializeField] private Boat boatPrefab;
 
-    private TreasureMap treasureMap; 
+    private TreasureMap treasureMap;
+    private Fleet fleet;
     private Boat enemy = null;
 
 
     private bool isInitialized;
 
-    public void Initialize(TreasureMap treasureMap)
+    public void Initialize(TreasureMap treasureMap, Fleet fleet)
     {
         Debug.Assert(!isInitialized);
         isInitialized = true;
 
         this.treasureMap = treasureMap;
+        this.fleet = fleet;
     }
 
     public void ClearData()
@@ -59,8 +61,9 @@ public class EnemyController : MonoBehaviour
     // spawn a single enemy, just to test it out.
     public void SpawnEnemy()
     {
+        int slot = fleet.Spawn(treasureMap.SpawnCoord);
         enemy = Instantiate(boatPrefab, transform);
-        Vector3 pos = HexProjection.CoordsToWorld(treasureMap.SpawnCoord);
+        Vector3 pos = fleet.PositionOf(slot);
         enemy.transform.localPosition = pos;
         enemy.name = $"Boat";
         enemy.Initialize(treasureMap.SpawnCoord, treasureMap.GoalCoord);
@@ -70,7 +73,7 @@ public class EnemyController : MonoBehaviour
     public void PathfindingUpdate()
     {
         if (enemy == null) return;
-
+        // TODO: this should change to go via the fleet, soon
         enemy.RecalculatePathing(treasureMap);
 
     }
@@ -78,9 +81,8 @@ public class EnemyController : MonoBehaviour
     public void PathfindingClear()
     {
         if (enemy == null) return;
-
+        // TODO: this should change to go via the fleet, soon
         enemy.ClearPathing();
-
     }
 
 

@@ -17,6 +17,12 @@ public static class HexProjection
         return new Vector3(posX, 0f, posZ);
     }
 
+    public static Vector2 CoordsToVector2(HexCoord coord)
+    {
+        Vector3 worldPos = CoordsToWorld(coord);
+        return new Vector2(worldPos.x, worldPos.z);
+    }
+
     public static Vector3 CoordsToLandSurface(HexCoord coord) => CoordsToWorld(coord) + Vector3.up * LandSurfaceY;
 
     public static Vector3 CompassToVector3(HexCompass dir) => CoordsToWorld(dir.Offset());
