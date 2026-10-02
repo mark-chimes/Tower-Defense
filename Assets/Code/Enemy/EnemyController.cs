@@ -61,9 +61,14 @@ public class EnemyController : MonoBehaviour
     // spawn a single enemy, just to test it out.
     public void SpawnEnemy()
     {
+        if (!fleet.CanSpawn()) 
+        {
+            Debug.LogWarning("Fleet size reached. Unable to spawn new enemy.");
+            return;
+        }
         int slot = fleet.Spawn(treasureMap.SpawnCoord);
         enemy = Instantiate(boatPrefab, transform);
-        Vector3 pos = fleet.PositionOf(slot);
+        Vector3 pos = HexProjection.Vector2ToWorld(fleet.PositionOf(slot));
         enemy.transform.localPosition = pos;
         enemy.name = $"Boat";
         enemy.Initialize(treasureMap.SpawnCoord, treasureMap.GoalCoord);

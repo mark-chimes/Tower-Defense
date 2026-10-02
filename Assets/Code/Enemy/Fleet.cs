@@ -65,9 +65,5 @@ public class Fleet
         return boat;
     }
 
-    public Vector3 PositionOf(int slot)
-    {
-        Vector2 pos = boats[slot].Position;
-        return new Vector3(pos.x, 0f, pos.y);
-    }
+    public Vector2 PositionOf(int slot) => boats[slot].Position;
 }

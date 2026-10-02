@@ -132,10 +132,11 @@ public class GameMaster : MonoBehaviour
         gridView.Initialize(treasureMap, visualizationSettings);
         flowBridge.Initialize(treasureMap, gridView);
 
-        // TODO For testing
+        // >>> TODO For testing <<<
         int capacity = 100;
+        // TODO this should become a parameter
         Fleet fleet = new Fleet(treasureMap, capacity);
-        // ^^^
+        // >>> ^^^ <<<
 
         enemyController.Initialize(treasureMap, fleet);
         towerController.Initialize(treasureMap);

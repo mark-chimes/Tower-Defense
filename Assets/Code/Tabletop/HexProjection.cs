@@ -17,6 +17,8 @@ public static class HexProjection
         return new Vector3(posX, 0f, posZ);
     }
 
+    public static Vector3 Vector2ToWorld(Vector2 pos) => new Vector3(pos.x, 0f, pos.y);
+
     public static Vector2 CoordsToVector2(HexCoord coord)
     {
         Vector3 worldPos = CoordsToWorld(coord);
