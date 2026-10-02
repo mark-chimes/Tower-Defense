@@ -66,9 +66,43 @@ public readonly struct HexCoord : IEquatable<HexCoord>
     {
         if (q + r + s != 0)
             return null;
-        return new HexCoord(q,r);
+        return new HexCoord(q, r);
     }
-
     // TODO can use something similar to above method for RANGE later
+
+    // See https://www.redblobgames.com/grids/hexagons/#rounding
+    public static HexCoord AxialRound(float qf, float rf)
+    {
+        float sf = -qf - rf;
+
+        float qRound = MathF.Round(qf);
+        float rRound = MathF.Round(rf);
+        float sRound = MathF.Round(sf);
+
+        float qDiff = MathF.Abs(qRound - qf);
+        float rDiff = MathF.Abs(rRound - rf);
+        float sDiff = MathF.Abs(sRound - sf);
+
+        int q;
+        int r;
+
+        if (qDiff > rDiff && qDiff > sDiff)
+        {
+            r = (int)rRound;
+            q = -r - (int)sRound;
+        }
+        else if (rDiff > sDiff)
+        {
+            q = (int)qRound;
+            r = -q - (int)sRound;
+        }
+        else
+        {
+            q = (int)qRound;
+            r = (int)rRound;
+        }
+
+        return new HexCoord(q, r);
+    }
 }
 

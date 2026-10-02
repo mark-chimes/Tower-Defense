@@ -56,7 +56,7 @@ public class GameMaster : MonoBehaviour
         Gizmo.Draw(layoutSpecs, hexMesh, transform, showSpawnAndGoal, isWire, diagonalColorMode, colorZeros, colorRGB);
     }
 
-    public void OnSave()
+    private void Save()
     {
         TerrainSaveData terrain = treasureMap.GetSaveData();
         TowerSaveData towers = towerController.GetSaveData();
@@ -64,7 +64,7 @@ public class GameMaster : MonoBehaviour
         saveLoadSystem.Save(saveData);
     }
 
-    public void OnLoad()
+    private void Load()
     {
         LevelSaveData loaded = saveLoadSystem.Load();
 
@@ -139,6 +139,6 @@ public class GameMaster : MonoBehaviour
 
         boardInput = new BoardInput(treasureMap, Camera.main, towerController);
         gui.Initialize(StartingVisualization, StartingIsStopOnPathFound,
-            boardInput, flowBridge, enemyController, towerController, this);
+            boardInput, flowBridge, enemyController, towerController, Save, Load);
     }
 }

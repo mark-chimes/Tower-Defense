@@ -29,7 +29,7 @@ public class FlowField
     public bool OnCriticalPath(HexCoord c) => TileAt(c).OnCriticalPath;
     public bool Reachable(HexCoord c) => TileAt(c).Distance >= 0;
 
-
+    // TODO move this so that FlowSample takes over its job and this disappears
     public struct Tile
 
     {

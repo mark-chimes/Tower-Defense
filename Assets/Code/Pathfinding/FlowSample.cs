@@ -1,3 +1,6 @@
+// TODO Restructure things to get rid of the HexCoord stored here, and get rid of FlowField.Tile as a concept.
+// Basically this does the job that FlowField.Tile now does.
+
 public class FlowSample
 {
     public readonly HexCoord Coord;

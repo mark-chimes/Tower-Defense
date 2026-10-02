@@ -420,7 +420,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HexGodClass
   layoutSpecs:
-    numRings: 8
+    numRings: 24
     spawnInitQR: {x: -5, y: 0}
     goalInitQR: {x: 5, y: 0}
   gridView: {fileID: 341370300}

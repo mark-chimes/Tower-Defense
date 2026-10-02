@@ -9,7 +9,7 @@ public class BoardInput
 
     //** === Shared === **//
 
-    private const float maxRayDistance = 500f;
+    private const float maxRayDistance = 1000f;
     private TreasureMap treasureMap;
     private Camera cam;
     private TowerController towerController;

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class DebugGUI : MonoBehaviour
@@ -9,7 +10,9 @@ public class DebugGUI : MonoBehaviour
     private TowerController towerController;
 
 
-    private GameMaster gameMaster; // // TODO Cross-dependency code smell not ideal, but I'll fix this later
+    private Action save;
+    private Action load;
+
 
     bool visualizeDistanceEnabled = true;
     bool wasVisualizeDistanceEnabled = true;
@@ -24,7 +27,8 @@ public class DebugGUI : MonoBehaviour
         FlowBridge flowBridge,
         EnemyController enemyController, // TODO remove reference
         TowerController towerController,
-        GameMaster gameMaster
+        Action save,
+        Action load
         )
     {
         visualizeDistanceEnabled = visualization.ShowDistance;
@@ -39,7 +43,8 @@ public class DebugGUI : MonoBehaviour
         this.enemyController = enemyController;
         this.boardInput = boardInput;
         this.towerController = towerController;
-        this.gameMaster = gameMaster; // TODO Cross-dependency code smell 
+        this.save = save;
+        this.load = load;
     }
 
 
@@ -202,7 +207,7 @@ public class DebugGUI : MonoBehaviour
         if (GUI.Button(new Rect(buttonX, guiSaveLoadY, buttonWidth, buttonHeight), "Save"))
         {
             Debug.Log("Save pressed");
-            gameMaster.OnSave();
+            save.Invoke();
         }
 
         guiSaveLoadY += yBetweenButtons;
@@ -210,7 +215,7 @@ public class DebugGUI : MonoBehaviour
         if (GUI.Button(new Rect(buttonX, guiSaveLoadY, buttonWidth, buttonHeight), "Load"))
         {
             Debug.Log("Load pressed");
-            gameMaster.OnLoad();
+            load.Invoke();
         }
 
         // // === //

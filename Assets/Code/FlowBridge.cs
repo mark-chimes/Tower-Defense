@@ -128,9 +128,6 @@ public class FlowBridge
 
     private void RefreshFromDeltaHighlightFrontier(HexSearch.Delta delta)
     {
-        Debug.Log("Refresh from delta");
-
-
         switch (delta.Phase)
         {
             case HexSearch.Phase.ExpandFrontier:

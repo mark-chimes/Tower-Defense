@@ -31,4 +31,13 @@ public static class HexProjection
     {
         return (first - second).sqrMagnitude <= SqrClose;
     }
+
+    // See https://www.redblobgames.com/grids/hexagons/#pixel-to-hex
+    public static HexCoord WorldToCoords(float x, float z)
+    {
+        float rf = z / (0.75f * CellHeight);
+        float qf = (x - CellWidth / 2 * rf) / CellWidth;
+
+        return HexCoord.AxialRound(qf, rf);
+    }
 }
