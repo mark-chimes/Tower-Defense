@@ -10,7 +10,7 @@ public class EnemyController : MonoBehaviour
 
     private TreasureMap treasureMap;
     private Fleet fleet;
-    private Boat enemy = null;
+    private Boat[] boats = null;
 
 
     private bool isInitialized;
@@ -22,6 +22,9 @@ public class EnemyController : MonoBehaviour
 
         this.treasureMap = treasureMap;
         this.fleet = fleet;
+
+        boats = new Boat[fleet.Capacity()];
+
     }
 
     public void ClearData()
@@ -31,64 +34,65 @@ public class EnemyController : MonoBehaviour
 
         foreach (Transform child in transform) Destroy(child.gameObject);
         treasureMap = null;
-        enemy = null;
+        fleet = null;
+        boats = null;
+    }
+
+    public void SyncBoats()
+    {
+        // TODO should this be on fleet.Count?
+        for (int i = 0; i < boats.Length; i++)
+        {
+            if (!fleet.IsAlive(i)) continue;
+            boats[i].transform.localPosition = fleet.Position3DOf(i);
+            boats[i].transform.localRotation = HexProjection.DegreesToQuaternion(fleet.HeadingOf(i));
+            // TODO set visibility here? 
+        }
     }
 
     public void OnSpawnBoatPressed()
     {
-        OnDeleteBoatsPressed(); // we can only have one boat at the moment.
         SpawnEnemy();
     }
+
     public void OnDeleteBoatsPressed()
     {
-        Debug.Log($"Destroy enemy {enemy}");
-        if (enemy != null) Destroy(enemy.gameObject);
-        Debug.Log($"Enemy destroyed: {enemy}");
+        // TODO implement or remove
     }
 
     public void OnBoatsFollowExistingPathPressed()
     {
-        PathfindingUpdate();
+        fleet.StartAll();
     }
 
     public void OnBoatsStopPressed()
     {
-        PathfindingClear();
+        fleet.StopAll();
     }
 
-
-
-    // spawn a single enemy, just to test it out.
     public void SpawnEnemy()
     {
-        if (!fleet.CanSpawn()) 
+        if (!fleet.CanSpawn())
         {
             Debug.LogWarning("Fleet size reached. Unable to spawn new enemy.");
             return;
         }
+        // Should the spawn button handler and the GameMaster startup call pass treasureMap.SpawnCoord?
         int slot = fleet.Spawn(treasureMap.SpawnCoord);
-        enemy = Instantiate(boatPrefab, transform);
-        Vector3 pos = HexProjection.Vector2ToWorld(fleet.PositionOf(slot));
-        enemy.transform.localPosition = pos;
-        enemy.name = $"Boat";
-        enemy.Initialize(treasureMap.SpawnCoord, treasureMap.GoalCoord);
-        // TODO save enemies in a list 
+        Boat boat = Instantiate(boatPrefab, transform);
+        Vector3 pos = fleet.Position3DOf(slot);
+        boat.transform.localPosition = pos;
+        boat.name = $"Boat";
+        boats[slot] = boat;
     }
 
     public void PathfindingUpdate()
     {
-        if (enemy == null) return;
-        // TODO: this should change to go via the fleet, soon
-        enemy.RecalculatePathing(treasureMap);
-
+        // TODO: implement or move
     }
 
     public void PathfindingClear()
     {
-        if (enemy == null) return;
-        // TODO: this should change to go via the fleet, soon
-        enemy.ClearPathing();
+        // TODO: implement or move
     }
-
-
 }

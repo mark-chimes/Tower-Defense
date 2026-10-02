@@ -67,6 +67,11 @@ public class TreasureMap
         onPathfindingClear.Invoke();
     }
 
+    public HexCompass DirectionAt(HexCoord coord) 
+    {
+        return FlowAt(coord).DirToGoal;
+    }
+
     public FlowSample FlowAt(HexCoord coord)
     {
         return wayfinder.FlowAt(coord);

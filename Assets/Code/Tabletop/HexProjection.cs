@@ -29,11 +29,52 @@ public static class HexProjection
 
     public static Vector3 CompassToVector3(HexCompass dir) => CoordsToWorld(dir.Offset());
 
+    public static Vector2 CompassToVector2(HexCompass dir) => CoordsToVector2(dir.Offset());
+
+    // public static float CompasstoDegreesHeading(HexCompass dir) => dir switch
+    // {
+    //     HexCompass.E => 90f,
+    //     HexCompass.NE => 30f,
+    //     HexCompass.NW => 330f,
+    //     HexCompass.W => 270f,
+    //     HexCompass.SW => 210f,
+    //     HexCompass.SE => 150f,
+    //     _ => throw new ArgumentOutOfRangeException(nameof(dir)),
+
+    // };
+
+    public static float CompasstoDegreesHeading(HexCompass dir)
+    {
+        var v = CompassToVector2(dir);
+        return Vector2ToDegreesHeading(v);
+    }
+
+    // 4. Later, in the smoothing step: 
+    // the target angle is Mathf.Atan2(dx, dz) * Mathf.Rad2Deg, with dx first.
+    public static float Vector2ToDegreesHeading(Vector2 v)
+    {
+        return Mathf.Atan2(v.x, v.y) * Mathf.Rad2Deg;
+    }
+
+
+
     public static Quaternion CompassToQuaternion(HexCompass dir)
     {
         if (dir == HexCompass.NONE) { throw new ArgumentOutOfRangeException(nameof(dir)); }
-        return Quaternion.LookRotation(CompassToVector3(dir), Vector3.up);
+        return Vector3ToQuaternion(CompassToVector3(dir));
     }
+
+    public static Quaternion Vector3ToQuaternion(Vector3 vector3)
+    {
+        return Quaternion.LookRotation(vector3, Vector3.up);
+    }
+
+    public static Quaternion Vector2ToQuaternion(Vector2 vector2)
+    {
+        return Vector3ToQuaternion(new Vector3(vector2.x, 0f, vector2.y));
+    }
+
+    public static Quaternion DegreesToQuaternion(float degrees) => Quaternion.Euler(0f, degrees, 0f);
 
     public static bool AreVector3Close(Vector3 first, Vector3 second)
     {

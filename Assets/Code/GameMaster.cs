@@ -30,6 +30,16 @@ public class GameMaster : MonoBehaviour
 
     HexLevelSaveLoadSystem saveLoadSystem;
 
+    Fleet fleet;
+
+
+    [SerializeField] private float stepSize = 0.02f;
+
+    [SerializeField] private int maxSteps = 5;
+
+    private readonly bool IsSimRunning = true; // TODO temporarily like this
+    private float accumulator = 0;
+
     void Awake()
     {
         camRig = new CameraRig();
@@ -49,6 +59,27 @@ public class GameMaster : MonoBehaviour
         camRig.ControlCamera();
         boardInput.HandleMouse();
         flowBridge.ContinuallySingleStep();
+        UpdateEnemies();
+    }
+
+
+    void UpdateEnemies()
+    {
+        if (fleet == null) return;
+
+        if (IsSimRunning)
+        {
+            accumulator += Time.deltaTime;
+            int numSteps = 0;
+            while (accumulator >= stepSize && numSteps < maxSteps)
+            {
+                fleet.StepDt(stepSize);
+                accumulator -= stepSize;
+                numSteps++;
+            }
+            if (numSteps == maxSteps) accumulator = 0;
+        }
+        enemyController.SyncBoats();
     }
 
     void OnDrawGizmos()
@@ -134,8 +165,7 @@ public class GameMaster : MonoBehaviour
 
         // >>> TODO For testing <<<
         int capacity = 100;
-        // TODO this should become a parameter
-        Fleet fleet = new Fleet(treasureMap, capacity);
+        fleet = new Fleet(treasureMap, capacity);
         // >>> ^^^ <<<
 
         enemyController.Initialize(treasureMap, fleet);

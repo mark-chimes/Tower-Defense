@@ -3,7 +3,7 @@ using UnityEngine;
 public class Fleet
 {
 
-    private float turnRate = 180f; // degrees per second
+    private float turnRate = 90f; // degrees per second
     private float startSpeed = 10f; // meters per second
     private float collisionRadius = 2.5f; // meters
 
@@ -65,5 +65,58 @@ public class Fleet
         return boat;
     }
 
-    public Vector2 PositionOf(int slot) => boats[slot].Position;
+    public int Capacity() => boats.Length;
+
+    public Vector2 Position2DOf(int slot) => boats[slot].Position;
+
+    public Vector3 Position3DOf(int slot) => HexProjection.Vector2ToWorld(boats[slot].Position);
+
+    public float HeadingOf(int slot) => boats[slot].Heading;
+
+    public bool IsAlive(int slot) => boats[slot].State != BoatState.Dead;
+
+    public void StartAll()
+    {
+        for (int i = 0; i < boats.Length; i++)
+        {
+            if (!IsAlive(i)) continue;
+            boats[i].State = BoatState.Moving;
+        }
+    }
+
+    public void StopAll()
+    {
+        for (int i = 0; i < boats.Length; i++)
+        {
+            if (!IsAlive(i)) continue;
+            boats[i].State = BoatState.Idle;
+        }
+    }
+
+    public void StepDt(float deltaTime)
+    {
+        for (int i = 0; i < boats.Length; i++)
+        {
+            if (boats[i].State != BoatState.Moving) continue;
+
+            ref BoatData boat = ref boats[i];
+            Vector2 pos = boat.Position;
+            HexCoord coord = HexProjection.WorldToCoords(pos.x, pos.y);
+
+            if (!treasureMap.Contains(coord) || treasureMap.IsLand(coord)) continue;
+            HexCompass dir = treasureMap.DirectionAt(coord);
+            if (dir == HexCompass.NONE) continue;
+
+            HexCoord targetCoord = coord.InDirection(dir);
+            Vector2 target = HexProjection.CoordsToVector2(targetCoord);
+            Vector2 toTarget = target - boat.Position;
+            float targetHeading = HexProjection.Vector2ToDegreesHeading(toTarget);
+            boat.Heading = Mathf.MoveTowardsAngle(boat.Heading, targetHeading, turnRate * deltaTime);
+            boat.Heading = Mathf.Repeat(boat.Heading, 360f);
+
+            float rads = boat.Heading * Mathf.Deg2Rad;
+            boat.Velocity = new Vector2(Mathf.Sin(rads), Mathf.Cos(rads)) * boat.Speed;
+            boat.Position += boat.Velocity * deltaTime;
+        }
+    }
 }
