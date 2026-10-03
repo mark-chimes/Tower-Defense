@@ -67,8 +67,13 @@ public class DebugGUI : MonoBehaviour
         int yBetweenButtons = buttonHeight;
         int yBetweenBuildingButtons = buttonHeight + boxBuffer;
 
+        int numUsefulControls = 4;
+        int usefulVisY = yBetweenButtons;
+        int usefulVisHeight = (numUsefulControls + 2) * yBetweenButtons + boxBuffer;
+        int guiUsefulEnd = usefulVisY + usefulVisHeight;
+
         int numVisControls = 10;
-        int guiVisY = yBetweenButtons;
+        int guiVisY = guiUsefulEnd + yBetweenButtons + boxBuffer;
         int guiVisHeight = (numVisControls + 2) * yBetweenButtons + boxBuffer;
         int guiVisEnd = guiVisY + guiVisHeight;
 
@@ -86,6 +91,43 @@ public class DebugGUI : MonoBehaviour
         int guiBuildingY = guiSaveLoadEnd + yBetweenButtons + boxBuffer;
         int guiBuildingHeight = (numBuildingControls + 2) * yBetweenBuildingButtons + boxBuffer;
         int guiBuildingEnd = guiBuildingY + guiBuildingHeight;
+
+        GUI.Box(new Rect(boxX, usefulVisY, boxWidth, usefulVisHeight), "USEFUL");
+        usefulVisY += yBetweenButtons + boxBuffer;
+
+        Rect rect = new Rect(buttonX, usefulVisY, buttonWidth, buttonHeight);
+        bool isAutoRefreshWanted = GUI.Toggle(rect, flowBridge.IsAutoRefreshMode, "Auto-Refresh");
+        if (isAutoRefreshWanted != flowBridge.IsAutoRefreshMode) flowBridge.SetAutoRefreshMode(isAutoRefreshWanted);
+        usefulVisY += yBetweenButtons;
+
+        visualizePathfindingEnabled = GUI.Toggle(new Rect(buttonX, usefulVisY, buttonWidth, buttonHeight), visualizePathfindingEnabled, "Pathfinding Arrows");
+        if (wasVisualizePathfindingEnabled != visualizePathfindingEnabled)
+        {
+            wasVisualizePathfindingEnabled = visualizePathfindingEnabled;
+            flowBridge.SetVisualizationVisible(visualizePathfindingEnabled);
+        }
+        usefulVisY += yBetweenButtons;
+
+        bool wantedFollow = GUI.Toggle(new Rect(buttonX, usefulVisY, buttonWidth, buttonHeight), enemyController.BoatsFollowPathOnSpawn,
+            "Boats follow path on spawn");
+        if (wantedFollow != enemyController.BoatsFollowPathOnSpawn) enemyController.BoatsFollowPathOnSpawn = wantedFollow;
+        usefulVisY += yBetweenButtons;
+
+        if (GUI.Button(new Rect(buttonX, usefulVisY, buttonWidth, buttonHeight), "Follow existing path"))
+        {
+            Debug.Log("Follow existing path pressed");
+            enemyController.OnBoatsFollowExistingPathPressed();
+        }
+        usefulVisY += yBetweenButtons;
+
+        if (GUI.Button(new Rect(buttonX, usefulVisY, buttonWidth, buttonHeight), "Spawn Boat"))
+        {
+            Debug.Log("Spawn boats pressed");
+            enemyController.OnSpawnBoatPressed();
+        }
+        usefulVisY += yBetweenButtons;
+
+
 
         GUI.Box(new Rect(boxX, guiVisY, boxWidth, guiVisHeight), "VISUALIZE");
         guiVisY += yBetweenButtons + boxBuffer;
@@ -133,8 +175,8 @@ public class DebugGUI : MonoBehaviour
         }
         guiVisY += yBetweenButtons + boxBuffer;
 
-        Rect rect = new Rect(buttonX, guiVisY, buttonWidth, buttonHeight);
-        bool isAutoRefreshWanted = GUI.Toggle(rect, flowBridge.IsAutoRefreshMode, "Auto-Refresh");
+        rect = new Rect(buttonX, guiVisY, buttonWidth, buttonHeight);
+        isAutoRefreshWanted = GUI.Toggle(rect, flowBridge.IsAutoRefreshMode, "Auto-Refresh");
         if (isAutoRefreshWanted != flowBridge.IsAutoRefreshMode) flowBridge.SetAutoRefreshMode(isAutoRefreshWanted);
         guiVisY += yBetweenButtons;
 

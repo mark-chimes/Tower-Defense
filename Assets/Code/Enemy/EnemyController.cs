@@ -12,6 +12,9 @@ public class EnemyController : MonoBehaviour
     private Fleet fleet;
     private Boat[] boats = null;
 
+    public bool BoatsFollowPathOnSpawn { get; set; } = true;
+
+
 
     private bool isInitialized;
 
@@ -44,11 +47,13 @@ public class EnemyController : MonoBehaviour
         for (int i = 0; i < boats.Length; i++)
         {
             if (!fleet.IsAlive(i)) continue;
-            boats[i].transform.localPosition = fleet.Position3DOf(i);
+            boats[i].transform.localPosition = Position3DOf(i);
             boats[i].transform.localRotation = HexProjection.DegreesToQuaternion(fleet.HeadingOf(i));
             // TODO set visibility here? 
         }
     }
+
+    private Vector3 Position3DOf(int slot) => HexProjection.Float2ToWorld(fleet.PositionOf(slot));
 
     public void OnSpawnBoatPressed()
     {
@@ -78,9 +83,9 @@ public class EnemyController : MonoBehaviour
             return;
         }
         // Should the spawn button handler and the GameMaster startup call pass treasureMap.SpawnCoord?
-        int slot = fleet.Spawn(treasureMap.SpawnCoord);
+        int slot = fleet.Spawn(treasureMap.SpawnCoord, BoatsFollowPathOnSpawn);
         Boat boat = Instantiate(boatPrefab, transform);
-        Vector3 pos = fleet.Position3DOf(slot);
+        Vector3 pos = Position3DOf(slot);
         boat.transform.localPosition = pos;
         boat.name = $"Boat";
         boats[slot] = boat;

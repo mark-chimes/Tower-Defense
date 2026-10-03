@@ -2,6 +2,9 @@ using System;
 using UnityEngine;
 using Unity.Mathematics;
 
+// TODO probably we want to split this into the 2D Hex Projection with float2 used for the fleet
+// And the 3D hex projection with Vector3 used for Unity stuff 
+// And only have the 3D version calling the 2D version but not vice-versa
 public static class HexProjection
 {
     public const float CellWidth = 10f; // center of one cell to center of another - the small diameter
@@ -51,10 +54,11 @@ public static class HexProjection
     }
 
     // 4. Later, in the smoothing step: 
-    // the target angle is Mathf.Atan2(dx, dz) * Mathf.Rad2Deg, with dx first.
+    // the target angle is something like Mathf.Atan2(dx, dz) * Mathf.Rad2Deg, with dx first
+    // but using math, not Mathf
     public static float Float2ToDegreesHeading(float2 f2)
     {
-        return Mathf.Atan2(f2.x, f2.y) * Mathf.Rad2Deg;
+        return math.degrees(math.atan2(f2.x, f2.y));
     }
 
     public static Quaternion CompassToQuaternion(HexCompass dir)

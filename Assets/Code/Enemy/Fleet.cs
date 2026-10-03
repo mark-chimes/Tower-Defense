@@ -43,15 +43,17 @@ public class Fleet
         return BoatCount < boats.Length;
     }
 
-    public int Spawn(HexCoord spawnCoord)
+    public int Spawn(HexCoord spawnCoord, bool shouldStart)
     {
         Debug.Assert(CanSpawn());
         if (!CanSpawn()) return -1;
         int slot = BoatCount;
         BoatCount++;
         float2 startPosition = HexProjection.CoordsToFloat2(spawnCoord);
-        boats[slot] = NewBoat(startPosition);
-        FaceNextPos(ref boats[slot]);
+        BoatData newBoat = NewBoat(startPosition);
+        FaceNextPos(ref newBoat);
+        if (shouldStart) newBoat.State = BoatState.Moving;
+        boats[slot] = newBoat;
         return slot;
     }
 
@@ -69,10 +71,8 @@ public class Fleet
 
     public int Capacity() => boats.Length;
 
-    private float2 PositionOf(int slot) => boats[slot].Position;
-
-    public Vector3 Position3DOf(int slot) => HexProjection.Float2ToWorld(boats[slot].Position);
-
+    public float2 PositionOf(int slot) => boats[slot].Position;
+    
     public float HeadingOf(int slot) => boats[slot].Heading;
 
     public bool IsAlive(int slot) => boats[slot].State != BoatState.Dead;
@@ -114,8 +114,9 @@ public class Fleet
             boat.Heading = Mathf.MoveTowardsAngle(boat.Heading, targetHeading, turnRate * deltaTime);
             boat.Heading = Mathf.Repeat(boat.Heading, 360f);
 
-            float rads = boat.Heading * Mathf.Deg2Rad;
-            boat.Velocity = new float2(Mathf.Sin(rads), Mathf.Cos(rads)) * boat.Speed;
+            float rads = math.radians(boat.Heading);
+            math.sincos(rads, out float s, out float c);
+            boat.Velocity = new float2(s, c) * boat.Speed;
             boat.Position += boat.Velocity * deltaTime;
         }
     }

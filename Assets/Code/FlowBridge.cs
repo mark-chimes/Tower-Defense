@@ -10,7 +10,7 @@ public class FlowBridge
     private float visualizeTime;
     private float tempTime;
 
-    public bool IsAutoRefreshMode { get; private set; } = false;
+    public bool IsAutoRefreshMode { get; private set; } = true;
     private bool isVisualizeMode = false;
 
 
