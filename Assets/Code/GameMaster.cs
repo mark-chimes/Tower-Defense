@@ -37,6 +37,10 @@ public class GameMaster : MonoBehaviour
 
     [SerializeField] private int maxSteps = 5;
 
+    [SerializeField] private int enemyCapacity = 100;
+
+    public int EnemyCapacity => enemyCapacity;
+
     private bool isSimRunning = true;
     private float accumulator = 0;
 
@@ -160,11 +164,7 @@ public class GameMaster : MonoBehaviour
         flowBridge.Initialize(treasureMap, gridView);
 
         flowBridge.RefreshIfAutoRefresh();
-
-        // >>> TODO For testing <<<
-        int capacity = 100;
-        fleet = new Fleet(treasureMap, capacity);
-        // >>> ^^^ <<<
+        fleet = new Fleet(treasureMap, EnemyCapacity);
 
         enemyController.Initialize(treasureMap, fleet);
         towerController.Initialize(treasureMap);
@@ -172,6 +172,6 @@ public class GameMaster : MonoBehaviour
 
         boardInput = new BoardInput(treasureMap, Camera.main, towerController);
         gui.Initialize(StartingVisualization, StartingIsStopOnPathFound,
-            boardInput, flowBridge, enemyController, towerController, Save, Load, () => isSimRunning, b => isSimRunning=b);
+            boardInput, flowBridge, enemyController, towerController, Save, Load, () => isSimRunning, b => isSimRunning = b);
     }
 }

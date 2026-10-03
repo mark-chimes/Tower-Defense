@@ -297,6 +297,8 @@ public class DebugGUI : MonoBehaviour
         Toggle("Boats despawn at goal",
             enemyController.BoatsDespawnAtGoal,
             value => enemyController.BoatsDespawnAtGoal = value);
+        Button($"Spawn {enemyController.SpawnBatchSize} Boats",
+            enemyController.OnSpawnBatchPressed);
         EndSection();
     }
 

@@ -7,6 +7,10 @@ using UnityEngine;
 public class EnemyController : MonoBehaviour
 {
     [SerializeField] private Boat boatPrefab;
+    [SerializeField] private int spawnBatchSize = 10;
+
+    public int SpawnBatchSize => spawnBatchSize;
+
 
     private TreasureMap treasureMap;
     private Fleet fleet;
@@ -76,6 +80,14 @@ public class EnemyController : MonoBehaviour
     public void OnBoatsStopPressed()
     {
         fleet.StopAll();
+    }
+
+    public void OnSpawnBatchPressed()
+    {
+        for (int i = 0; i < spawnBatchSize && fleet.CanSpawn(); i++)
+        {
+            SpawnEnemy();
+        }
     }
 
     public void SpawnEnemy()

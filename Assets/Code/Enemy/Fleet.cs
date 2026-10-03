@@ -1,5 +1,6 @@
 using Unity.Mathematics;
 using UnityEngine;
+using Random = Unity.Mathematics.Random;
 
 public class Fleet
 {
@@ -7,6 +8,10 @@ public class Fleet
     private float turnRate = 90f; // degrees per second
     private float startSpeed = 10f; // meters per second
     private float collisionRadius = 2.5f; // meters
+    private float maxSpawnOffset = 2f; // meters
+
+    private Random random;
+    uint randomSeed = 1;
 
     public bool DespawnsAtGoal { get; set; } = false;
 
@@ -34,12 +39,15 @@ public class Fleet
     public int BoatCount { get; private set; }
     public int SlotsUsed { get; private set; }
 
+
+
     public Fleet(TreasureMap treasureMap, int capacity)
     {
         this.treasureMap = treasureMap;
         boats = new BoatData[capacity];
         BoatCount = 0;
         SlotsUsed = 0;
+        random = new Random(randomSeed);
     }
 
     public bool CanSpawn()
@@ -58,12 +66,19 @@ public class Fleet
         int slot = FirstDeadSlot();
         BoatCount++;
         if (slot >= SlotsUsed) SlotsUsed++;
-        float2 startPosition = HexProjection.CoordsToFloat2(spawnCoord);
-        BoatData newBoat = NewBoat(startPosition);
+        BoatData newBoat = NewBoat(RandomPositionAtCoord(spawnCoord));
         FaceNextPos(ref newBoat);
         if (shouldStart) newBoat.State = BoatState.Moving;
         boats[slot] = newBoat;
         return slot;
+    }
+
+    private float2 RandomPositionAtCoord(HexCoord coord)
+    {
+        float2 pos = HexProjection.CoordsToFloat2(coord);
+        // Distribution: this places more boats near the centre than near the edge
+        pos += random.NextFloat2Direction() * random.NextFloat(0f, maxSpawnOffset);
+        return pos;
     }
 
     public void DespawnIfPossible(int slot)
