@@ -6,9 +6,18 @@ public class Fleet
 {
 
     private float turnRate = 90f; // degrees per second
+    private float forwardFriction = 2f;
+    private float sidewaysFriction = 10f;
+
+    // How much the boat aims beyond its target
+    private float driftCorrection = 0.5f;
+
     private float startSpeed = 10f; // meters per second
     private float collisionRadius = 2.5f; // meters
     private float maxSpawnOffset = 2f; // meters
+
+
+
 
     private Random random;
     uint randomSeed = 1;
@@ -146,25 +155,52 @@ public class Fleet
                 continue;
             }
 
-            if (boats[i].State != BoatState.Moving) continue;
-
             ref BoatData boat = ref boats[i];
-            float2 pos = boat.Position;
 
-            HexCoord? targetCoord = TargetCoordAt(pos);
-            if (targetCoord == null) continue;
-
-            float2 target = HexProjection.CoordsToFloat2(targetCoord.Value);
-            float2 toTarget = target - boat.Position;
-            float targetHeading = HexProjection.Float2ToDegreesHeading(toTarget);
-            boat.Heading = Mathf.MoveTowardsAngle(boat.Heading, targetHeading, turnRate * deltaTime);
-            boat.Heading = Mathf.Repeat(boat.Heading, 360f);
-
-            float rads = math.radians(boat.Heading);
-            math.sincos(rads, out float s, out float c);
-            boat.Velocity = new float2(s, c) * boat.Speed;
+            if (boat.State == BoatState.Moving) SteerAndThrust(ref boat, deltaTime);
+            ApplyFriction(ref boat, deltaTime);
             boat.Position += boat.Velocity * deltaTime;
         }
+    }
+
+    private void SteerAndThrust(ref BoatData boat, float deltaTime)
+    {
+        HexCoord? targetCoord = TargetCoordAt(boat.Position);
+        if (targetCoord == null) return;
+
+        float2 target = HexProjection.CoordsToFloat2(targetCoord.Value);
+        float2 desired = math.normalizesafe(target - boat.Position) * boat.Speed;
+        float2 steer = desired + driftCorrection * (desired - boat.Velocity);
+
+        float targetHeading = HexProjection.Float2ToDegreesHeading(steer);
+        boat.Heading = Mathf.MoveTowardsAngle(boat.Heading, targetHeading, turnRate * deltaTime);
+        boat.Heading = Mathf.Repeat(boat.Heading, 360f);
+
+        float2 forward = Forward(boat.Heading);
+        float alignment = math.max(0f, math.dot(forward, math.normalizesafe(steer)));
+        float thrust = boat.Speed * forwardFriction;
+        boat.Velocity += forward * thrust * alignment * deltaTime;
+    }
+
+    private void ApplyFriction(ref BoatData boat, float deltaTime)
+    {
+        float2 forward = Forward(boat.Heading);
+        float2 right = new float2(forward.y, -forward.x);
+
+        float forwardSpeed = math.dot(boat.Velocity, forward);
+        float sidewaysSpeed = math.dot(boat.Velocity, right);
+
+        forwardSpeed *= 1f - math.min(forwardFriction * deltaTime, 1f);
+        sidewaysSpeed *= 1f - math.min(sidewaysFriction * deltaTime, 1f);
+
+        boat.Velocity = forward * forwardSpeed + right * sidewaysSpeed;
+    }
+
+
+
+    private static float2 Forward(float heading)
+    {
+        return HexProjection.DegreesHeadingToFloat2(heading);
     }
 
     private HexCoord? TargetCoordAt(float2 pos)

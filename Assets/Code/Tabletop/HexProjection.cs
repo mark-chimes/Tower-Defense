@@ -39,6 +39,13 @@ public static class HexProjection
         return math.degrees(math.atan2(f2.x, f2.y));
     }
 
+    public static float2 DegreesHeadingToFloat2(float heading)
+    {
+        float rads = math.radians(heading);
+        math.sincos(rads, out float s, out float c);
+        return new float2(s,c);
+    }
+
     public static Quaternion CompassToQuaternion(HexCompass dir)
     {
         if (dir == HexCompass.NONE) { throw new ArgumentOutOfRangeException(nameof(dir)); }
