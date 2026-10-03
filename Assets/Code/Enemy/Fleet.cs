@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Fleet
@@ -50,6 +51,7 @@ public class Fleet
         BoatCount++;
         Vector2 startPosition = HexProjection.CoordsToVector2(spawnCoord);
         boats[slot] = NewBoat(startPosition);
+        FaceNextPos(ref boats[slot]);
         return slot;
     }
 
@@ -79,8 +81,9 @@ public class Fleet
     {
         for (int i = 0; i < boats.Length; i++)
         {
-            if (!IsAlive(i)) continue;
+            if (boats[i].State != BoatState.Idle) continue;
             boats[i].State = BoatState.Moving;
+            FaceNextPos(ref boats[i]);
         }
     }
 
@@ -101,14 +104,11 @@ public class Fleet
 
             ref BoatData boat = ref boats[i];
             Vector2 pos = boat.Position;
-            HexCoord coord = HexProjection.WorldToCoords(pos.x, pos.y);
 
-            if (!treasureMap.Contains(coord) || treasureMap.IsLand(coord)) continue;
-            HexCompass dir = treasureMap.DirectionAt(coord);
-            if (dir == HexCompass.NONE) continue;
+            HexCoord? targetCoord = TargetCoordAt(pos);
+            if (targetCoord == null) continue;
 
-            HexCoord targetCoord = coord.InDirection(dir);
-            Vector2 target = HexProjection.CoordsToVector2(targetCoord);
+            Vector2 target = HexProjection.CoordsToVector2(targetCoord.Value);
             Vector2 toTarget = target - boat.Position;
             float targetHeading = HexProjection.Vector2ToDegreesHeading(toTarget);
             boat.Heading = Mathf.MoveTowardsAngle(boat.Heading, targetHeading, turnRate * deltaTime);
@@ -118,5 +118,23 @@ public class Fleet
             boat.Velocity = new Vector2(Mathf.Sin(rads), Mathf.Cos(rads)) * boat.Speed;
             boat.Position += boat.Velocity * deltaTime;
         }
+    }
+
+    private HexCoord? TargetCoordAt(Vector2 pos)
+    {
+        HexCoord coord = HexProjection.WorldToCoords(pos.x, pos.y);
+        if (!treasureMap.Contains(coord) || treasureMap.IsLand(coord)) return null;
+        HexCompass dir = treasureMap.DirectionAt(coord);
+        if (dir == HexCompass.NONE) return null;
+        HexCoord targetCoord = coord.InDirection(dir);
+        return targetCoord;
+    }
+
+    private void FaceNextPos(ref BoatData boat)
+    {
+        HexCoord? targetCoord = TargetCoordAt(boat.Position);
+        if (targetCoord == null) return;
+        Vector2 nextPos = HexProjection.CoordsToVector2(targetCoord.Value);
+        boat.Heading = HexProjection.Vector2ToDegreesHeading(nextPos - boat.Position);
     }
 }
