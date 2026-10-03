@@ -9,7 +9,7 @@ public class Fleet
     private float forwardFriction = 2f;
     private float sidewaysFriction = 10f;
 
-    // How much the boat aims beyond its target
+    // over-steer, how much the boat aims beyond its target
     private float driftCorrection = 0.5f;
 
     private float startSpeed = 10f; // meters per second
@@ -168,18 +168,41 @@ public class Fleet
         HexCoord? targetCoord = TargetCoordAt(boat.Position);
         if (targetCoord == null) return;
 
-        float2 target = HexProjection.CoordsToFloat2(targetCoord.Value);
-        float2 desired = math.normalizesafe(target - boat.Position) * boat.Speed;
-        float2 steer = desired + driftCorrection * (desired - boat.Velocity);
+        float2 targetPos = HexProjection.CoordsToFloat2(targetCoord.Value);
 
-        float targetHeading = HexProjection.Float2ToDegreesHeading(steer);
-        boat.Heading = Mathf.MoveTowardsAngle(boat.Heading, targetHeading, turnRate * deltaTime);
+        // the vector defining how we actually want to move
+        float2 desiredShift = math.normalizesafe(targetPos - boat.Position) * boat.Speed;
+
+        // we aim PAST it, based on the difference between how we want to move and how we actually move.
+        float2 overSteer = driftCorrection * (desiredShift - boat.Velocity);
+
+        // the heading we aim for, with over-steer driftCorrection
+        // aim past the target, against the drift (desired minus actual motion)
+        float2 correctedShift = desiredShift + overSteer;
+        float correctedHeading = HexProjection.Float2ToDegreesHeading(correctedShift);
+
+        // We can only turn towards our target heading 
+        boat.Heading = Mathf.MoveTowardsAngle(boat.Heading, correctedHeading, turnRate * deltaTime);
+
+        // neaten the angle (not necessary)
         boat.Heading = Mathf.Repeat(boat.Heading, 360f);
 
+        // get the forward shift as a normalized float2 ("vector")
         float2 forward = Forward(boat.Heading);
-        float alignment = math.max(0f, math.dot(forward, math.normalizesafe(steer)));
+
+        // after adjusting its heading, how far is the boat still "on-target" with its targeted direction?
+        // how well the bow points where we want to go: 1 = exactly, 0 = sideways or worse
+        float alignment = math.dot(forward, math.normalizesafe(correctedShift));
+        // If we are off-target, we don't go as fast, so that we can steer back more easily
+        float throttle = math.max(0f, alignment);
+
+        // calculated so that speeding-up gets cancelled out by friction based on speed
         float thrust = boat.Speed * forwardFriction;
-        boat.Velocity += forward * thrust * alignment * deltaTime;
+
+        // "change in velocity = acceleration × time", applied for one step
+        // push along the bow: add this step's speed gain (thrust × throttle × dt)
+        float2 acceleration = forward * thrust * throttle;
+        boat.Velocity += acceleration * deltaTime;
     }
 
     private void ApplyFriction(ref BoatData boat, float deltaTime)
