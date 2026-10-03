@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using Unity.Mathematics;
 
 public static class HexProjection
 {
@@ -17,19 +18,19 @@ public static class HexProjection
         return new Vector3(posX, 0f, posZ);
     }
 
-    public static Vector3 Vector2ToWorld(Vector2 pos) => new Vector3(pos.x, 0f, pos.y);
+    public static Vector3 Float2ToWorld(float2 pos) => new Vector3(pos.x, 0f, pos.y);
 
-    public static Vector2 CoordsToVector2(HexCoord coord)
+    public static float2 CoordsToFloat2(HexCoord coord)
     {
         Vector3 worldPos = CoordsToWorld(coord);
-        return new Vector2(worldPos.x, worldPos.z);
+        return new float2(worldPos.x, worldPos.z);
     }
 
     public static Vector3 CoordsToLandSurface(HexCoord coord) => CoordsToWorld(coord) + Vector3.up * LandSurfaceY;
 
-    public static Vector3 CompassToVector3(HexCompass dir) => CoordsToWorld(dir.Offset());
+    private static Vector3 CompassToVector3(HexCompass dir) => CoordsToWorld(dir.Offset());
 
-    public static Vector2 CompassToVector2(HexCompass dir) => CoordsToVector2(dir.Offset());
+    private static float2 CompassToFloat2(HexCompass dir) => CoordsToFloat2(dir.Offset());
 
     // public static float CompasstoDegreesHeading(HexCompass dir) => dir switch
     // {
@@ -45,18 +46,16 @@ public static class HexProjection
 
     public static float CompasstoDegreesHeading(HexCompass dir)
     {
-        var v = CompassToVector2(dir);
-        return Vector2ToDegreesHeading(v);
+        var v = CompassToFloat2(dir);
+        return Float2ToDegreesHeading(v);
     }
 
     // 4. Later, in the smoothing step: 
     // the target angle is Mathf.Atan2(dx, dz) * Mathf.Rad2Deg, with dx first.
-    public static float Vector2ToDegreesHeading(Vector2 v)
+    public static float Float2ToDegreesHeading(float2 f2)
     {
-        return Mathf.Atan2(v.x, v.y) * Mathf.Rad2Deg;
+        return Mathf.Atan2(f2.x, f2.y) * Mathf.Rad2Deg;
     }
-
-
 
     public static Quaternion CompassToQuaternion(HexCompass dir)
     {
@@ -69,9 +68,9 @@ public static class HexProjection
         return Quaternion.LookRotation(vector3, Vector3.up);
     }
 
-    public static Quaternion Vector2ToQuaternion(Vector2 vector2)
+    public static Quaternion Float2ToQuaternion(float2 f2)
     {
-        return Vector3ToQuaternion(new Vector3(vector2.x, 0f, vector2.y));
+        return Vector3ToQuaternion(new Vector3(f2.x, 0f, f2.y));
     }
 
     public static Quaternion DegreesToQuaternion(float degrees) => Quaternion.Euler(0f, degrees, 0f);
