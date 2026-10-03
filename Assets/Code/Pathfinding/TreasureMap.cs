@@ -10,22 +10,18 @@ public class TreasureMap
     public readonly HexCoord SpawnCoord;
     public readonly HexCoord GoalCoord;
 
-    private readonly Action onPathfindingUpdate;
-    private readonly Action onPathfindingClear;
     private readonly Action<HexCoord> onTerrainChange;
 
 
     private Wayfinder wayfinder;
 
     public TreasureMap(Lattice<bool> landMap, HexCoord spawnCoord, HexCoord goalCoord, bool isStopOnPathFound,
-    Action onPathfindingUpdate, Action onPathfindingClear, Action<HexCoord> onTerrainChange)
+        Action<HexCoord> onTerrainChange)
     {
         this.landMap = landMap;
         SpawnCoord = spawnCoord;
         GoalCoord = goalCoord;
         RecreateWayfinder(isStopOnPathFound);
-        this.onPathfindingUpdate = onPathfindingUpdate;
-        this.onPathfindingClear = onPathfindingClear;
         this.onTerrainChange = onTerrainChange;
     }
 
@@ -57,17 +53,15 @@ public class TreasureMap
     {
         wayfinder.ClearField();
         wayfinder.ComputeFlow();
-        onPathfindingUpdate.Invoke();
     }
 
     // External functions can assume internal functions will call this if they have to
     public void ClearField()
     {
         wayfinder.ClearField();
-        onPathfindingClear.Invoke();
     }
 
-    public HexCompass DirectionAt(HexCoord coord) 
+    public HexCompass DirectionAt(HexCoord coord)
     {
         return FlowAt(coord).DirToGoal;
     }
@@ -82,7 +76,7 @@ public class TreasureMap
         return wayfinder.Flows();
     }
 
-    public void SetLand(HexCoord c, bool isLand) 
+    public void SetLand(HexCoord c, bool isLand)
     {
         landMap.SetAt(c, isLand);
         onTerrainChange.Invoke(c);

@@ -61,7 +61,7 @@ public class Fleet
     {
         BoatData boat = new BoatData();
         boat.Position = startPosition;
-        boat.Velocity = new float2(0, 0);
+        boat.Velocity = float2.zero;
         boat.Heading = 0;
         boat.Speed = startSpeed;
         boat.Radius = collisionRadius;

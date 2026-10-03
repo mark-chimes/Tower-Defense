@@ -14,6 +14,9 @@ public class DebugGUI : MonoBehaviour
     private Action save;
     private Action load;
 
+    private Func<bool> isSimRunning;
+    private Action<bool> setSimRunning;
+
 
     bool visualizeDistanceEnabled = true;
     bool wasVisualizeDistanceEnabled = true;
@@ -29,7 +32,9 @@ public class DebugGUI : MonoBehaviour
         EnemyController enemyController, // TODO remove reference
         TowerController towerController,
         Action save,
-        Action load
+        Action load,
+        Func<bool> isSimRunning,
+        Action<bool> setSimRunning
         )
     {
         visualizeDistanceEnabled = visualization.ShowDistance;
@@ -46,6 +51,8 @@ public class DebugGUI : MonoBehaviour
         this.towerController = towerController;
         this.save = save;
         this.load = load;
+        this.isSimRunning = isSimRunning;
+        this.setSimRunning = setSimRunning;
     }
 
 
@@ -233,19 +240,27 @@ public class DebugGUI : MonoBehaviour
         // On right-side 
         GUILayout.BeginArea(new Rect(Screen.width - boxWidth - margin, margin, boxWidth, Screen.height));
         DrawBuildingControls();
+
+        DrawSimRunningControls();
+
         GUILayout.EndArea();
 
 
     }
 
+    int spacing = 5;
+
     private void DrawUsefulControls()
     {
         BeginSection("USEFUL");
 
+        Toggle("Sim running", isSimRunning(), setSimRunning);
+        GUILayout.Space(spacing);
+
         Toggle("Auto-Refresh", flowBridge.IsAutoRefreshMode,
             flowBridge.SetAutoRefreshMode);
 
-        Toggle("Auto-Refresh", visualizePathfindingEnabled,
+        Toggle("Pathfinding Arrows", visualizePathfindingEnabled,
             value => { visualizePathfindingEnabled = value; flowBridge.SetVisualizationVisible(value); });
 
         Toggle("Boats follow path on spawn", enemyController.BoatsFollowPathOnSpawn,
@@ -257,46 +272,8 @@ public class DebugGUI : MonoBehaviour
 
         EndSection();
     }
-
-
-    // bool isAutoRefreshWanted = GUI.Toggle(rect, flowBridge.IsAutoRefreshMode, "Auto-Refresh");
-    // if (isAutoRefreshWanted != flowBridge.IsAutoRefreshMode) flowBridge.SetAutoRefreshMode(isAutoRefreshWanted);
-    // usefulVisY += yBetweenButtons;
-
-    // visualizePathfindingEnabled = GUI.Toggle(new Rect(buttonX, usefulVisY, buttonWidth, buttonHeight), visualizePathfindingEnabled, "Pathfinding Arrows");
-    // if (wasVisualizePathfindingEnabled != visualizePathfindingEnabled)
-    // {
-    //     wasVisualizePathfindingEnabled = visualizePathfindingEnabled;
-    //     flowBridge.SetVisualizationVisible(visualizePathfindingEnabled);
-    // }
-    // usefulVisY += yBetweenButtons;
-
-    // bool wantedFollow = GUI.Toggle(new Rect(buttonX, usefulVisY, buttonWidth, buttonHeight), enemyController.BoatsFollowPathOnSpawn,
-    //     "Boats follow path on spawn");
-    // if (wantedFollow != enemyController.BoatsFollowPathOnSpawn) enemyController.BoatsFollowPathOnSpawn = wantedFollow;
-    // usefulVisY += yBetweenButtons;
-
-    // if (GUI.Button(new Rect(buttonX, usefulVisY, buttonWidth, buttonHeight), "Follow existing path"))
-    // {
-    //     Debug.Log("Follow existing path pressed");
-    //     enemyController.OnBoatsFollowExistingPathPressed();
-    // }
-    // usefulVisY += yBetweenButtons;
-
-    // if (GUI.Button(new Rect(buttonX, usefulVisY, buttonWidth, buttonHeight), "Spawn Boat"))
-    // {
-    //     Debug.Log("Spawn boats pressed");
-    //     enemyController.OnSpawnBoatPressed();
-    // }
-    // usefulVisY += yBetweenButtons;
-
-
-
-
-
     private void DrawBuildingControls()
     {
-        int spacing = 10;
         BeginSection("Building");
 
         string[] buildModeLabels = { "Land", "Tower" };
@@ -312,6 +289,12 @@ public class DebugGUI : MonoBehaviour
         GUILayout.Space(spacing);
 
         Button("Remove All Towers", towerController.RemoveAllTowers);
+        EndSection();
+    }
+
+    private void DrawSimRunningControls()
+    {
+        BeginSection("SIM");
         EndSection();
     }
 

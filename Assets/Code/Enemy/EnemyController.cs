@@ -82,22 +82,11 @@ public class EnemyController : MonoBehaviour
             Debug.LogWarning("Fleet size reached. Unable to spawn new enemy.");
             return;
         }
-        // Should the spawn button handler and the GameMaster startup call pass treasureMap.SpawnCoord?
         int slot = fleet.Spawn(treasureMap.SpawnCoord, BoatsFollowPathOnSpawn);
         Boat boat = Instantiate(boatPrefab, transform);
         Vector3 pos = Position3DOf(slot);
         boat.transform.localPosition = pos;
         boat.name = $"Boat";
         boats[slot] = boat;
-    }
-
-    public void PathfindingUpdate()
-    {
-        // TODO: implement or move
-    }
-
-    public void PathfindingClear()
-    {
-        // TODO: implement or move
     }
 }

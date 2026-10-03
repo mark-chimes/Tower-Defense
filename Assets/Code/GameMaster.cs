@@ -131,8 +131,6 @@ public class GameMaster : MonoBehaviour
 
         treasureMap = new TreasureMap(landMap, spawnPos, goalPos,
                 StartingIsStopOnPathFound,
-                enemyController.PathfindingUpdate,
-                enemyController.PathfindingClear,
                 flowBridge.OnTerrainChange
             );
 
@@ -148,8 +146,6 @@ public class GameMaster : MonoBehaviour
             treasureMap.SpawnCoord,
             treasureMap.GoalCoord,
             StartingIsStopOnPathFound,
-            enemyController.PathfindingUpdate,
-            enemyController.PathfindingClear,
             flowBridge.OnTerrainChange
             );
         CreateMapFromTreasureMap(treasureMap, StartingVisualization);
@@ -176,6 +172,6 @@ public class GameMaster : MonoBehaviour
 
         boardInput = new BoardInput(treasureMap, Camera.main, towerController);
         gui.Initialize(StartingVisualization, StartingIsStopOnPathFound,
-            boardInput, flowBridge, enemyController, towerController, Save, Load);
+            boardInput, flowBridge, enemyController, towerController, Save, Load, () => isSimRunning, b => isSimRunning=b);
     }
 }

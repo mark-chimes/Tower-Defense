@@ -12,8 +12,6 @@ public static class HexProjection
     // large diamater / diagonal 
     public const float LandSurfaceY = 1f;
 
-    public const float SqrClose = 0.01f; // TODO what's a good value here? 
-
     public static Vector3 CoordsToWorld(HexCoord coord)
     {
         float posX = CellWidth * coord.Q + CellWidth / 2f * coord.R; // Horizontal spacing W
@@ -32,26 +30,6 @@ public static class HexProjection
     public static Vector3 CoordsToLandSurface(HexCoord coord) => CoordsToWorld(coord) + Vector3.up * LandSurfaceY;
 
     private static Vector3 CompassToVector3(HexCompass dir) => CoordsToWorld(dir.Offset());
-
-    private static float2 CompassToFloat2(HexCompass dir) => CoordsToFloat2(dir.Offset());
-
-    // public static float CompasstoDegreesHeading(HexCompass dir) => dir switch
-    // {
-    //     HexCompass.E => 90f,
-    //     HexCompass.NE => 30f,
-    //     HexCompass.NW => 330f,
-    //     HexCompass.W => 270f,
-    //     HexCompass.SW => 210f,
-    //     HexCompass.SE => 150f,
-    //     _ => throw new ArgumentOutOfRangeException(nameof(dir)),
-
-    // };
-
-    public static float CompasstoDegreesHeading(HexCompass dir)
-    {
-        var v = CompassToFloat2(dir);
-        return Float2ToDegreesHeading(v);
-    }
 
     // 4. Later, in the smoothing step: 
     // the target angle is something like Mathf.Atan2(dx, dz) * Mathf.Rad2Deg, with dx first
@@ -72,17 +50,7 @@ public static class HexProjection
         return Quaternion.LookRotation(vector3, Vector3.up);
     }
 
-    public static Quaternion Float2ToQuaternion(float2 f2)
-    {
-        return Vector3ToQuaternion(new Vector3(f2.x, 0f, f2.y));
-    }
-
     public static Quaternion DegreesToQuaternion(float degrees) => Quaternion.Euler(0f, degrees, 0f);
-
-    public static bool AreVector3Close(Vector3 first, Vector3 second)
-    {
-        return (first - second).sqrMagnitude <= SqrClose;
-    }
 
     // See https://www.redblobgames.com/grids/hexagons/#pixel-to-hex
     public static HexCoord WorldToCoords(float x, float z)
