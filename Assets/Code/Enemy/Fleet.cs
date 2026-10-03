@@ -8,6 +8,8 @@ public class Fleet
     private float startSpeed = 10f; // meters per second
     private float collisionRadius = 2.5f; // meters
 
+    public bool DespawnsAtGoal { get; set; } = false;
+
     private struct BoatData
     {
         public float2 Position; // meters
@@ -122,6 +124,13 @@ public class Fleet
     {
         for (int i = 0; i < SlotsUsed; i++)
         {
+            if (!IsAlive(i)) continue;
+            if (DespawnsAtGoal && IsAtGoal(boats[i].Position))
+            {
+                DespawnIfPossible(i);
+                continue;
+            }
+
             if (boats[i].State != BoatState.Moving) continue;
 
             ref BoatData boat = ref boats[i];
@@ -151,6 +160,11 @@ public class Fleet
         if (dir == HexCompass.NONE) return null;
         HexCoord targetCoord = coord.InDirection(dir);
         return targetCoord;
+    }
+
+    private bool IsAtGoal(float2 pos)
+    {
+        return HexProjection.WorldToCoords(pos.x, pos.y) == treasureMap.GoalCoord;
     }
 
     private void FaceNextPos(ref BoatData boat)

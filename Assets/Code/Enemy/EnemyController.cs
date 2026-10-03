@@ -14,6 +14,7 @@ public class EnemyController : MonoBehaviour
 
     public bool BoatsFollowPathOnSpawn { get; set; } = true;
 
+    public bool BoatsDespawnAtGoal { get => fleet.DespawnsAtGoal; set => fleet.DespawnsAtGoal = value; }
 
 
     private bool isInitialized;

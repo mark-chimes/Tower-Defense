@@ -10,7 +10,6 @@ public class DebugGUI : MonoBehaviour
     private BoardInput boardInput;
     private TowerController towerController;
 
-
     private Action save;
     private Action load;
 
@@ -241,7 +240,7 @@ public class DebugGUI : MonoBehaviour
         GUILayout.BeginArea(new Rect(Screen.width - boxWidth - margin, margin, boxWidth, Screen.height));
         DrawBuildingControls();
 
-        DrawSimRunningControls();
+        DrawNewControls();
 
         GUILayout.EndArea();
 
@@ -292,9 +291,12 @@ public class DebugGUI : MonoBehaviour
         EndSection();
     }
 
-    private void DrawSimRunningControls()
+    private void DrawNewControls()
     {
-        BeginSection("SIM");
+        BeginSection("New");
+        Toggle("Boats despawn at goal",
+            enemyController.BoatsDespawnAtGoal,
+            value => enemyController.BoatsDespawnAtGoal = value);
         EndSection();
     }
 
