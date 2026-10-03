@@ -48,13 +48,16 @@ public class DebugGUI : MonoBehaviour
     }
 
 
+    private const int boxBuffer = 10;
+    private const int boxWidth = 210;
+
+    private const int margin = 10;
+
 
 
     void OnGUI()
     {
-        int boxBuffer = 10;
         int leftBoxX = 10;
-        int boxWidth = 210;
         int leftButtonX = leftBoxX + boxBuffer;
         int rightBoxX = Screen.width - boxWidth - leftBoxX;
         int rightButtonX = rightBoxX + boxBuffer;
@@ -86,11 +89,6 @@ public class DebugGUI : MonoBehaviour
         int guiSaveLoadY = guiBoatEnd + yBetweenButtons + boxBuffer;
         int guiSaveLoadHeight = (numSaveLoadControls + 2) * yBetweenButtons + boxBuffer;
         int guiSaveLoadEnd = guiSaveLoadY + guiSaveLoadHeight;
-
-        int numBuildingControls = 3;
-        int guiBuildingY = guiSaveLoadEnd + yBetweenButtons + boxBuffer;
-        int guiBuildingHeight = (numBuildingControls + 2) * yBetweenBuildingButtons + boxBuffer;
-        int guiBuildingEnd = guiBuildingY + guiBuildingHeight;
 
         GUI.Box(new Rect(boxX, usefulVisY, boxWidth, usefulVisHeight), "USEFUL");
         usefulVisY += yBetweenButtons + boxBuffer;
@@ -262,36 +260,61 @@ public class DebugGUI : MonoBehaviour
 
         // // === //
         // On right-side 
-
-        boxX = rightBoxX;
-        buttonX = rightButtonX;
-        guiBuildingY = yBetweenBuildingButtons + boxBuffer;
-
-        GUI.Box(new Rect(boxX, guiBuildingY, boxWidth, guiBuildingHeight),
-            "Building");
-        guiBuildingY += yBetweenBuildingButtons;
-
-        string[] buildModeLabels = { "Land", "Tower" };
-        int current = (int)boardInput.BuildMode;
-        int selected = GUI.Toolbar(new Rect(buttonX, guiBuildingY, buttonWidth, buttonHeight), current, buildModeLabels);
-        if (selected != current) boardInput.SetBuildMode((BoardInput.BuildType)selected);
-
-        guiBuildingY += yBetweenBuildingButtons;
-        bool wanted = GUI.Toggle(new Rect(buttonX, guiBuildingY, buttonWidth, buttonHeight), boardInput.DestroysTowerWithLand,
-            "Land removal destroys tower");
-        if (wanted != boardInput.DestroysTowerWithLand) boardInput.DestroysTowerWithLand = wanted;
-
-        guiBuildingY += yBetweenBuildingButtons;
-
-        if (GUI.Button(new Rect(buttonX, guiBuildingY, buttonWidth, buttonHeight),
-            "Remove All Towers"))
-        {
-            Debug.Log("Remove All Towers pressed");
-            towerController.RemoveAllTowers();
-        }
-
-        guiBuildingY += yBetweenBuildingButtons;
+        GUILayout.BeginArea(new Rect(Screen.width - boxWidth - margin, margin, boxWidth, Screen.height));
+        DrawBuildingControls();
+        GUILayout.EndArea();
 
 
     }
+
+    private void DrawBuildingControls()
+    {
+        int spacing = 10;
+        BeginSection("Building");
+
+
+        string[] buildModeLabels = { "Land", "Tower" };
+        int current = (int)boardInput.BuildMode;
+        int selected = GUILayout.Toolbar(current, buildModeLabels);
+        if (selected != current) boardInput.SetBuildMode((BoardInput.BuildType)selected);
+
+        GUILayout.Space(spacing);
+
+        Toggle("Land removal destroys tower", boardInput.DestroysTowerWithLand,
+            value => boardInput.DestroysTowerWithLand = value);
+
+        GUILayout.Space(spacing);
+
+        Button("Remove All Towers", towerController.RemoveAllTowers);
+        EndSection();
+    }
+
+    private void BeginSection(string title)
+    {
+        GUILayout.BeginVertical("box");
+        GUILayout.Label(title);
+    }
+
+    private void EndSection()
+    {
+        GUILayout.EndVertical();
+        GUILayout.Space(boxBuffer);
+    }
+
+    private void Button(string label, Action onClick)
+    {
+        if (GUILayout.Button(label))
+        {
+            Debug.Log($"{label} pressed");
+            onClick.Invoke();
+        }
+    }
+
+
+    private void Toggle(string label, bool current, Action<bool> onChanged)
+    {
+        bool wanted = GUILayout.Toggle(current, label);
+        if (wanted != current) onChanged(wanted);
+    }
 }
+
