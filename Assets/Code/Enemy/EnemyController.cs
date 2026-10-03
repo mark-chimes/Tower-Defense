@@ -43,13 +43,15 @@ public class EnemyController : MonoBehaviour
 
     public void SyncBoats()
     {
-        // TODO should this be on fleet.Count?
-        for (int i = 0; i < boats.Length; i++)
+        for (int i = 0; i < fleet.SlotsUsed; i++)
         {
-            if (!fleet.IsAlive(i)) continue;
+            bool isAlive = fleet.IsAlive(i);
+            if (boats[i].gameObject.activeSelf != isAlive)
+                boats[i].gameObject.SetActive(isAlive);
+            if (!isAlive) continue;
+
             boats[i].transform.localPosition = Position3DOf(i);
             boats[i].transform.localRotation = HexProjection.DegreesToQuaternion(fleet.HeadingOf(i));
-            // TODO set visibility here? 
         }
     }
 
@@ -62,7 +64,7 @@ public class EnemyController : MonoBehaviour
 
     public void OnDeleteBoatsPressed()
     {
-        // TODO implement or remove
+        fleet.DespawnAll();
     }
 
     public void OnBoatsFollowExistingPathPressed()
@@ -83,10 +85,12 @@ public class EnemyController : MonoBehaviour
             return;
         }
         int slot = fleet.Spawn(treasureMap.SpawnCoord, BoatsFollowPathOnSpawn);
-        Boat boat = Instantiate(boatPrefab, transform);
+
+        if (boats[slot] == null) boats[slot] = Instantiate(boatPrefab, transform);
+
+        Boat boat = boats[slot];
         Vector3 pos = Position3DOf(slot);
         boat.transform.localPosition = pos;
-        boat.name = $"Boat";
-        boats[slot] = boat;
+        boat.name = $"Boat_{slot}";
     }
 }

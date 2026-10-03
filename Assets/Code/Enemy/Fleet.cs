@@ -22,7 +22,7 @@ public class Fleet
 
     private enum BoatState
     {
-        Dead, Idle, Moving
+        Dead, Idle, Moving // keep Dead as first member: assumed as default value
     }
 
     private BoatData[] boats;
@@ -30,12 +30,14 @@ public class Fleet
     private TreasureMap treasureMap;
 
     public int BoatCount { get; private set; }
+    public int SlotsUsed { get; private set; }
 
     public Fleet(TreasureMap treasureMap, int capacity)
     {
         this.treasureMap = treasureMap;
         boats = new BoatData[capacity];
         BoatCount = 0;
+        SlotsUsed = 0;
     }
 
     public bool CanSpawn()
@@ -43,18 +45,38 @@ public class Fleet
         return BoatCount < boats.Length;
     }
 
+    public bool CanDespawn(int slot)
+    {
+        return slot >= 0 && slot < SlotsUsed && IsAlive(slot);
+    }
+
     public int Spawn(HexCoord spawnCoord, bool shouldStart)
     {
-        Debug.Assert(CanSpawn());
         if (!CanSpawn()) return -1;
-        int slot = BoatCount;
+        int slot = FirstDeadSlot();
         BoatCount++;
+        if (slot >= SlotsUsed) SlotsUsed++;
         float2 startPosition = HexProjection.CoordsToFloat2(spawnCoord);
         BoatData newBoat = NewBoat(startPosition);
         FaceNextPos(ref newBoat);
         if (shouldStart) newBoat.State = BoatState.Moving;
         boats[slot] = newBoat;
         return slot;
+    }
+
+    public void DespawnIfPossible(int slot)
+    {
+        if (!CanDespawn(slot)) return;
+        boats[slot].State = BoatState.Dead;
+        BoatCount--;
+    }
+
+    public void DespawnAll()
+    {
+        for (int i = 0; i < SlotsUsed; i++)
+        {
+            DespawnIfPossible(i);
+        }
     }
 
     private BoatData NewBoat(float2 startPosition)
@@ -72,14 +94,14 @@ public class Fleet
     public int Capacity() => boats.Length;
 
     public float2 PositionOf(int slot) => boats[slot].Position;
-    
+
     public float HeadingOf(int slot) => boats[slot].Heading;
 
     public bool IsAlive(int slot) => boats[slot].State != BoatState.Dead;
 
     public void StartAll()
     {
-        for (int i = 0; i < boats.Length; i++)
+        for (int i = 0; i < SlotsUsed; i++)
         {
             if (boats[i].State != BoatState.Idle) continue;
             boats[i].State = BoatState.Moving;
@@ -89,7 +111,7 @@ public class Fleet
 
     public void StopAll()
     {
-        for (int i = 0; i < boats.Length; i++)
+        for (int i = 0; i < SlotsUsed; i++)
         {
             if (!IsAlive(i)) continue;
             boats[i].State = BoatState.Idle;
@@ -98,7 +120,7 @@ public class Fleet
 
     public void StepDt(float deltaTime)
     {
-        for (int i = 0; i < boats.Length; i++)
+        for (int i = 0; i < SlotsUsed; i++)
         {
             if (boats[i].State != BoatState.Moving) continue;
 
@@ -137,5 +159,14 @@ public class Fleet
         if (targetCoord == null) return;
         float2 nextPos = HexProjection.CoordsToFloat2(targetCoord.Value);
         boat.Heading = HexProjection.Float2ToDegreesHeading(nextPos - boat.Position);
+    }
+
+    private int FirstDeadSlot()
+    {
+        for (int i = 0; i < boats.Length; i++)
+        {
+            if (boats[i].State == BoatState.Dead) return i;
+        }
+        return -1;
     }
 }
