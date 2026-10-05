@@ -2,6 +2,10 @@ using Unity.Mathematics;
 using UnityEngine;
 using Random = Unity.Mathematics.Random;
 
+// See Steering Behaviors For Autonomous Characters
+// https://www.red3d.com/cwr/steer/gdc99/
+// For some ideas, although I do not implement things exactly as in there?
+
 public class Fleet
 {
 
@@ -21,6 +25,7 @@ public class Fleet
     // 0 means no correction, boat tries to aim directly at target
     // at a high value, the boat will over-correct, snaking back and forth
     // can be higher than 1
+    // See https://en.wikipedia.org/wiki/Proportional_control
     private float driftCorrectionGain = 0.5f;
 
     private float topSpeed = 10f; // meters per second
@@ -28,6 +33,8 @@ public class Fleet
     // TODO use the collision radius
     // private float collisionRadius = 2.5f; // meters
     /****************************************/
+
+
 
 
     private float maxSpawnOffset = 2f; // meters
@@ -153,6 +160,7 @@ public class Fleet
         }
     }
 
+    // A single step of the simulation
     public void StepDt(float deltaTime)
     {
         for (int i = 0; i < SlotsUsed; i++)
@@ -172,6 +180,7 @@ public class Fleet
         }
     }
 
+    // How the boat chooses to move. Aim is where it would point if it could choose, throttle is how fast
     private (float2 aim, float throttle) Controls(in BoatData boat)
     {
         float2 aim;
@@ -194,14 +203,10 @@ public class Fleet
         return (aim, throttle);
     }
 
-    private void MoveBoat(ref BoatData boat, float deltaTime, float2 aim, float throttle)
+    // normalized vector, forward direction based on heading angle
+    private static float2 Forward(float heading)
     {
-        boat.Heading = Turn(aim, boat.Heading, turnRate, deltaTime);
-        float2 forward = Forward(boat.Heading);
-        float2 acceleration = Acceleration(forward, throttle, forwardFriction, topSpeed);
-        boat.Velocity += acceleration * deltaTime;
-        ApplyFriction(ref boat, deltaTime);
-        boat.Position += boat.Velocity * deltaTime;
+        return HexProjection.DegreesHeadingToFloat2(heading);
     }
 
     // Boat over-aims slightly using the drift correction gain to correct for sideways-drift
@@ -210,14 +215,6 @@ public class Fleet
         float2 desiredVelocity = math.normalizesafe(targetPos - position) * topSpeed;
         float2 aimOffset = driftCorrectionGain * (desiredVelocity - velocity);
         return math.normalizesafe(desiredVelocity + aimOffset);
-    }
-
-    // Calculates where the boat will turn based on where it's trying to aim
-    private float Turn(float2 aim, float oldHeading, float turnRate, float deltaTime)
-    {
-        float aimHeading = HexProjection.Float2ToDegreesHeading(aim);
-        float newHeading = Mathf.MoveTowardsAngle(oldHeading, aimHeading, turnRate * deltaTime);
-        return Mathf.Repeat(newHeading, 360f);        // neaten the angle (not necessary)
     }
 
     // calculates an under-thrust (throttle) to make up for being off-target
@@ -235,6 +232,27 @@ public class Fleet
         // since a slower boat turns tighter 
         // max value of 1
         return math.max(0f, alignment);
+    }
+
+
+    // Update boat's heading, position, velocity, etc. based on the passed-in controls
+    private void MoveBoat(ref BoatData boat, float deltaTime, float2 aim, float throttle)
+    {
+        boat.Heading = Turn(aim, boat.Heading, turnRate, deltaTime);
+        float2 forward = Forward(boat.Heading);
+        float2 acceleration = Acceleration(forward, throttle, forwardFriction, topSpeed);
+        boat.Velocity += acceleration * deltaTime;
+        ApplyFriction(ref boat, deltaTime);
+        boat.Position += boat.Velocity * deltaTime;
+    }
+
+
+    // Calculates where the boat will turn based on where it's trying to aim
+    private float Turn(float2 aim, float oldHeading, float turnRate, float deltaTime)
+    {
+        float aimHeading = HexProjection.Float2ToDegreesHeading(aim);
+        float newHeading = Mathf.MoveTowardsAngle(oldHeading, aimHeading, turnRate * deltaTime);
+        return Mathf.Repeat(newHeading, 360f);        // neaten the angle (not necessary)
     }
 
     private float2 Acceleration(float2 forward, float throttle, float forwardFriction, float topSpeed)
@@ -262,12 +280,6 @@ public class Fleet
         boat.Velocity = forward * forwardSpeed + right * sidewaysSpeed;
     }
 
-    // normalized vector, forward direction based on heading angle
-    private static float2 Forward(float heading)
-    {
-        return HexProjection.DegreesHeadingToFloat2(heading);
-    }
-
     private void FaceNextPos(ref BoatData boat)
     {
         float2? targetPos = TargetPosAt(boat.Position);
@@ -285,7 +297,6 @@ public class Fleet
         HexCoord targetCoord = coord.InDirection(dir);
         return HexProjection.CoordsToFloat2(targetCoord);
     }
-
 
     private bool IsAtGoal(float2 pos)
     {
