@@ -161,7 +161,8 @@ public class Fleet
 
             ref BoatData boat = ref boats[i];
 
-            BoatDoesStuff(ref boat, deltaTime);
+            (float2 aim, float throttle) = Controls(boat);
+            MoveBoat(ref boat, deltaTime, aim, throttle);
 
             if (DespawnsAtGoal && IsAtGoal(boat.Position))
             {
@@ -171,13 +172,13 @@ public class Fleet
         }
     }
 
-    private void BoatDoesStuff(ref BoatData boat, float deltaTime)
+    private (float2 aim, float throttle) Controls(in BoatData boat)
     {
         float2 aim;
-        float2? targetPos = TargetPosAt(boat.Position);
         float throttle;
-        float2 forward = Forward(boat.Heading);
 
+        float2 forward = Forward(boat.Heading);
+        float2? targetPos = TargetPosAt(boat.Position);
 
         if (boat.State == BoatState.Moving && targetPos != null)
         {
@@ -190,8 +191,14 @@ public class Fleet
             throttle = 0;
         }
 
-        float2 acceleration = Acceleration(forward, throttle, forwardFriction, topSpeed);
+        return (aim, throttle);
+    }
+
+    private void MoveBoat(ref BoatData boat, float deltaTime, float2 aim, float throttle)
+    {
         boat.Heading = Turn(aim, boat.Heading, turnRate, deltaTime);
+        float2 forward = Forward(boat.Heading);
+        float2 acceleration = Acceleration(forward, throttle, forwardFriction, topSpeed);
         boat.Velocity += acceleration * deltaTime;
         ApplyFriction(ref boat, deltaTime);
         boat.Position += boat.Velocity * deltaTime;
