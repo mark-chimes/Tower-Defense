@@ -18,13 +18,15 @@ public class Fleet
     private float sidewaysFriction = 10f;
 
     // how much the boat aims beyond its target to correct for drift
-    // 0 means no correct, boat tries to aim directly at target
+    // 0 means no correction, boat tries to aim directly at target
     // at a high value, the boat will over-correct, snaking back and forth
     // can be higher than 1
     private float driftCorrectionGain = 0.5f;
 
     private float topSpeed = 10f; // meters per second
-    private float collisionRadius = 2.5f; // meters
+
+    // TODO use the collision radius
+    // private float collisionRadius = 2.5f; // meters
     /****************************************/
 
 
@@ -159,13 +161,9 @@ public class Fleet
 
             ref BoatData boat = ref boats[i];
 
-            if (boat.State == BoatState.Moving) SteerAndThrust(ref boat, deltaTime);
-            ApplyFriction(ref boat, deltaTime);
-            boat.Position += boat.Velocity * deltaTime;
+            BoatDoesStuff(ref boat, deltaTime);
 
-
-
-            if (DespawnsAtGoal && IsAtGoal(boats[i].Position))
+            if (DespawnsAtGoal && IsAtGoal(boat.Position))
             {
                 DespawnIfPossible(i);
                 // continue;
@@ -173,20 +171,30 @@ public class Fleet
         }
     }
 
-    // Aims the boat at the next target position from the flow field (treasure map)
-    // over-aims slightly using the drift correction gain because of sideways-drift
-    // Under-thrusts a bit if it is off target
-    // And calculates the boat's next movement in its current movement direction
-    private void SteerAndThrust(ref BoatData boat, float deltaTime)
+    private void BoatDoesStuff(ref BoatData boat, float deltaTime)
     {
+        float2 aim;
         float2? targetPos = TargetPosAt(boat.Position);
-        if (targetPos == null) return;
+        float throttle;
+        float2 forward = Forward(boat.Heading);
 
-        float2 aim = Aim(targetPos.Value, boat.Position, boat.Velocity, driftCorrectionGain, topSpeed);
+
+        if (boat.State == BoatState.Moving && targetPos != null)
+        {
+            aim = Aim(targetPos.Value, boat.Position, boat.Velocity, driftCorrectionGain, topSpeed);
+            throttle = Throttle(aim, forward);
+        }
+        else
+        {
+            aim = forward;
+            throttle = 0;
+        }
+
+        float2 acceleration = Acceleration(forward, throttle, forwardFriction, topSpeed);
         boat.Heading = Turn(aim, boat.Heading, turnRate, deltaTime);
-        float2 acceleration = Acceleration(aim, boat.Heading, forwardFriction, topSpeed);
-
         boat.Velocity += acceleration * deltaTime;
+        ApplyFriction(ref boat, deltaTime);
+        boat.Position += boat.Velocity * deltaTime;
     }
 
     // Boat over-aims slightly using the drift correction gain to correct for sideways-drift
@@ -198,7 +206,6 @@ public class Fleet
     }
 
     // Calculates where the boat will turn based on where it's trying to aim
-    // Maybe this should be an update method that runs on the boat
     private float Turn(float2 aim, float oldHeading, float turnRate, float deltaTime)
     {
         float aimHeading = HexProjection.Float2ToDegreesHeading(aim);
@@ -207,15 +214,12 @@ public class Fleet
     }
 
     // calculates an under-thrust (throttle) to make up for being off-target
-    // This particular algorithm uses normalized aim and calculates normalized forward vector
-    // from the heading, and then reduces thrust based on the dot-product of those.
-    // It's best suited for tighter turns 
-    private float2 Acceleration(float2 aim, float heading, float forwardFriction, float topSpeed)
+    // This particular algorithm uses normalized aim and normalized forward vector
+    // and to be used for reducing thrust based on the dot-product of those.
+    // It's best suited for tighter turns
+    // Higher throttle is faster acceleration 
+    private float Throttle(float2 aim, float2 forward)
     {
-        // normalized vector, forward direction based on heading
-        float2 forward = Forward(heading);
-
-        // after adjusting its heading, how far has the boat managed to get "on-target"?
         // how well the bow points where we want to go: 1 = exactly, 0 = perpendicular
         // dot(a, b) = |a| |b| cos(theta)
         float alignment = math.dot(forward, aim);
@@ -223,8 +227,11 @@ public class Fleet
         // If we are off-target, we don't go as fast, so that we can steer back more easily,
         // since a slower boat turns tighter 
         // max value of 1
-        float throttle = math.max(0f, alignment);
+        return math.max(0f, alignment);
+    }
 
+    private float2 Acceleration(float2 forward, float throttle, float forwardFriction, float topSpeed)
+    {
         // max acceleration; forward friction balances it exactly at topSpeed
         float maxAcceleration = topSpeed * forwardFriction;
 
