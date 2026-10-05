@@ -5,19 +5,30 @@ using Random = Unity.Mathematics.Random;
 public class Fleet
 {
 
+    /****************************************/
+    // These variables should go on some sort of "boat personality" 
+    // or "boat type" data, that can be referenced
     private float turnRate = 90f; // degrees per second
+
+    // friction slows down boat proportional to current speed
+    // so its units are "per-second"
+    // friction 2 /s means "lose 2x your speed per second".
     private float forwardFriction = 2f;
+
     private float sidewaysFriction = 10f;
 
-    // over-steer, how much the boat aims beyond its target
-    private float driftCorrection = 0.5f;
+    // how much the boat aims beyond its target to correct for drift
+    // 0 means no correct, boat tries to aim directly at target
+    // at a high value, the boat will over-correct, snaking back and forth
+    // can be higher than 1
+    private float driftCorrectionGain = 0.5f;
 
-    private float startSpeed = 10f; // meters per second
+    private float topSpeed = 10f; // meters per second
     private float collisionRadius = 2.5f; // meters
+    /****************************************/
+
+
     private float maxSpawnOffset = 2f; // meters
-
-
-
 
     private Random random;
     uint randomSeed = 1;
@@ -30,8 +41,6 @@ public class Fleet
         public float2 Velocity; // meters per second
 
         public float Heading; // degrees
-        public float Speed; // meters per second
-        public float Radius; // meters
 
         public BoatState State;
     }
@@ -111,8 +120,6 @@ public class Fleet
         boat.Position = startPosition;
         boat.Velocity = float2.zero;
         boat.Heading = 0;
-        boat.Speed = startSpeed;
-        boat.Radius = collisionRadius;
         boat.State = BoatState.Idle;
         return boat;
     }
@@ -149,60 +156,82 @@ public class Fleet
         for (int i = 0; i < SlotsUsed; i++)
         {
             if (!IsAlive(i)) continue;
-            if (DespawnsAtGoal && IsAtGoal(boats[i].Position))
-            {
-                DespawnIfPossible(i);
-                continue;
-            }
 
             ref BoatData boat = ref boats[i];
 
             if (boat.State == BoatState.Moving) SteerAndThrust(ref boat, deltaTime);
             ApplyFriction(ref boat, deltaTime);
             boat.Position += boat.Velocity * deltaTime;
+
+
+
+            if (DespawnsAtGoal && IsAtGoal(boats[i].Position))
+            {
+                DespawnIfPossible(i);
+                // continue;
+            }
         }
     }
 
+    // Aims the boat at the next target position from the flow field (treasure map)
+    // over-aims slightly using the drift correction gain because of sideways-drift
+    // Under-thrusts a bit if it is off target
+    // And calculates the boat's next movement in its current movement direction
     private void SteerAndThrust(ref BoatData boat, float deltaTime)
     {
-        HexCoord? targetCoord = TargetCoordAt(boat.Position);
-        if (targetCoord == null) return;
+        float2? targetPos = TargetPosAt(boat.Position);
+        if (targetPos == null) return;
 
-        float2 targetPos = HexProjection.CoordsToFloat2(targetCoord.Value);
+        float2 aim = Aim(targetPos.Value, boat.Position, boat.Velocity, driftCorrectionGain, topSpeed);
+        boat.Heading = Turn(aim, boat.Heading, turnRate, deltaTime);
+        float2 acceleration = Acceleration(aim, boat.Heading, forwardFriction, topSpeed);
 
-        // the vector defining how we actually want to move
-        float2 desiredShift = math.normalizesafe(targetPos - boat.Position) * boat.Speed;
+        boat.Velocity += acceleration * deltaTime;
+    }
 
-        // we aim PAST it, based on the difference between how we want to move and how we actually move.
-        float2 overSteer = driftCorrection * (desiredShift - boat.Velocity);
+    // Boat over-aims slightly using the drift correction gain to correct for sideways-drift
+    private float2 Aim(float2 targetPos, float2 position, float2 velocity, float driftCorrectionGain, float topSpeed)
+    {
+        float2 desiredVelocity = math.normalizesafe(targetPos - position) * topSpeed;
+        float2 aimOffset = driftCorrectionGain * (desiredVelocity - velocity);
+        return math.normalizesafe(desiredVelocity + aimOffset);
+    }
 
-        // the heading we aim for, with over-steer driftCorrection
-        // aim past the target, against the drift (desired minus actual motion)
-        float2 correctedShift = desiredShift + overSteer;
-        float correctedHeading = HexProjection.Float2ToDegreesHeading(correctedShift);
+    // Calculates where the boat will turn based on where it's trying to aim
+    // Maybe this should be an update method that runs on the boat
+    private float Turn(float2 aim, float oldHeading, float turnRate, float deltaTime)
+    {
+        float aimHeading = HexProjection.Float2ToDegreesHeading(aim);
+        float newHeading = Mathf.MoveTowardsAngle(oldHeading, aimHeading, turnRate * deltaTime);
+        return Mathf.Repeat(newHeading, 360f);        // neaten the angle (not necessary)
+    }
 
-        // We can only turn towards our target heading 
-        boat.Heading = Mathf.MoveTowardsAngle(boat.Heading, correctedHeading, turnRate * deltaTime);
+    // calculates an under-thrust (throttle) to make up for being off-target
+    // This particular algorithm uses normalized aim and calculates normalized forward vector
+    // from the heading, and then reduces thrust based on the dot-product of those.
+    // It's best suited for tighter turns 
+    private float2 Acceleration(float2 aim, float heading, float forwardFriction, float topSpeed)
+    {
+        // normalized vector, forward direction based on heading
+        float2 forward = Forward(heading);
 
-        // neaten the angle (not necessary)
-        boat.Heading = Mathf.Repeat(boat.Heading, 360f);
+        // after adjusting its heading, how far has the boat managed to get "on-target"?
+        // how well the bow points where we want to go: 1 = exactly, 0 = perpendicular
+        // dot(a, b) = |a| |b| cos(theta)
+        float alignment = math.dot(forward, aim);
 
-        // get the forward shift as a normalized float2 ("vector")
-        float2 forward = Forward(boat.Heading);
-
-        // after adjusting its heading, how far is the boat still "on-target" with its targeted direction?
-        // how well the bow points where we want to go: 1 = exactly, 0 = sideways or worse
-        float alignment = math.dot(forward, math.normalizesafe(correctedShift));
-        // If we are off-target, we don't go as fast, so that we can steer back more easily
+        // If we are off-target, we don't go as fast, so that we can steer back more easily,
+        // since a slower boat turns tighter 
+        // max value of 1
         float throttle = math.max(0f, alignment);
 
-        // calculated so that speeding-up gets cancelled out by friction based on speed
-        float thrust = boat.Speed * forwardFriction;
+        // max acceleration; forward friction balances it exactly at topSpeed
+        float maxAcceleration = topSpeed * forwardFriction;
 
-        // "change in velocity = acceleration × time", applied for one step
-        // push along the bow: add this step's speed gain (thrust × throttle × dt)
-        float2 acceleration = forward * thrust * throttle;
-        boat.Velocity += acceleration * deltaTime;
+        // throttle is scalar multiplier 0 <= throttle <= 1
+        // maxAcceleration is scalar coefficient
+        // forward is normalized direction vector |forward|=1
+        return throttle * maxAcceleration * forward;
     }
 
     private void ApplyFriction(ref BoatData boat, float deltaTime)
@@ -219,34 +248,34 @@ public class Fleet
         boat.Velocity = forward * forwardSpeed + right * sidewaysSpeed;
     }
 
-
-
+    // normalized vector, forward direction based on heading angle
     private static float2 Forward(float heading)
     {
         return HexProjection.DegreesHeadingToFloat2(heading);
     }
 
-    private HexCoord? TargetCoordAt(float2 pos)
+    private void FaceNextPos(ref BoatData boat)
+    {
+        float2? targetPos = TargetPosAt(boat.Position);
+        if (targetPos == null) return;
+        boat.Heading = HexProjection.Float2ToDegreesHeading(targetPos.Value - boat.Position);
+    }
+
+    // finds the next target position using the flow field (treasure map)
+    private float2? TargetPosAt(float2 pos)
     {
         HexCoord coord = HexProjection.WorldToCoords(pos.x, pos.y);
         if (!treasureMap.Contains(coord) || treasureMap.IsLand(coord)) return null;
         HexCompass dir = treasureMap.DirectionAt(coord);
         if (dir == HexCompass.NONE) return null;
         HexCoord targetCoord = coord.InDirection(dir);
-        return targetCoord;
+        return HexProjection.CoordsToFloat2(targetCoord);
     }
+
 
     private bool IsAtGoal(float2 pos)
     {
         return HexProjection.WorldToCoords(pos.x, pos.y) == treasureMap.GoalCoord;
-    }
-
-    private void FaceNextPos(ref BoatData boat)
-    {
-        HexCoord? targetCoord = TargetCoordAt(boat.Position);
-        if (targetCoord == null) return;
-        float2 nextPos = HexProjection.CoordsToFloat2(targetCoord.Value);
-        boat.Heading = HexProjection.Float2ToDegreesHeading(nextPos - boat.Position);
     }
 
     private int FirstDeadSlot()
