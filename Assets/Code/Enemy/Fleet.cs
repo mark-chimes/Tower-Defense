@@ -182,7 +182,7 @@ public class Fleet
 
             (float2 aim, float throttle) = Controls(boat);
             MoveBoat(ref boat, deltaTime, aim, throttle);
-            AdjustAwayFromCoast(ref boat, deltaTime);
+            AdjustForLand(ref boat, deltaTime);
 
             if (DespawnsAtGoal && IsAtGoal(boat.Position))
             {
@@ -193,7 +193,7 @@ public class Fleet
     }
 
     // TODO maybe split the calculation of this force from the actual application?
-    private void AdjustAwayFromCoast(ref BoatData boat, float deltaTime)
+    private void AdjustForLand(ref BoatData boat, float deltaTime)
     {
         // find hex boat is on
         float2 pos = boat.Position;
@@ -207,54 +207,23 @@ public class Fleet
         // Find nearest sea hex and push boat out
         if (treasureMap.IsLand(coord))
         {
-            HexCoord? nearestSeaNeighbor = null;
-            float nearestSeaSquareDistance = float.MaxValue;
-            Debug.Log($"neighbors:{neighbors}, length: {neighbors.Length}");
-            foreach (HexCoord neighbor in neighbors)
-            {
-                // can skip non-land hexes
-                if (!treasureMap.Contains(coord) || treasureMap.IsLand(neighbor)) continue;
-                float2 nPos = HexProjection.CoordsToFloat2(neighbor);
-                float2 toNeighbor = nPos - pos;
-                float dx = toNeighbor.x;
-                float dy = toNeighbor.y;
-                float dSquared = dx * dx + dy * dy;
-
-                Debug.Log($"nPos:{nPos}, toNeighbor:{toNeighbor}, dx:{dx}, dy:{dy}, dSquared:{dSquared}, nearestSeaSquareDistance:{nearestSeaSquareDistance}, neighbor:{neighbor}, ");
-                if (dSquared < nearestSeaSquareDistance)
-                {
-                    nearestSeaNeighbor = neighbor;
-                    nearestSeaSquareDistance = dSquared;
-                }
-            }
-
-            // If none of the valid neighbors is sea, nothing to be done for now
-            if (nearestSeaNeighbor == null) return;
-
-            // Find a nice point on the sea neighbor and put the boat there
-            // my simple version for now, just put it somewhere we know is inside the new hex
-            // pointing a little from the center of the hex towards its old position
-            float2 nCenter = HexProjection.CoordsToFloat2(nearestSeaNeighbor.Value);
-            float2 fromNeighbor = boat.Position - nCenter;
-            float fromX = fromNeighbor.x;
-            float fromY = fromNeighbor.y;
-            float maxAllowed = 2.85f; // 5.7/2 ~ about half the hexagon side-length
-
-            // if we scale both coordinates, can we be *sure* we land inside the hex?
-            float maxOff = math.max(math.abs(fromX) / maxAllowed, math.abs(fromY) / maxAllowed);
-            float2 newPos = nCenter + fromNeighbor / maxOff;
-            boat.Position = newPos;
+            TeleportOutOfLand(ref boat, neighbors);
+            return;
         }
+        PushFromCoast(ref boat, neighbors, deltaTime);
+    }
 
-
+    private void PushFromCoast(ref BoatData boat, HexCoord[] neighbors, float deltaTime)
+    {
+        float2 pos = boat.Position;
 
         float pushFactor = 10; // Arbitrary value for now, TODO move out to top
         float shiftFactor = 2; // Arbitrary value for now, TODO move out to top
 
         foreach (HexCoord neighbor in neighbors)
         {
-            // can skip non-land hexes
-            if (!treasureMap.Contains(coord) || !treasureMap.IsLand(neighbor)) continue;
+            // can skip non-land hexes, but off-map hexes are treated as land
+            if (treasureMap.Contains(neighbor) && !treasureMap.IsLand(neighbor)) continue;
 
             // direction vector to center of land neighbor
             float2 nPos = HexProjection.CoordsToFloat2(neighbor);
@@ -277,6 +246,48 @@ public class Fleet
             boat.Position += -shift * deltaTime * toNeighbor;
 
         }
+    }
+
+    private void TeleportOutOfLand(ref BoatData boat, HexCoord[] neighbors)
+    {
+        HexCoord? nearestSeaNeighbor = null;
+        float nearestSeaSquareDistance = float.MaxValue;
+        float2 pos = boat.Position;
+
+        foreach (HexCoord neighbor in neighbors)
+        {
+            // can skip non-land hexes and off-map hexes
+            // TODO maybe we can re-use this code for off-map hexes?
+            if (!treasureMap.Contains(neighbor) || treasureMap.IsLand(neighbor)) continue;
+            float2 nPos = HexProjection.CoordsToFloat2(neighbor);
+            float2 toNeighbor = nPos - pos;
+            float dx = toNeighbor.x;
+            float dy = toNeighbor.y;
+            float dSquared = dx * dx + dy * dy;
+
+            if (dSquared < nearestSeaSquareDistance)
+            {
+                nearestSeaNeighbor = neighbor;
+                nearestSeaSquareDistance = dSquared;
+            }
+        }
+
+        // If none of the valid neighbors is sea, nothing to be done for now
+        if (nearestSeaNeighbor == null) return;
+
+        // Find a nice point on the sea neighbor and put the boat there
+        // my simple version for now, just put it somewhere we know is inside the new hex
+        // pointing a little from the center of the hex towards its old position
+        float2 nCenter = HexProjection.CoordsToFloat2(nearestSeaNeighbor.Value);
+        float2 fromNeighbor = boat.Position - nCenter;
+        float fromX = fromNeighbor.x;
+        float fromY = fromNeighbor.y;
+        float maxAllowed = 2.85f; // 5.7/2 ~ about half the hexagon side-length
+
+        // if we scale both coordinates, can we be *sure* we land inside the hex?
+        float maxOff = math.max(math.abs(fromX) / maxAllowed, math.abs(fromY) / maxAllowed);
+        float2 newPos = nCenter + fromNeighbor / maxOff;
+        boat.Position = newPos;
     }
 
     private void ShiftBoatsAwayFromEachOther(float deltaTime)
@@ -399,7 +410,7 @@ public class Fleet
         {
             // TODO inefficient, avoid sqrt if possible
             float factor = math.sqrt(velSqr / topSpSqr);
-            boat.Velocity = velSqr / factor;
+            boat.Velocity = boat.Velocity / factor;
         }
 
 
