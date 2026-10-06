@@ -292,6 +292,17 @@ public class Fleet
 
             float hullOverhang = bigBoatRadius - distFromEdge;
 
+            // if we are heading into the land
+            // then remove all the velocity pointing towards the land
+            if (hullOverhang > 0)
+            {
+                var intoLandSpeed = math.dot(boat.Velocity, pushDir);
+                if (intoLandSpeed > 0)
+                {
+                    boat.Velocity += pushDir * intoLandSpeed;
+                }
+            }
+
             float softDepth = math.max(0f, hullOverhang + coastMargin);
             float strongDepth = math.max(0f, hullOverhang);
 
@@ -300,41 +311,70 @@ public class Fleet
 
             // push away from edge
             boat.Position += (softPush + strongPush) * pushDir;
+
+
         }
     }
 
 
     // TODO Delete this once new method is finalized
-    private void PushFromCoastOld(ref BoatData boat, HexCoord[] neighbors, float deltaTime)
+    private void PushFromCoastOld(ref BoatData boat, HexCoord coord,
+        HexCoord[] neighbors, float deltaTime)
     {
-        float2 pos = boat.Position;
+        float2 seaCenter = HexProjection.CoordsToFloat2(coord);
 
-        float pushFactor = 10; // Arbitrary value for now, TODO move out to top
-        float shiftFactor = 2; // Arbitrary value for now, TODO move out to top
+        // cap at 1 in case of large deltaTime. 1 already pushes us all the way out.
+        float softPerStep = math.min(coastSoftRate * deltaTime, 1f);
+        float strongPerStep = math.min(coastStrongRate * deltaTime, 1f);
 
         foreach (HexCoord neighbor in neighbors)
         {
             // can skip non-land hexes, but off-map hexes are treated as land
             if (treasureMap.Contains(neighbor) && !treasureMap.IsLand(neighbor)) continue;
+            float2 nCenter = HexProjection.CoordsToFloat2(neighbor);
+            float2 seaToEdgeDir = (nCenter - seaCenter) / HexProjection.CellWidth;
 
-            // direction vector to center of land neighbor
-            float2 nPos = HexProjection.CoordsToFloat2(neighbor);
-            float2 toNeighbor = (nPos - pos);
-            float dx = toNeighbor.x;
-            float dy = toNeighbor.y;
+            float2 pos = boat.Position;
 
-            // find squared-distance to the neighbor
-            float dSquared = dx * dx + dy * dy;
-            // inverselerp, TODO pre-calcualate min values in consts
-            // this uses 49, 36, and 49-36=13
-            float push = pushFactor * math.min(1.0f, math.max(0, 49f - dSquared) / 13f);
+            float2 edgeMid = seaCenter + seaToEdgeDir * HexProjection.Inradius;
 
-            // this uses 49, 46, and 49-46=3
-            float shift = shiftFactor * math.min(1.0f, math.max(0, 49f - dSquared) / 3f);
+            // perpendicular vector to seaToEdgeDir 
+            float2 alongEdgeDir = new float2(seaToEdgeDir.y, -seaToEdgeDir.x);
 
-            // use position for hard-bump
-            boat.Position += -shift * deltaTime * toNeighbor;
+            float2 midToBoat = pos - edgeMid;
+            // projection: how far the boat is along the edge, sideways
+            float offsetAlongEdge = math.dot(midToBoat, alongEdgeDir);
+            offsetAlongEdge = math.clamp(offsetAlongEdge, -HexProjection.HalfEdge, HexProjection.HalfEdge);
 
+            float2 closestEdgePoint = edgeMid + alongEdgeDir * offsetAlongEdge;
+            float2 edgeToBoat = pos - closestEdgePoint;
+
+            // This requires sqrt. Check it when profiling
+            float distFromEdge = math.length(edgeToBoat);
+
+            float2 pushDir;
+            if (distFromEdge < veryClose)
+            {
+                // if we are too close for a direction vector to make sense
+                // just push us perpendicularly away from the edge
+                pushDir = -seaToEdgeDir;
+            }
+            else
+            {
+                // unit vector from the edge to the boat
+                pushDir = edgeToBoat / distFromEdge;
+            }
+
+            float hullOverhang = bigBoatRadius - distFromEdge;
+
+            float softDepth = math.max(0f, hullOverhang + coastMargin);
+            float strongDepth = math.max(0f, hullOverhang);
+
+            float softPush = softDepth * softPerStep;
+            float strongPush = strongDepth * strongPerStep;
+
+            // push away from edge
+            boat.Position += (softPush + strongPush) * pushDir;
         }
     }
 
