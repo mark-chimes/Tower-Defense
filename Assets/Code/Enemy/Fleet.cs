@@ -31,8 +31,9 @@ public class Fleet
     private float topSpeed = 10f; // meters per second, engine speed
     private float topSpeedReal = 20f; // meters per second, can't be pushed faster
 
-    // TODO use the collision radius
-    private float collisionRadius = 2.5f; // meters
+    private float bigBoatRadius = 2.5f; // meters
+    private float smallBoatRadius = 0.5f; // meters
+
     /****************************************/
 
 
@@ -62,6 +63,10 @@ public class Fleet
 
     private BoatData[] boats;
 
+    // Minimum translation vector sums - the smallest move that resolves an overlap
+    float2[] mtvSums;
+
+
     private TreasureMap treasureMap;
 
     public int BoatCount { get; private set; }
@@ -73,6 +78,8 @@ public class Fleet
     {
         this.treasureMap = treasureMap;
         boats = new BoatData[capacity];
+        mtvSums = new float2[capacity];
+
         BoatCount = 0;
         SlotsUsed = 0;
         random = new Random(randomSeed);
@@ -290,7 +297,71 @@ public class Fleet
         boat.Position = newPos;
     }
 
+
+    float veryClose = 0.001f; // boats within 1mm of each other
     private void ShiftBoatsAwayFromEachOther(float deltaTime)
+    {
+        float pushFactor = 10; // Arbitrary value for now, TODO move out to top
+        float shiftFactor = 2; // Arbitrary value for now, TODO move out to top
+        float separationRate = 10;
+
+        // Only check each pair of boats once
+        // Outer loop starts at 1, inner loop stays strictly below i
+        for (int i = 1; i < SlotsUsed; i++)
+        {
+            if (!IsAlive(i)) continue;
+            ref BoatData boat1 = ref boats[i];
+            for (int j = 0; j < i; j++)
+            {
+                if (!IsAlive(j)) continue;
+                ref BoatData boat2 = ref boats[j];
+                float R = bigBoatRadius + bigBoatRadius; // boat 1 radius + boat 2 radius
+
+                float2 pos1 = boat1.Position;
+                float2 pos2 = boat2.Position;
+                float2 oneToTwo = (pos2 - pos1);
+                float dx = oneToTwo.x;
+                float dy = oneToTwo.y;
+
+                float dSquared = dx * dx + dy * dy;
+                // boats aren't touching: 
+                if (dSquared > R * R) continue;
+
+                // TODO I don't want to use sqrt in a loop like this if I can help it
+                float d = math.sqrt(dSquared);
+                float overlap = R - d;
+
+                float2 dir1to2;
+                if (d < veryClose)
+                {
+                    // arbitrarily move one East and the other West
+                    dir1to2 = new float2(1f, 0f);
+                }
+                else
+                {
+                    dir1to2 = oneToTwo / d;
+                }
+
+                // minimum translation vectors - smallest move that resolves the overlap
+                float2 mtv1 = -dir1to2 * overlap; // shift boat 1 away from 2
+                float2 mtv2 = dir1to2 * overlap;
+
+                mtvSums[i] += mtv1;
+                mtvSums[j] += mtv2;
+            }
+        }
+
+        float separationAmount = math.min(separationRate * deltaTime, 1f) * 0.5f;
+        // update all boats at once
+        for (int i = 0; i < SlotsUsed; i++)
+        {
+            boats[i].Position += mtvSums[i] * separationAmount;
+            mtvSums[i] = float2.zero;
+        }
+    }
+
+    // TODO delete this once the new algorithm is finalized
+    private void ShiftBoatsAwayFromEachOtherOld(float deltaTime)
     {
         float pushFactor = 10; // Arbitrary value for now, TODO move out to top
         float shiftFactor = 2; // Arbitrary value for now, TODO move out to top
@@ -318,7 +389,7 @@ public class Fleet
 
                 float dSquared = dx * dx + dy * dy;
 
-                float cr = collisionRadius;
+                float cr = bigBoatRadius;
                 // inverselerp
                 // just copying the land calculation for now
                 // this uses collisionRadius=2.5f, 0f, and 2.5f-0f=2.5f

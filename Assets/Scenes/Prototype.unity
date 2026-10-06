@@ -420,7 +420,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HexGodClass
   layoutSpecs:
-    numRings: 24
+    numRings: 5
     spawnInitQR: {x: -5, y: 0}
     goalInitQR: {x: 5, y: 0}
   gridView: {fileID: 341370300}
@@ -439,6 +439,7 @@ MonoBehaviour:
   colorRGB: 1
   stepSize: 0.02
   maxSteps: 5
+  enemyCapacity: 1000
 --- !u!1 &961739749
 GameObject:
   m_ObjectHideFlags: 0
@@ -607,7 +608,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HexEnemyController
   boatPrefab: {fileID: 1076209933697243558, guid: f892c45eb8f41284784aa45f782d4fe3, type: 3}
   spawnBatchSize: 10
-  enemyCapacity: 15
 --- !u!4 &1842459479
 Transform:
   m_ObjectHideFlags: 0
