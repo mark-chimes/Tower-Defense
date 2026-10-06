@@ -261,17 +261,7 @@ public class Fleet
 
             float2 pos = boat.Position;
 
-            float2 edgeMid = seaCenter + seaToEdgeDir * HexProjection.Inradius;
-
-            // perpendicular vector to seaToEdgeDir 
-            float2 alongEdgeDir = new float2(seaToEdgeDir.y, -seaToEdgeDir.x);
-
-            float2 midToBoat = pos - edgeMid;
-            // projection: how far the boat is along the edge, sideways
-            float offsetAlongEdge = math.dot(midToBoat, alongEdgeDir);
-            offsetAlongEdge = math.clamp(offsetAlongEdge, -HexProjection.HalfEdge, HexProjection.HalfEdge);
-
-            float2 closestEdgePoint = edgeMid + alongEdgeDir * offsetAlongEdge;
+            float2 closestEdgePoint = ClosestEdgePoint(seaCenter, seaToEdgeDir, pos);
             float2 edgeToBoat = pos - closestEdgePoint;
 
             // This requires sqrt. Check it when profiling
@@ -314,6 +304,23 @@ public class Fleet
 
 
         }
+    }
+
+    private static float2 ClosestEdgePoint(float2 hexCenter, float2 hexToEdgeDir, float2 pos)
+    {
+        float2 edgeMid = hexCenter + hexToEdgeDir * HexProjection.Inradius;
+
+        // perpendicular vector to hexToEdgeDir 
+        float2 alongEdgeDir = new float2(hexToEdgeDir.y, -hexToEdgeDir.x);
+
+        float2 midToPos = pos - edgeMid;
+
+        // projection giving how far from center of the edge the pos is
+        float offsetAlongEdge = math.dot(midToPos, alongEdgeDir);
+        offsetAlongEdge = math.clamp(offsetAlongEdge, -HexProjection.HalfEdge, HexProjection.HalfEdge);
+
+        float2 closestEdgePoint = edgeMid + alongEdgeDir * offsetAlongEdge;
+        return closestEdgePoint;
     }
 
 
