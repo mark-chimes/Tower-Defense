@@ -169,14 +169,51 @@ public class Fleet
 
             ref BoatData boat = ref boats[i];
 
+            // TODO not quite sure of the order here
             (float2 aim, float throttle) = Controls(boat);
             MoveBoat(ref boat, deltaTime, aim, throttle);
+            AdjustAwayFromCoast(ref boat, deltaTime);
 
             if (DespawnsAtGoal && IsAtGoal(boat.Position))
             {
                 DespawnIfPossible(i);
                 // continue;
             }
+        }
+    }
+
+    // TODO maybe split the calculation of this force from the actual application?
+    private void AdjustAwayFromCoast(ref BoatData boat, float deltaTime)
+    {
+        // find distance to nearest land hexes
+        float2 pos = boat.Position;
+        HexCoord coord = HexProjection.WorldToCoords(pos.x, pos.y);
+        // We'll need to deal with out-of-bounds or land itself later
+        if (!treasureMap.Contains(coord) || treasureMap.IsLand(coord)) return;
+
+        float pushFactor = 10; // Arbitrary value for now, TODO move out to top
+
+        HexCoord[] neighbors = coord.Neighbours();
+        foreach (HexCoord neighbor in neighbors)
+        {
+            // can skip non-land hexes
+            if (!treasureMap.IsLand(neighbor)) continue;
+
+            // direction vector to center of land neighbor
+            float2 nPos = HexProjection.CoordsToFloat2(neighbor);
+            float2 toNeighbor = (nPos - pos);
+            float dx = toNeighbor.x;
+            float dy = toNeighbor.y;
+
+            // find squared-distance to the neighbor
+            float dSquared = dx*dx + dy*dy;
+            // inverselerp, TODO pre-calcualate min values in consts
+            // this uses 36, 49, and 49-36=13
+            float push = pushFactor * math.min(1.0f, math.max(0, 49f - dSquared)/13f);
+            
+             // push away from neighbor - soft-bump
+             // use position for hard-bump
+            boat.Velocity += -push * deltaTime * toNeighbor;
         }
     }
 
