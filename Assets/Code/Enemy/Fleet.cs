@@ -28,10 +28,11 @@ public class Fleet
     // See https://en.wikipedia.org/wiki/Proportional_control
     private float driftCorrectionGain = 0.5f;
 
-    private float topSpeed = 10f; // meters per second
+    private float topSpeed = 10f; // meters per second, engine speed
+    private float topSpeedReal = 20f; // meters per second, can't be pushed faster
 
     // TODO use the collision radius
-    // private float collisionRadius = 2.5f; // meters
+    private float collisionRadius = 2.5f; // meters
     /****************************************/
 
 
@@ -163,13 +164,16 @@ public class Fleet
     // A single step of the simulation
     public void StepDt(float deltaTime)
     {
+        // TODO not quite sure of the order here
+
+        ShiftBoatsAwayFromEachOther(deltaTime);
+
         for (int i = 0; i < SlotsUsed; i++)
         {
             if (!IsAlive(i)) continue;
 
             ref BoatData boat = ref boats[i];
 
-            // TODO not quite sure of the order here
             (float2 aim, float throttle) = Controls(boat);
             MoveBoat(ref boat, deltaTime, aim, throttle);
             AdjustAwayFromCoast(ref boat, deltaTime);
@@ -192,6 +196,7 @@ public class Fleet
         if (!treasureMap.Contains(coord) || treasureMap.IsLand(coord)) return;
 
         float pushFactor = 10; // Arbitrary value for now, TODO move out to top
+        float shiftFactor = 2; // Arbitrary value for now, TODO move out to top
 
         HexCoord[] neighbors = coord.Neighbours();
         foreach (HexCoord neighbor in neighbors)
@@ -206,14 +211,66 @@ public class Fleet
             float dy = toNeighbor.y;
 
             // find squared-distance to the neighbor
-            float dSquared = dx*dx + dy*dy;
+            float dSquared = dx * dx + dy * dy;
             // inverselerp, TODO pre-calcualate min values in consts
-            // this uses 36, 49, and 49-36=13
-            float push = pushFactor * math.min(1.0f, math.max(0, 49f - dSquared)/13f);
-            
-             // push away from neighbor - soft-bump
-             // use position for hard-bump
+            // this uses 49, 36, and 49-36=13
+            float push = pushFactor * math.min(1.0f, math.max(0, 49f - dSquared) / 13f);
+
+            // this uses 49, 46, and 49-46=3
+            float shift = shiftFactor * math.min(1.0f, math.max(0, 49f - dSquared) / 3f);
+
+            // push away from neighbor - soft-bump
+            // use position for hard-bump
             boat.Velocity += -push * deltaTime * toNeighbor;
+            boat.Position += -shift * deltaTime * toNeighbor;
+
+        }
+    }
+
+    private void ShiftBoatsAwayFromEachOther(float deltaTime)
+    {
+        float pushFactor = 10; // Arbitrary value for now, TODO move out to top
+        float shiftFactor = 2; // Arbitrary value for now, TODO move out to top
+
+        // Naive n^2 algorithm for now to get things working
+        // Should register boats to some hex-array or something later
+        for (int i = 0; i < SlotsUsed; i++)
+        {
+            if (!IsAlive(i)) continue;
+            ref BoatData boat = ref boats[i];
+
+            for (int j = 0; j < SlotsUsed; j++)
+            {
+                if (!IsAlive(j)) continue;
+                // Shouldn't push away from itself
+                if (i == j) continue;
+
+                ref BoatData nbor = ref boats[j];
+
+                float2 pos = boat.Position;
+                float2 nPos = nbor.Position;
+                float2 toNeighbor = (nPos - pos);
+                float dx = toNeighbor.x;
+                float dy = toNeighbor.y;
+
+                float dSquared = dx * dx + dy * dy;
+
+                float cr = collisionRadius;
+                // inverselerp
+                // just copying the land calculation for now
+                // this uses collisionRadius=2.5f, 0f, and 2.5f-0f=2.5f
+                float push = pushFactor * math.min(1.0f, math.max(0, cr - dSquared) / cr);
+
+                // push away from neighbor - soft-bump
+                // use position for hard-bump
+                boat.Velocity += -push * deltaTime * toNeighbor;
+
+
+                // this uses 1, 0, and 1-0=1
+                float shift = shiftFactor * math.min(1.0f, math.max(0, 1f - dSquared) / 1f);
+                boat.Position += -shift * deltaTime * toNeighbor;
+
+            }
         }
     }
 
@@ -280,6 +337,20 @@ public class Fleet
         float2 acceleration = Acceleration(forward, throttle, forwardFriction, topSpeed);
         boat.Velocity += acceleration * deltaTime;
         ApplyFriction(ref boat, deltaTime);
+
+        // clamp the velocity
+        float vx = boat.Velocity.x;
+        float vy = boat.Velocity.y;
+        float topSpSqr = topSpeedReal * topSpeedReal;
+        float velSqr = vx * vx + vy * vy;
+        if (velSqr > topSpSqr)
+        {
+            // TODO inefficient, avoid sqrt if possible
+            float factor = math.sqrt(velSqr / topSpSqr);
+            boat.Velocity = velSqr / factor;
+        }
+
+
         boat.Position += boat.Velocity * deltaTime;
     }
 
