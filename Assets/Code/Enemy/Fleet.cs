@@ -43,7 +43,7 @@ public class Fleet
     /****************************************/
 
     // Coast values
-    // Probably constant for all boats, but could put these on boat personalities later
+    // Probably constant for all boats, but could put some on boat personalities later
 
     // soft push starts when the hull is this close to land
     private float coastMargin = 0.5f; // meters
@@ -53,15 +53,23 @@ public class Fleet
     // added once the hull overlaps the land
     private float coastStrongRate = 10f;  // per second
 
+    // How close a ship's center is placed from land when it gets moved out of a land hex
+    private float landGap = 0.01f;
+
     /****************************************/
 
 
+    // Other constants and tunable values
 
+    float veryClose = 0.001f; // boats within 1mm of each other
 
     private float maxSpawnOffset = 2f; // meters
 
-    private Random random;
     uint randomSeed = 1;
+
+    /****************************************/
+
+    private Random random;
 
     public bool DespawnsAtGoal { get; set; } = false;
 
@@ -237,7 +245,7 @@ public class Fleet
         // Find nearest sea hex and push boat out
         if (treasureMap.IsLand(coord))
         {
-            TeleportOutOfLand(ref boat, neighbors);
+            MoveOutOfLand(ref boat, coord, neighbors);
             return;
         }
         PushFromCoast(ref boat, coord, neighbors, deltaTime);
@@ -286,7 +294,7 @@ public class Fleet
             // then remove all the velocity pointing towards the land
             if (hullOverhang > 0)
             {
-                var intoLandSpeed = math.dot(boat.Velocity, pushDir);
+                var intoLandSpeed = math.dot(boat.Velocity, -pushDir);
                 if (intoLandSpeed > 0)
                 {
                     boat.Velocity += pushDir * intoLandSpeed;
@@ -324,67 +332,55 @@ public class Fleet
     }
 
 
-    // TODO Delete this once new method is finalized
-    private void PushFromCoastOld(ref BoatData boat, HexCoord coord,
-        HexCoord[] neighbors, float deltaTime)
+    private void MoveOutOfLand(ref BoatData boat, HexCoord coord, HexCoord[] neighbors)
     {
-        float2 seaCenter = HexProjection.CoordsToFloat2(coord);
+        float2 pos = boat.Position;
+        float2 landCenter = HexProjection.CoordsToFloat2(coord);
 
-        // cap at 1 in case of large deltaTime. 1 already pushes us all the way out.
-        float softPerStep = math.min(coastSoftRate * deltaTime, 1f);
-        float strongPerStep = math.min(coastStrongRate * deltaTime, 1f);
+        float nearestDistSquared = float.MaxValue;
+        float2 bestToSeaDir = float2.zero;
+        float2 bestPoint = float2.zero;
+        bool isNearestSeaFound = false;
 
         foreach (HexCoord neighbor in neighbors)
         {
-            // can skip non-land hexes, but off-map hexes are treated as land
-            if (treasureMap.Contains(neighbor) && !treasureMap.IsLand(neighbor)) continue;
-            float2 nCenter = HexProjection.CoordsToFloat2(neighbor);
-            float2 seaToEdgeDir = (nCenter - seaCenter) / HexProjection.CellWidth;
+            // can skip non-land hexes and off-map hexes
+            // TODO maybe we can re-use this code for off-map hexes?
+            if (!treasureMap.Contains(neighbor) || treasureMap.IsLand(neighbor)) continue;
 
-            float2 pos = boat.Position;
+            isNearestSeaFound = true;
+            float2 nPos = HexProjection.CoordsToFloat2(neighbor);
 
-            float2 edgeMid = seaCenter + seaToEdgeDir * HexProjection.Inradius;
+            // unit vector: land hex towards the edge shared with this sea neighbor
+            float2 landToSeaDir = (nPos - landCenter) / HexProjection.CellWidth;
+            float2 closestEdgePoint = ClosestEdgePoint(landCenter, landToSeaDir, pos);
+            float distToClosestEdgePointSqr = math.distancesq(pos, closestEdgePoint);
 
-            // perpendicular vector to seaToEdgeDir 
-            float2 alongEdgeDir = new float2(seaToEdgeDir.y, -seaToEdgeDir.x);
-
-            float2 midToBoat = pos - edgeMid;
-            // projection: how far the boat is along the edge, sideways
-            float offsetAlongEdge = math.dot(midToBoat, alongEdgeDir);
-            offsetAlongEdge = math.clamp(offsetAlongEdge, -HexProjection.HalfEdge, HexProjection.HalfEdge);
-
-            float2 closestEdgePoint = edgeMid + alongEdgeDir * offsetAlongEdge;
-            float2 edgeToBoat = pos - closestEdgePoint;
-
-            // This requires sqrt. Check it when profiling
-            float distFromEdge = math.length(edgeToBoat);
-
-            float2 pushDir;
-            if (distFromEdge < veryClose)
+            if (distToClosestEdgePointSqr < nearestDistSquared)
             {
-                // if we are too close for a direction vector to make sense
-                // just push us perpendicularly away from the edge
-                pushDir = -seaToEdgeDir;
+                bestPoint = closestEdgePoint;
+                bestToSeaDir = landToSeaDir;
+                nearestDistSquared = distToClosestEdgePointSqr;
             }
-            else
-            {
-                // unit vector from the edge to the boat
-                pushDir = edgeToBoat / distFromEdge;
-            }
-
-            float hullOverhang = bigBoatRadius - distFromEdge;
-
-            float softDepth = math.max(0f, hullOverhang + coastMargin);
-            float strongDepth = math.max(0f, hullOverhang);
-
-            float softPush = softDepth * softPerStep;
-            float strongPush = strongDepth * strongPerStep;
-
-            // push away from edge
-            boat.Position += (softPush + strongPush) * pushDir;
         }
+
+        // If none of the valid neighbors is sea, nothing to be done for now
+        if (!isNearestSeaFound) return;
+        boat.Position = bestPoint + bestToSeaDir * landGap;
+
+        // If we are moving back towards the land, stop that!
+        float intoLandSpeed = math.dot(boat.Velocity, -bestToSeaDir);
+        if (intoLandSpeed > 0)
+        {
+            boat.Velocity += bestToSeaDir * intoLandSpeed;
+        }
+
     }
 
+
+
+
+    // TODO delete once it isn't needed
     private void TeleportOutOfLand(ref BoatData boat, HexCoord[] neighbors)
     {
         HexCoord? nearestSeaNeighbor = null;
@@ -428,7 +424,7 @@ public class Fleet
     }
 
 
-    float veryClose = 0.001f; // boats within 1mm of each other
+
     private void ShiftBoatsAwayFromEachOther(float deltaTime)
     {
         float pushFactor = 10; // Arbitrary value for now, TODO move out to top
