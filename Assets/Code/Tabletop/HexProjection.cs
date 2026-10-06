@@ -9,6 +9,10 @@ public static class HexProjection
 {
     public const float CellWidth = 10f; // center of one cell to center of another - the small diameter
     public static readonly float CellHeight = CellWidth * 2f / Mathf.Sqrt(3f);
+
+    public const float Inradius = CellWidth / 2f;
+    public static readonly float HalfEdge = CellHeight / 4f;
+
     // large diamater / diagonal 
     public const float LandSurfaceY = 1f;
 
@@ -43,7 +47,7 @@ public static class HexProjection
     {
         float rads = math.radians(heading);
         math.sincos(rads, out float s, out float c);
-        return new float2(s,c);
+        return new float2(s, c);
     }
 
     public static Quaternion CompassToQuaternion(HexCompass dir)

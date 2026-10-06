@@ -34,6 +34,25 @@ public class Fleet
     private float bigBoatRadius = 2.5f; // meters
     private float smallBoatRadius = 0.5f; // meters
 
+    // between 0 and 1
+    // 0 means boats will wait politely for each other
+    // 1 means boats will shove each other roughly
+    private float pushiness = 0.5f;
+
+
+    /****************************************/
+
+    // Coast values
+    // Probably constant for all boats, but could put these on boat personalities later
+
+    // soft push starts when the hull is this close to land
+    private float coastMargin = 0.5f; // meters
+
+    private float coastSoftRate = 5f;    // per second
+
+    // added once the hull overlaps the land
+    private float coastStrongRate = 10f;  // per second
+
     /****************************************/
 
 
@@ -221,10 +240,72 @@ public class Fleet
             TeleportOutOfLand(ref boat, neighbors);
             return;
         }
-        PushFromCoast(ref boat, neighbors, deltaTime);
+        PushFromCoast(ref boat, coord, neighbors, deltaTime);
     }
 
-    private void PushFromCoast(ref BoatData boat, HexCoord[] neighbors, float deltaTime)
+    private void PushFromCoast(ref BoatData boat, HexCoord coord,
+        HexCoord[] neighbors, float deltaTime)
+    {
+        float2 seaCenter = HexProjection.CoordsToFloat2(coord);
+
+        // cap at 1 in case of large deltaTime. 1 already pushes us all the way out.
+        float softPerStep = math.min(coastSoftRate * deltaTime, 1f);
+        float strongPerStep = math.min(coastStrongRate * deltaTime, 1f);
+
+        foreach (HexCoord neighbor in neighbors)
+        {
+            // can skip non-land hexes, but off-map hexes are treated as land
+            if (treasureMap.Contains(neighbor) && !treasureMap.IsLand(neighbor)) continue;
+            float2 nCenter = HexProjection.CoordsToFloat2(neighbor);
+            float2 seaToEdgeDir = (nCenter - seaCenter) / HexProjection.CellWidth;
+
+            float2 pos = boat.Position;
+
+            float2 edgeMid = seaCenter + seaToEdgeDir * HexProjection.Inradius;
+
+            // perpendicular vector to seaToEdgeDir 
+            float2 alongEdgeDir = new float2(seaToEdgeDir.y, -seaToEdgeDir.x);
+
+            float2 midToBoat = pos - edgeMid;
+            // projection: how far the boat is along the edge, sideways
+            float offsetAlongEdge = math.dot(midToBoat, alongEdgeDir);
+            offsetAlongEdge = math.clamp(offsetAlongEdge, -HexProjection.HalfEdge, HexProjection.HalfEdge);
+
+            float2 closestEdgePoint = edgeMid + alongEdgeDir * offsetAlongEdge;
+            float2 edgeToBoat = pos - closestEdgePoint;
+
+            // This requires sqrt. Check it when profiling
+            float distFromEdge = math.length(edgeToBoat);
+
+            float2 pushDir;
+            if (distFromEdge < veryClose)
+            {
+                // if we are too close for a direction vector to make sense
+                // just push us perpendicularly away from the edge
+                pushDir = -seaToEdgeDir;
+            }
+            else
+            {
+                // unit vector from the edge to the boat
+                pushDir = edgeToBoat / distFromEdge;
+            }
+
+            float hullOverhang = bigBoatRadius - distFromEdge;
+
+            float softDepth = math.max(0f, hullOverhang + coastMargin);
+            float strongDepth = math.max(0f, hullOverhang);
+
+            float softPush = softDepth * softPerStep;
+            float strongPush = strongDepth * strongPerStep;
+
+            // push away from edge
+            boat.Position += (softPush + strongPush) * pushDir;
+        }
+    }
+
+
+    // TODO Delete this once new method is finalized
+    private void PushFromCoastOld(ref BoatData boat, HexCoord[] neighbors, float deltaTime)
     {
         float2 pos = boat.Position;
 
@@ -251,9 +332,7 @@ public class Fleet
             // this uses 49, 46, and 49-46=3
             float shift = shiftFactor * math.min(1.0f, math.max(0, 49f - dSquared) / 3f);
 
-            // push away from neighbor - soft-bump
             // use position for hard-bump
-            boat.Velocity += -push * deltaTime * toNeighbor;
             boat.Position += -shift * deltaTime * toNeighbor;
 
         }
@@ -360,13 +439,11 @@ public class Fleet
                 // boats are moving closer together, so we should cancel velocity in that direction
                 if (closingSpeed > 0)
                 {
-                    float2 vc2 = dir1to2 * closingSpeed * 0.5f;
-                    float2 vc1 = -vc2; // shift boat 1 away from 2
+                    float2 vc2 = dir1to2 * closingSpeed * 0.5f * (1f - pushiness);
+                    float2 vc1 = -vc2; // boat 1 doesn't drive into boat 2
                     vcSums[i] += vc1;
                     vcSums[j] += vc2;
-
                 }
-
             }
         }
 
@@ -378,68 +455,6 @@ public class Fleet
 
             mtvSums[i] = float2.zero;
             vcSums[i] = float2.zero;
-        }
-    }
-
-    // TODO delete this once the new algorithm is finalized
-    private void ShiftBoatsAwayFromEachOtherOld(float deltaTime)
-    {
-        float pushFactor = 10; // Arbitrary value for now, TODO move out to top
-        float shiftFactor = 2; // Arbitrary value for now, TODO move out to top
-        float separationRate = 10;
-
-        // Only check each pair of boats once
-        // Outer loop starts at 1, inner loop stays strictly below i
-        for (int i = 1; i < SlotsUsed; i++)
-        {
-            if (!IsAlive(i)) continue;
-            ref BoatData boat1 = ref boats[i];
-            for (int j = 0; j < i; j++)
-            {
-                if (!IsAlive(j)) continue;
-                ref BoatData boat2 = ref boats[j];
-                float R = bigBoatRadius + bigBoatRadius; // boat 1 radius + boat 2 radius
-
-                float2 pos1 = boat1.Position;
-                float2 pos2 = boat2.Position;
-                float2 oneToTwo = (pos2 - pos1);
-                float dx = oneToTwo.x;
-                float dy = oneToTwo.y;
-
-                float dSquared = dx * dx + dy * dy;
-                // boats aren't touching: 
-                if (dSquared > R * R) continue;
-
-                // TODO I don't want to use sqrt in a loop like this if I can help it
-                float d = math.sqrt(dSquared);
-                float overlap = R - d;
-
-                float2 dir1to2;
-                if (d < veryClose)
-                {
-                    // arbitrarily move one East and the other West
-                    dir1to2 = new float2(1f, 0f);
-                }
-                else
-                {
-                    dir1to2 = oneToTwo / d;
-                }
-
-                // minimum translation vectors - smallest move that resolves the overlap
-                float2 mtv1 = -dir1to2 * overlap; // shift boat 1 away from 2
-                float2 mtv2 = dir1to2 * overlap;
-
-                mtvSums[i] += mtv1;
-                mtvSums[j] += mtv2;
-            }
-        }
-
-        float separationAmount = math.min(separationRate * deltaTime, 1f) * 0.5f;
-        // update all boats at once
-        for (int i = 0; i < SlotsUsed; i++)
-        {
-            boats[i].Position += mtvSums[i] * separationAmount;
-            mtvSums[i] = float2.zero;
         }
     }
 
