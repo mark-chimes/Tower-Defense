@@ -92,7 +92,7 @@ public class Fleet
     private enum BoatState
     {
         // keep Dead as first member: assumed as default value
-        Dead, Coast, Brake, Move
+        Dead, Slide, Brake, Move
     }
 
     private BoatData[] boats;
@@ -109,6 +109,7 @@ public class Fleet
     public int BoatCount { get; private set; }
     public int SlotsUsed { get; private set; }
 
+    private BoatState fleetOrder = BoatState.Move;
 
 
     public Fleet(TreasureMap treasureMap, int capacity)
@@ -133,7 +134,7 @@ public class Fleet
         return slot >= 0 && slot < SlotsUsed && IsAlive(slot);
     }
 
-    public int Spawn(HexCoord spawnCoord, bool shouldStart)
+    public int Spawn(HexCoord spawnCoord)
     {
         if (!CanSpawn()) return -1;
         int slot = FirstDeadSlot();
@@ -141,7 +142,7 @@ public class Fleet
         if (slot >= SlotsUsed) SlotsUsed++;
         BoatData newBoat = NewBoat(RandomPositionAtCoord(spawnCoord));
         FaceNextPos(ref newBoat);
-        if (shouldStart) newBoat.State = BoatState.Move;
+        newBoat.State = fleetOrder;
         boats[slot] = newBoat;
         return slot;
     }
@@ -175,7 +176,7 @@ public class Fleet
         boat.Position = startPosition;
         boat.Velocity = float2.zero;
         boat.Heading = 0;
-        boat.State = BoatState.Coast;
+        boat.State = BoatState.Slide;
         return boat;
     }
 
@@ -196,12 +197,12 @@ public class Fleet
         }
     }
 
-    public void StopAll()
+    public void SlideAll()
     {
         for (int i = 0; i < SlotsUsed; i++)
         {
             if (!IsAlive(i)) continue;
-            boats[i].State = BoatState.Coast;
+            boats[i].State = BoatState.Slide;
         }
     }
 

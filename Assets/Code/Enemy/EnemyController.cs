@@ -16,8 +16,6 @@ public class EnemyController : MonoBehaviour
     private Fleet fleet;
     private Boat[] boats = null;
 
-    public bool BoatsFollowPathOnSpawn { get; set; } = true;
-
     public bool BoatsDespawnAtGoal { get => fleet.DespawnsAtGoal; set => fleet.DespawnsAtGoal = value; }
 
 
@@ -62,33 +60,33 @@ public class EnemyController : MonoBehaviour
 
     private Vector3 Position3DOf(int slot) => HexProjection.Float2ToWorld(fleet.PositionOf(slot));
 
-    public void OnSpawnBoatPressed()
+    public void SpawnBoat()
     {
         SpawnEnemy();
     }
 
-    public void OnDeleteBoatsPressed()
+    public void DeleteAllBoats()
     {
         fleet.DespawnAll();
     }
 
-    public void OnBoatsFollowExistingPathPressed()
+    public void StartBoats()
     {
         fleet.StartAll();
     }
 
-    public void OnBoatsStopPressed()
+    public void SlideBoats()
     {
-        fleet.StopAll();
+        fleet.SlideAll();
     }
 
-    public void OnBoatsBrakePressed()
+    public void BrakeBoats()
     {
         fleet.BrakeAll();
     }
 
 
-    public void OnSpawnBatchPressed()
+    public void SpawnBatch()
     {
         for (int i = 0; i < spawnBatchSize && fleet.CanSpawn(); i++)
         {
@@ -103,7 +101,7 @@ public class EnemyController : MonoBehaviour
             Debug.LogWarning("Fleet size reached. Unable to spawn new enemy.");
             return;
         }
-        int slot = fleet.Spawn(treasureMap.SpawnCoord, BoatsFollowPathOnSpawn);
+        int slot = fleet.Spawn(treasureMap.SpawnCoord);
 
         if (boats[slot] == null) boats[slot] = Instantiate(boatPrefab, transform);
 

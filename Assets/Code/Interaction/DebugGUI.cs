@@ -82,12 +82,7 @@ public class DebugGUI : MonoBehaviour
         Toggle("Pathfinding Arrows", visualizePathfindingEnabled,
             value => { visualizePathfindingEnabled = value; flowBridge.SetVisualizationVisible(value); });
 
-        Toggle("Boats follow path on spawn", enemyController.BoatsFollowPathOnSpawn,
-              value => enemyController.BoatsFollowPathOnSpawn = value);
-
-        Button("Follow existing path", enemyController.OnBoatsFollowExistingPathPressed);
-
-        Button("Spawn Boat", enemyController.OnSpawnBoatPressed);
+        Button("Spawn Boat", enemyController.SpawnBoat);
 
         EndSection();
     }
@@ -124,14 +119,13 @@ public class DebugGUI : MonoBehaviour
     {
         BeginSection("BOATS");
 
-        Button("Spawn 1", enemyController.OnSpawnBoatPressed);
+        Button("Spawn 1", enemyController.SpawnBoat);
         Button($"Spawn {enemyController.SpawnBatchSize}",
-            enemyController.OnSpawnBatchPressed);
-        Button("Delete All", enemyController.OnDeleteBoatsPressed);
-        Button("Start", enemyController.OnBoatsFollowExistingPathPressed);
-        Button("Coast", enemyController.OnBoatsStopPressed);
-        Button("Brake", enemyController.OnBoatsBrakePressed);
-
+            enemyController.SpawnBatch);
+        Button("Delete All", enemyController.DeleteAllBoats);
+        Button("Start", enemyController.StartBoats);
+        Button("Slide", enemyController.SlideBoats);
+        Button("Brake", enemyController.BrakeBoats);
 
         EndSection();
     }
