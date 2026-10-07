@@ -58,7 +58,6 @@ public class Fleet
 
     /****************************************/
 
-
     // Other constants and tunable values
 
     float veryClose = 0.001f; // boats within 1mm of each other
@@ -66,6 +65,8 @@ public class Fleet
     private float maxSpawnOffset = 2f; // meters
 
     uint randomSeed = 1;
+
+    float separationRate = 10;
 
     /****************************************/
 
@@ -379,8 +380,6 @@ public class Fleet
 
     private void ShiftBoatsAwayFromEachOther(float deltaTime)
     {
-        float separationRate = 10;
-
         // Only check each pair of boats once
         // Outer loop starts at 1, inner loop stays strictly below i
         for (int i = 1; i < SlotsUsed; i++)
