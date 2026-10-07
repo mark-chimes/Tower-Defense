@@ -379,8 +379,6 @@ public class Fleet
 
     private void ShiftBoatsAwayFromEachOther(float deltaTime)
     {
-        float pushFactor = 10; // Arbitrary value for now, TODO move out to top
-        float shiftFactor = 2; // Arbitrary value for now, TODO move out to top
         float separationRate = 10;
 
         // Only check each pair of boats once
