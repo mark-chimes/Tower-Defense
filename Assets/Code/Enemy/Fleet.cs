@@ -30,9 +30,14 @@ public class Fleet
 
     private float topSpeed = 10f; // meters per second, engine speed
     private float topSpeedReal = 20f; // meters per second, can't be pushed faster
+    private static float bigBoatRadius = 2.5f; // meters
+    private static float midBoatRadius = 1.5f; // meters
 
-    private float bigBoatRadius = 2.5f; // meters
-    private float smallBoatRadius = 0.5f; // meters
+    private static float smallBoatRadius = 0.5f; // meters
+
+    private float boatRadius = midBoatRadius; // meters
+
+
 
     // between 0 and 1
     // 0 means boats will wait politely for each other
@@ -289,7 +294,7 @@ public class Fleet
                 pushDir = edgeToBoat / distFromEdge;
             }
 
-            float hullOverhang = bigBoatRadius - distFromEdge;
+            float hullOverhang = boatRadius - distFromEdge;
 
             // if we are heading into the land
             // then remove all the velocity pointing towards the land
@@ -390,7 +395,7 @@ public class Fleet
             {
                 if (!IsAlive(j)) continue;
                 ref BoatData boat2 = ref boats[j];
-                float R = bigBoatRadius + bigBoatRadius; // boat 1 radius + boat 2 radius
+                float R = boatRadius + boatRadius; // boat 1 radius + boat 2 radius
 
                 float2 pos1 = boat1.Position;
                 float2 pos2 = boat2.Position;
