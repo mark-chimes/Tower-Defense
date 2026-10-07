@@ -57,13 +57,13 @@ public class DebugGUI : MonoBehaviour
         GUILayout.BeginArea(new Rect(margin, margin, boxWidth, Screen.height));
         DrawUsefulControls();
         DrawVisualizationControls();
-        DrawBoatControls();
         DrawSaveLoadControls();
         GUILayout.EndArea();
 
         // Right 
         GUILayout.BeginArea(new Rect(Screen.width - boxWidth - margin, margin, boxWidth, Screen.height));
         DrawBuildingControls();
+        DrawBoatControls();
         DrawNewControls();
         GUILayout.EndArea();
     }
@@ -124,10 +124,14 @@ public class DebugGUI : MonoBehaviour
     {
         BeginSection("BOATS");
 
-        Button("Spawn Boat", enemyController.OnSpawnBoatPressed);
-        Button("Delete Boats", enemyController.OnDeleteBoatsPressed);
-        Button("Follow existing path", enemyController.OnBoatsFollowExistingPathPressed);
-        Button("Stop boats", enemyController.OnBoatsStopPressed);
+        Button("Spawn 1", enemyController.OnSpawnBoatPressed);
+        Button($"Spawn {enemyController.SpawnBatchSize}",
+            enemyController.OnSpawnBatchPressed);
+        Button("Delete All", enemyController.OnDeleteBoatsPressed);
+        Button("Start", enemyController.OnBoatsFollowExistingPathPressed);
+        Button("Coast", enemyController.OnBoatsStopPressed);
+        Button("Brake", enemyController.OnBoatsBrakePressed);
+
 
         EndSection();
     }
@@ -166,8 +170,7 @@ public class DebugGUI : MonoBehaviour
         Toggle("Boats despawn at goal",
             enemyController.BoatsDespawnAtGoal,
             value => enemyController.BoatsDespawnAtGoal = value);
-        Button($"Spawn {enemyController.SpawnBatchSize} Boats",
-            enemyController.OnSpawnBatchPressed);
+
         EndSection();
     }
 

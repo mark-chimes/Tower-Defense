@@ -82,6 +82,12 @@ public class EnemyController : MonoBehaviour
         fleet.StopAll();
     }
 
+    public void OnBoatsBrakePressed()
+    {
+        fleet.BrakeAll();
+    }
+
+
     public void OnSpawnBatchPressed()
     {
         for (int i = 0; i < spawnBatchSize && fleet.CanSpawn(); i++)

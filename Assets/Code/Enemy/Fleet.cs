@@ -91,7 +91,8 @@ public class Fleet
 
     private enum BoatState
     {
-        Dead, Idle, Moving // keep Dead as first member: assumed as default value
+        // keep Dead as first member: assumed as default value
+        Dead, Coast, Brake, Move
     }
 
     private BoatData[] boats;
@@ -140,7 +141,7 @@ public class Fleet
         if (slot >= SlotsUsed) SlotsUsed++;
         BoatData newBoat = NewBoat(RandomPositionAtCoord(spawnCoord));
         FaceNextPos(ref newBoat);
-        if (shouldStart) newBoat.State = BoatState.Moving;
+        if (shouldStart) newBoat.State = BoatState.Move;
         boats[slot] = newBoat;
         return slot;
     }
@@ -174,7 +175,7 @@ public class Fleet
         boat.Position = startPosition;
         boat.Velocity = float2.zero;
         boat.Heading = 0;
-        boat.State = BoatState.Idle;
+        boat.State = BoatState.Coast;
         return boat;
     }
 
@@ -190,9 +191,8 @@ public class Fleet
     {
         for (int i = 0; i < SlotsUsed; i++)
         {
-            if (boats[i].State != BoatState.Idle) continue;
-            boats[i].State = BoatState.Moving;
-            FaceNextPos(ref boats[i]);
+            if (boats[i].State == BoatState.Dead) continue;
+            boats[i].State = BoatState.Move;
         }
     }
 
@@ -201,7 +201,16 @@ public class Fleet
         for (int i = 0; i < SlotsUsed; i++)
         {
             if (!IsAlive(i)) continue;
-            boats[i].State = BoatState.Idle;
+            boats[i].State = BoatState.Coast;
+        }
+    }
+
+    public void BrakeAll()
+    {
+        for (int i = 0; i < SlotsUsed; i++)
+        {
+            if (!IsAlive(i)) continue;
+            boats[i].State = BoatState.Brake;
         }
     }
 
@@ -464,7 +473,7 @@ public class Fleet
         float2 forward = Forward(boat.Heading);
         float2? targetPos = TargetPosAt(boat.Position);
 
-        if (boat.State == BoatState.Moving && targetPos != null)
+        if (boat.State == BoatState.Move && targetPos != null)
         {
             aim = Aim(targetPos.Value, boat.Position, boat.Velocity, driftCorrectionGain, topSpeed);
             throttle = Throttle(aim, forward);
