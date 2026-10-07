@@ -14,12 +14,15 @@ public class Fleet
     // or "boat type" data, that can be referenced
     private float turnRate = 90f; // degrees per second
 
+    // TODO should be drag rather than friction? 
     // friction slows down boat proportional to current speed
     // so its units are "per-second"
     // friction 2 /s means "lose 2x your speed per second".
     private float forwardFriction = 2f;
 
     private float sidewaysFriction = 10f;
+
+    private float brakingRate = 10f;
 
     // how much the boat aims beyond its target to correct for drift
     // 0 means no correction, boat tries to aim directly at target
@@ -30,10 +33,11 @@ public class Fleet
 
     private float topSpeed = 10f; // meters per second, engine speed
     private float topSpeedReal = 20f; // meters per second, can't be pushed faster
-    private static float bigBoatRadius = 2.5f; // meters
-    private static float midBoatRadius = 1.5f; // meters
 
-    private static float smallBoatRadius = 0.5f; // meters
+    // private const float bigBoatRadius = 2.5f; // meters
+    private const float midBoatRadius = 1.5f; // meters
+
+    // private const float smallBoatRadius = 0.5f; // meters
 
     private float boatRadius = midBoatRadius; // meters
 
@@ -190,6 +194,7 @@ public class Fleet
 
     public void StartAll()
     {
+        fleetOrder = BoatState.Move;
         for (int i = 0; i < SlotsUsed; i++)
         {
             if (boats[i].State == BoatState.Dead) continue;
@@ -199,6 +204,7 @@ public class Fleet
 
     public void SlideAll()
     {
+        fleetOrder = BoatState.Slide;
         for (int i = 0; i < SlotsUsed; i++)
         {
             if (!IsAlive(i)) continue;
@@ -208,6 +214,7 @@ public class Fleet
 
     public void BrakeAll()
     {
+        fleetOrder = BoatState.Brake;
         for (int i = 0; i < SlotsUsed; i++)
         {
             if (!IsAlive(i)) continue;
@@ -256,19 +263,16 @@ public class Fleet
         // TODO deal with out-of-bounds by moving the boat in-bounds
         if (!treasureMap.Contains(coord)) return;
 
-        HexCoord[] neighbors = coord.Neighbours();
-
         // Find nearest sea hex and push boat out
         if (treasureMap.IsLand(coord))
         {
-            MoveOutOfLand(ref boat, coord, neighbors);
+            MoveOutOfLand(ref boat, coord);
             return;
         }
-        PushFromCoast(ref boat, coord, neighbors, deltaTime);
+        PushFromCoast(ref boat, coord, deltaTime);
     }
 
-    private void PushFromCoast(ref BoatData boat, HexCoord coord,
-        HexCoord[] neighbors, float deltaTime)
+    private void PushFromCoast(ref BoatData boat, HexCoord coord, float deltaTime)
     {
         float2 seaCenter = HexProjection.CoordsToFloat2(coord);
 
@@ -276,8 +280,9 @@ public class Fleet
         float softPerStep = math.min(coastSoftRate * deltaTime, 1f);
         float strongPerStep = math.min(coastStrongRate * deltaTime, 1f);
 
-        foreach (HexCoord neighbor in neighbors)
+        foreach (HexCompass dir in HexCompassExtension.AllDirs)
         {
+            HexCoord neighbor = coord.InDirection(dir);
             // can skip non-land hexes, but off-map hexes are treated as land
             if (treasureMap.Contains(neighbor) && !treasureMap.IsLand(neighbor)) continue;
             float2 nCenter = HexProjection.CoordsToFloat2(neighbor);
@@ -348,7 +353,7 @@ public class Fleet
     }
 
 
-    private void MoveOutOfLand(ref BoatData boat, HexCoord coord, HexCoord[] neighbors)
+    private void MoveOutOfLand(ref BoatData boat, HexCoord coord)
     {
         float2 pos = boat.Position;
         float2 landCenter = HexProjection.CoordsToFloat2(coord);
@@ -358,8 +363,9 @@ public class Fleet
         float2 bestPoint = float2.zero;
         bool isNearestSeaFound = false;
 
-        foreach (HexCoord neighbor in neighbors)
+        foreach (HexCompass dir in HexCompassExtension.AllDirs)
         {
+            HexCoord neighbor = coord.InDirection(dir);
             // can skip non-land hexes and off-map hexes
             // TODO maybe we can re-use this code for off-map hexes?
             if (!treasureMap.Contains(neighbor) || treasureMap.IsLand(neighbor)) continue;
@@ -527,7 +533,8 @@ public class Fleet
         float2 forward = Forward(boat.Heading);
         float2 acceleration = Acceleration(forward, throttle, forwardFriction, topSpeed);
         boat.Velocity += acceleration * deltaTime;
-        ApplyFriction(ref boat, deltaTime);
+        ApplyFrictionOrBrake(ref boat, deltaTime);
+
 
         // clamp the velocity
         float vx = boat.Velocity.x;
@@ -540,7 +547,6 @@ public class Fleet
             float factor = math.sqrt(velSqr / topSpSqr);
             boat.Velocity = boat.Velocity / factor;
         }
-
 
         boat.Position += boat.Velocity * deltaTime;
     }
@@ -565,19 +571,41 @@ public class Fleet
         return throttle * maxAcceleration * forward;
     }
 
-    private void ApplyFriction(ref BoatData boat, float deltaTime)
+    // This won't brake against the crowd push
+    private void ApplyFrictionOrBrake(ref BoatData boat, float deltaTime)
     {
+
         float2 forward = Forward(boat.Heading);
         float2 right = new float2(forward.y, -forward.x);
-
         float forwardSpeed = math.dot(boat.Velocity, forward);
         float sidewaysSpeed = math.dot(boat.Velocity, right);
 
-        forwardSpeed *= 1f - math.min(forwardFriction * deltaTime, 1f);
-        sidewaysSpeed *= 1f - math.min(sidewaysFriction * deltaTime, 1f);
-
+        if (boat.State == BoatState.Brake)
+        {
+            float minDecel = forwardFriction * topSpeed; // TODO move up as paramater
+            forwardSpeed = BrakeComponent(forwardSpeed, brakingRate, minDecel, deltaTime);
+            sidewaysSpeed = BrakeComponent(sidewaysSpeed, brakingRate, minDecel, deltaTime);
+        }
+        else
+        {
+            forwardSpeed *= 1f - math.min(forwardFriction * deltaTime, 1f);
+            sidewaysSpeed *= 1f - math.min(sidewaysFriction * deltaTime, 1f);
+        }
         boat.Velocity = forward * forwardSpeed + right * sidewaysSpeed;
+
     }
+
+    // Brake in one direction of the movement
+    private float BrakeComponent(float speed, float brakeRate, float minDecel, float deltaTime)
+    {
+        // TODO revise this algorithm
+        float absSpeed = math.abs(speed);
+        float proportionalLoss = absSpeed * math.min(brakeRate * deltaTime, 1f);
+        float constantLoss = minDecel * deltaTime;
+        float newAbsSpeed = math.max(0f, absSpeed - math.max(proportionalLoss, constantLoss));
+        return math.sign(speed) * newAbsSpeed;
+    }
+
 
     private void FaceNextPos(ref BoatData boat)
     {
