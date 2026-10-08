@@ -50,20 +50,20 @@ public class BoardInput
         return hit.collider.GetComponentInParent<Flagstone>();
     }
 
-    public void SetBuildMode(BuildType buildMode)
+    public void SetBuildModeToLand()
     {
-        BuildMode = buildMode;
-
-        if (buildMode == BuildType.Tower)
-        {
-            if (highlighted != null) highlighted.Unhighlight();
-            highlighted = null;
-        }
-        else
-        {
-            towerController.HideGhosts();
-        }
+        BuildMode = BuildType.Land;
+        towerController.HideGhosts();
     }
+
+    public void SetBuildModeToTower(int towerType)
+    {
+        BuildMode = BuildType.Tower;
+        if (highlighted != null) highlighted.Unhighlight();
+        highlighted = null;
+        towerController.BoardInputSetsTowerType(towerType);
+    }
+
 
     //** === Land === **//
 
@@ -147,7 +147,7 @@ public class BoardInput
         {
             if (towerController.CanPlaceTower(c))
             {
-                towerController.PlaceTower(c);
+                towerController.BoardInputCallsPlaceTower(c);
                 justPlacedAt = c;
             }
         }

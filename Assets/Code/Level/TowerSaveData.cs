@@ -3,15 +3,15 @@ using UnityEngine;
 [System.Serializable]
 public class TowerSaveData
 {
-    public bool[] IsTower;
+    public int[] IsTower;
 
-    public TowerSaveData(Lattice<bool> towerMap)
+    public TowerSaveData(Lattice<int> towerMap)
     {
         IsTower = towerMap.ToFlatArray();
     }
 
-    public Lattice<bool> GetTowerMap(int numRings)
+    public Lattice<int> GetTowerMap(int numRings)
     {
-        return Lattice<bool>.FromFlatArray(IsTower, numRings);
+        return Lattice<int>.FromFlatArray(IsTower, numRings);
     }
 }

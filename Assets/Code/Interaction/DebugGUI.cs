@@ -138,14 +138,29 @@ public class DebugGUI : MonoBehaviour
         EndSection();
     }
 
+
     private void DrawBuildingControls()
     {
         BeginSection("Building");
 
-        string[] buildModeLabels = { "Land", "Tower" };
+        // TODO this is probably not a great way to do this, but it works
+        // fix it later when the BoardInput / TowerController figure out the deal with tower types.
+
+        string[] buildModeLabels = { "Land", "Tower1", "Tower2" };
+
         int current = (int)boardInput.BuildMode;
+        if (current != 0) current = towerController.currentPlacementTowerType;
+
         int selected = GUILayout.Toolbar(current, buildModeLabels);
-        if (selected != current) boardInput.SetBuildMode((BoardInput.BuildType)selected);
+
+
+        if (selected != current)
+        {
+            if (selected == 0)
+                boardInput.SetBuildModeToLand();
+            else
+                boardInput.SetBuildModeToTower(selected);
+        }
 
         GUILayout.Space(spacing);
 
