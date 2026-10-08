@@ -535,7 +535,6 @@ public class Fleet
         boat.Velocity += acceleration * deltaTime;
         ApplyFrictionOrBrake(ref boat, deltaTime);
 
-
         // clamp the velocity
         float vx = boat.Velocity.x;
         float vy = boat.Velocity.y;
@@ -574,7 +573,6 @@ public class Fleet
     // This won't brake against the crowd push
     private void ApplyFrictionOrBrake(ref BoatData boat, float deltaTime)
     {
-
         float2 forward = Forward(boat.Heading);
         float2 right = new float2(forward.y, -forward.x);
         float forwardSpeed = math.dot(boat.Velocity, forward);
@@ -582,7 +580,7 @@ public class Fleet
 
         if (boat.State == BoatState.Brake)
         {
-            float minDecel = forwardFriction * topSpeed; // TODO move up as paramater
+            float minDecel = forwardFriction * topSpeed; // TODO move up as class variable or something
             forwardSpeed = BrakeComponent(forwardSpeed, brakingRate, minDecel, deltaTime);
             sidewaysSpeed = BrakeComponent(sidewaysSpeed, brakingRate, minDecel, deltaTime);
         }
@@ -592,7 +590,6 @@ public class Fleet
             sidewaysSpeed *= 1f - math.min(sidewaysFriction * deltaTime, 1f);
         }
         boat.Velocity = forward * forwardSpeed + right * sidewaysSpeed;
-
     }
 
     // Brake in one direction of the movement
@@ -605,7 +602,6 @@ public class Fleet
         float newAbsSpeed = math.max(0f, absSpeed - math.max(proportionalLoss, constantLoss));
         return math.sign(speed) * newAbsSpeed;
     }
-
 
     private void FaceNextPos(ref BoatData boat)
     {
