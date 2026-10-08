@@ -607,7 +607,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afc0f40e80886f4449422e1a3dc4f2b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HexEnemyController
-  boatPrefab: {fileID: 4018648309864206475, guid: 6454ae4eaad368943b38ed128f99f521, type: 3}
+  boatPrefab: {fileID: 2114684330762882047, guid: a2eb23bed88c9ee479d0256a2587b2a6, type: 3}
   spawnBatchSize: 100
 --- !u!4 &1842459479
 Transform:

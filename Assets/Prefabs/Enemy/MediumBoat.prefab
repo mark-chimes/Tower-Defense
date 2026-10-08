@@ -120,7 +120,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1170275249955885085, guid: f892c45eb8f41284784aa45f782d4fe3, type: 3}
       propertyPath: m_Name
-      value: SmallBoat
+      value: MediumBoat
       objectReference: {fileID: 0}
     - target: {fileID: 5464068575794239558, guid: f892c45eb8f41284784aa45f782d4fe3, type: 3}
       propertyPath: m_LocalPosition.x
